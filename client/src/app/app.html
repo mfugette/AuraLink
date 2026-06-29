@@ -20,28 +20,50 @@
     </div>
   </header>
 
-  <!-- ── Hero ──────────────────────────────────────────────────────────────── -->
-  <section class="hero" [class.hero--gone]="heroHidden()">
-    <div class="container hero-inner">
-      <h1 class="hero-title">
-        Diagnose your car.<br>
-        <span class="hero-accent">For free.</span>
-      </h1>
-      <p class="hero-sub">
-        Enter your OBD2 fault codes to get detailed explanations, likely causes, and find the
-        parts you need at nearby stores — all in one place.
-      </p>
-      <div class="hero-badges">
-        <span class="badge"><mat-icon>check</mat-icon> No account needed</span>
-        <span class="badge"><mat-icon>check</mat-icon> Works on any device</span>
-        <span class="badge"><mat-icon>check</mat-icon> 100% free</span>
+  <!-- ── Hero stage (horizontal slider: hero ⇄ live DTC) ──────────────────── -->
+  <section class="hero-stage" [class.hero--gone]="heroHidden()">
+    <div class="stage-track" [class.stage-track--live]="liveMode()">
+
+      <!-- Panel A: Hero -->
+      <div class="stage-panel hero">
+        <div class="container hero-inner">
+          <h1 class="hero-title">
+            Diagnose your car.<br>
+            <span class="hero-accent">For free.</span>
+          </h1>
+          <p class="hero-sub">
+            Enter your OBD2 fault codes to get detailed explanations, likely causes, and find the
+            parts you need at nearby stores — all in one place.
+          </p>
+          <div class="hero-badges">
+            <span class="badge"><mat-icon>check</mat-icon> No account needed</span>
+            <span class="badge"><mat-icon>check</mat-icon> Works on any device</span>
+            <span class="badge"><mat-icon>check</mat-icon> 100% free</span>
+          </div>
+          <div class="hero-cta">
+            <button mat-flat-button class="get-started-btn" (click)="scrollToForm()">
+              Get Started
+              <mat-icon iconPositionEnd>arrow_downward</mat-icon>
+            </button>
+            <span class="cta-or">or</span>
+            <button mat-stroked-button class="detect-live-btn" (click)="enterLiveMode()">
+              Detect Live DTCs
+              <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="hero-cta">
-        <button mat-flat-button class="get-started-btn" (click)="scrollToForm()">
-          Get Started
-          <mat-icon iconPositionEnd>arrow_downward</mat-icon>
-        </button>
+
+      <!-- Panel B: Live DTC flow -->
+      <div class="stage-panel stage-panel--live">
+        <div class="container live-host">
+          <app-live-dtc
+            (back)="exitLiveMode()"
+            (useCodes)="onUseDetectedCodes($event)"
+          />
+        </div>
       </div>
+
     </div>
   </section>
 
@@ -57,7 +79,7 @@
           <p class="obd-section-subtitle">Type each code from your OBD2 scanner and press Enter or comma to add it.</p>
         </div>
       </div>
-      <app-code-entry (codesChanged)="onCodesChanged($event)" />
+      <app-code-entry [initialCodes]="codes()" (codesChanged)="onCodesChanged($event)" />
     </section>
 
     <mat-divider class="section-divider" />

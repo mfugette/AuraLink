@@ -1,5 +1,5 @@
 import {
-  Component, EventEmitter, OnInit, Output, signal, computed,
+  Component, EventEmitter, Input, OnInit, Output, signal, computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -27,6 +27,13 @@ import { DtcCode } from '../../models/dtc-code.model';
 })
 export class CodeEntryComponent implements OnInit {
   @Output() codesChanged = new EventEmitter<string[]>();
+
+  // Allows external flows (e.g. live DTC scan) to seed the chip list.
+  @Input() set initialCodes(codes: string[] | null) {
+    if (codes && codes.join(',') !== this.selectedCodes().join(',')) {
+      this.selectedCodes.set([...codes]);
+    }
+  }
 
   readonly separatorKeys = [ENTER, COMMA];
   inputValue = '';

@@ -1,0 +1,113 @@
+<div class="live-dtc">
+
+  <!-- Top bar -->
+  <div class="live-header">
+    <button mat-stroked-button class="back-btn" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back
+    </button>
+    <div class="live-progress">
+      <span class="dot" [class.active]="step() >= 0"></span>
+      <span class="dot" [class.active]="step() >= 1"></span>
+      <span class="dot" [class.active]="step() >= 2"></span>
+    </div>
+  </div>
+
+  <!-- Horizontal step track -->
+  <div class="step-viewport">
+    <div class="step-track" [style.transform]="'translateX(' + (-step() * 100) + '%)'">
+
+      <!-- Panel 1: Instructions -->
+      <div class="step-panel">
+        <div class="panel-inner">
+          <span class="eyebrow"><mat-icon>bluetooth</mat-icon> Live Diagnostics</span>
+          <h2 class="panel-title">Connect your OBD2 dongle</h2>
+          <p class="panel-sub">
+            Read fault codes straight from your car in seconds — no typing required.
+            Just follow these three steps.
+          </p>
+
+          <div class="instruction-list">
+            @for (s of steps; track s.title; let i = $index) {
+              <div class="instruction">
+                <div class="instruction-num">{{ i + 1 }}</div>
+                <div class="instruction-icon"><mat-icon>{{ s.icon }}</mat-icon></div>
+                <div class="instruction-text">
+                  <h3>{{ s.title }}</h3>
+                  <p>{{ s.text }}</p>
+                </div>
+              </div>
+            }
+          </div>
+
+          <button mat-flat-button class="connect-btn" (click)="connect()">
+            <mat-icon>bluetooth_searching</mat-icon>
+            Connect Now
+          </button>
+
+          <p class="demo-note">
+            <mat-icon>info</mat-icon>
+            Demo mode — this preview simulates a connection with sample data.
+          </p>
+        </div>
+      </div>
+
+      <!-- Panel 2: Connecting -->
+      <div class="step-panel">
+        <div class="panel-inner connecting-inner">
+          <div class="radar">
+            <mat-spinner diameter="120" strokeWidth="3" />
+            <mat-icon class="radar-icon">bluetooth_searching</mat-icon>
+          </div>
+          <h2 class="panel-title">Connecting…</h2>
+          <p class="panel-sub">Pairing with your dongle and scanning the ECU for stored trouble codes.</p>
+          <ul class="connect-log">
+            <li class="done"><mat-icon>check</mat-icon> Bluetooth link established</li>
+            <li class="done"><mat-icon>check</mat-icon> Handshake with ECU</li>
+            <li class="active"><mat-spinner diameter="14" strokeWidth="2" /> Reading diagnostic trouble codes…</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Panel 3: Detected codes -->
+      <div class="step-panel">
+        <div class="panel-inner results-inner">
+          <span class="eyebrow success"><mat-icon>check_circle</mat-icon> Scan complete</span>
+          <h2 class="panel-title">
+            {{ detected().length }} trouble code{{ detected().length !== 1 ? 's' : '' }} detected
+          </h2>
+          <p class="panel-sub">These codes were read directly from your vehicle’s computer.</p>
+
+          <div class="detected-list">
+            @for (code of detected(); track code.code) {
+              <div class="detected-card" [class]="'sev-' + code.severity">
+                <div class="detected-code">{{ code.code }}</div>
+                <div class="detected-info">
+                  <h3>{{ code.name }}</h3>
+                  <p>{{ code.description }}</p>
+                  <span class="severity-badge {{ code.severity }}">
+                    <mat-icon>{{ severityIcon(code.severity) }}</mat-icon>
+                    {{ code.severity }}
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="results-actions">
+            <button mat-flat-button class="connect-btn" (click)="lookupDetected()">
+              <mat-icon>article</mat-icon>
+              Look Up These Codes
+            </button>
+            <button mat-stroked-button class="rescan-btn" (click)="rescan()">
+              <mat-icon>refresh</mat-icon>
+              Rescan
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

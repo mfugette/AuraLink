@@ -8,6 +8,7 @@ import { CodeEntryComponent } from './components/code-entry/code-entry.component
 import { VehicleSelectorComponent } from './components/vehicle-selector/vehicle-selector.component';
 import { CodeResultsComponent } from './components/code-results/code-results.component';
 import { PartsLocatorComponent } from './components/parts-locator/parts-locator.component';
+import { LiveDtcComponent } from './components/live-dtc/live-dtc.component';
 import { Vehicle } from './models/vehicle.model';
 
 @Component({
@@ -20,6 +21,7 @@ import { Vehicle } from './models/vehicle.model';
     VehicleSelectorComponent,
     CodeResultsComponent,
     PartsLocatorComponent,
+    LiveDtcComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
@@ -29,6 +31,7 @@ export class App implements OnInit, OnDestroy {
   vehicle = signal<Vehicle>({ year: null, make: null, model: null, subModel: null, engine: null, driveType: null, transmission: null, fuelType: null, bodyStyle: null, mileage: null, vin: null });
   showResults = signal(false);
   heroHidden = signal(false);
+  liveMode = signal(false);
   selectedParts = signal<string[]>([]);
 
   readonly canLookup = computed(() => this.codes().length > 0);
@@ -96,5 +99,30 @@ export class App implements OnInit, OnDestroy {
     this.codes.set([]);
     this.showResults.set(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── Live DTC flow (Bluetooth dongle demo) ──────────────────────────────────
+  enterLiveMode(): void {
+    this.liveMode.set(true);
+  }
+
+  exitLiveMode(): void {
+    this.liveMode.set(false);
+  }
+
+  onUseDetectedCodes(codes: string[]): void {
+    // Carry the scanned codes into the main lookup flow and reveal results.
+    this.codes.set(codes);
+    this.liveMode.set(false);
+    this.heroHidden.set(true);
+    this.showResults.set(true);
+    document.documentElement.style.overflow = '';
+
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      })
+    );
   }
 }
