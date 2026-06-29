@@ -214,6 +214,18 @@
   &.out-stock { color: var(--obd-text-muted); }
 }
 
+// ── Action panels grid ────────────────────────────────────────────────────────
+.action-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
+}
+
 // ── Notification panel ────────────────────────────────────────────────────────
 .notify-panel {
   background: var(--obd-surface-2);
@@ -294,6 +306,56 @@
 
   mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); opacity: 0.7; }
   strong { color: var(--obd-text); }
+}
+
+// ── Retailer panel ────────────────────────────────────────────────────────────
+.retailer-note {
+  font-size: 0.8rem;
+  color: var(--obd-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.retailer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.retailer-btn {
+  width: 100%;
+  height: 44px;
+  justify-content: flex-start !important;
+  border-color: var(--obd-border) !important;
+  color: var(--obd-text-dim) !important;
+  border-radius: var(--obd-radius-sm) !important;
+  font-size: 0.875rem !important;
+  transition: border-color 0.15s, color 0.15s, background 0.15s !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 0 14px !important;
+
+  &:hover {
+    border-color: var(--obd-blue) !important;
+    color: var(--obd-blue) !important;
+    background: var(--obd-blue-dim) !important;
+  }
+
+  .retailer-arrow {
+    margin-left: auto;
+    font-size: 15px !important;
+    width: 15px !important;
+    height: 15px !important;
+    opacity: 0.5;
+  }
+
+  mat-icon:first-of-type {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--obd-blue);
+  }
 }
 
 // ── Empty state ───────────────────────────────────────────────────────────────

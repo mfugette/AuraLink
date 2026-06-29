@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,9 +22,11 @@ import { DtcCode, Severity } from '../../models/dtc-code.model';
 })
 export class CodeResultsComponent implements OnChanges {
   @Input() codes: string[] = [];
+  @Output() selectedPartsChanged = new EventEmitter<string[]>();
 
   results = signal<DtcCode[]>([]);
   unknownCodes = signal<string[]>([]);
+  selectedParts = signal<Set<string>>(new Set());
 
   constructor(private dtcService: DtcService) {}
 
@@ -39,18 +41,27 @@ export class CodeResultsComponent implements OnChanges {
       }
       this.results.set(found);
       this.unknownCodes.set(unknown);
+
+      // Drop selections for parts no longer present in any result
+      const allCurrentParts = new Set(found.flatMap(r => r.relatedParts));
+      const filtered = new Set([...this.selectedParts()].filter(p => allCurrentParts.has(p)));
+      this.selectedParts.set(filtered);
+      this.selectedPartsChanged.emit([...filtered]);
     }
+  }
+
+  togglePart(part: string): void {
+    const next = new Set(this.selectedParts());
+    if (next.has(part)) next.delete(part); else next.add(part);
+    this.selectedParts.set(next);
+    this.selectedPartsChanged.emit([...next]);
+  }
+
+  get selectedPartsArray(): string[] {
+    return [...this.selectedParts()];
   }
 
   severityIcon(severity: Severity): string {
     return { low: 'check_circle', moderate: 'warning', high: 'error', critical: 'dangerous' }[severity];
-  }
-
-  allRelatedParts(): string[] {
-    const parts = new Set<string>();
-    for (const r of this.results()) {
-      r.relatedParts.forEach(p => parts.add(p));
-    }
-    return [...parts];
   }
 }

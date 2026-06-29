@@ -1,3 +1,9 @@
+// ── Host element (<app-root>) ─────────────────────────────────────────────────
+:host {
+  display: block;
+  width: 100%;
+}
+
 // ── Shell ─────────────────────────────────────────────────────────────────────
 .app-shell {
   min-height: 100vh;
@@ -22,6 +28,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
+  width: 100%;
   background: rgba(8, 12, 20, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -100,17 +107,30 @@
 
 // ── Hero ──────────────────────────────────────────────────────────────────────
 .hero {
-  padding: 72px 0 56px;
+  min-height: calc(100vh - 60px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  // Push content down so its vertical center lands on the upper/middle-third boundary.
+  // ~150px is half the approximate content block height.
+  padding-top: max(32px, calc((100vh - 60px) / 3 - 150px));
   background:
     radial-gradient(ellipse 60% 50% at 50% -10%, rgba(59, 130, 246, 0.12), transparent),
     radial-gradient(ellipse 40% 30% at 80% 60%, rgba(99, 102, 241, 0.07), transparent);
+
+  &.hero--gone {
+    display: none;
+  }
 }
 
 .hero-inner {
   max-width: 680px;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  align-items: flex-start;
+  text-align: left;
+  gap: 20px;
 }
 
 .hero-title {
@@ -160,6 +180,47 @@
     width: 14px;
     height: 14px;
     color: var(--obd-green);
+  }
+}
+
+// ── Hero CTA button ───────────────────────────────────────────────────────────
+.hero-cta {
+  margin-top: 8px;
+  opacity: 0;
+  animation: fadeInUp 0.6s ease forwards;
+  animation-delay: 0.7s;
+}
+
+.get-started-btn {
+  height: 52px;
+  padding: 0 32px !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  background: linear-gradient(135deg, var(--obd-blue), #6366f1) !important;
+  color: #fff !important;
+  border-radius: var(--obd-radius) !important;
+  box-shadow: 0 4px 20px var(--obd-blue-glow) !important;
+  transition: box-shadow 0.2s, transform 0.15s !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+
+  &:hover {
+    box-shadow: 0 6px 28px rgba(59, 130, 246, 0.45) !important;
+    transform: translateY(-2px);
+  }
+
+  mat-icon { font-size: 20px; width: 20px; height: 20px; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -259,6 +320,7 @@
 
 // ── Footer ────────────────────────────────────────────────────────────────────
 .app-footer {
+  width: 100%;
   border-top: 1px solid var(--obd-border);
   background: var(--obd-surface);
   padding: 20px 0;

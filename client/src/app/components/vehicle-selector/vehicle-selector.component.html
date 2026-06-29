@@ -2,7 +2,7 @@
 
   <!-- VIN Row -->
   <div class="vin-row">
-    <mat-form-field appearance="outline" class="vin-field">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="vin-field">
       <mat-label>VIN (auto-fills year/make/model)</mat-label>
       <input
         matInput
@@ -75,7 +75,7 @@
 
   <!-- Year / Make / Model / Sub-model grid -->
   <div class="ymm-grid">
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Year</mat-label>
       <mat-select formControlName="year">
         @for (y of years; track y) {
@@ -84,7 +84,7 @@
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>
         @if (loadingMakes()) { Loading makes... } @else { Make }
       </mat-label>
@@ -98,7 +98,7 @@
       }
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>
         @if (loadingModels()) { Loading models... } @else { Model }
       </mat-label>
@@ -112,15 +112,57 @@
       }
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Trim / Sub-model (optional)</mat-label>
       <input matInput formControlName="subModel" placeholder="EX, Sport, Limited..." />
     </mat-form-field>
   </div>
 
-  <!-- Optional fields -->
-  <div class="optional-grid">
-    <mat-form-field appearance="outline">
+  <!-- Engine / Drive / Transmission / Fuel / Body / Mileage -->
+  <div class="details-grid">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Engine (optional)</mat-label>
+      <input matInput formControlName="engine" placeholder="3.5L V6" />
+      <mat-icon matPrefix>settings</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Drive Type (optional)</mat-label>
+      <mat-select formControlName="driveType">
+        @for (opt of driveTypeOptions; track opt) {
+          <mat-option [value]="opt">{{ opt }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Transmission (optional)</mat-label>
+      <mat-select formControlName="transmission">
+        @for (opt of transmissionOptions; track opt) {
+          <mat-option [value]="opt">{{ opt }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Fuel Type (optional)</mat-label>
+      <mat-select formControlName="fuelType">
+        @for (opt of fuelTypeOptions; track opt) {
+          <mat-option [value]="opt">{{ opt }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Body Style (optional)</mat-label>
+      <mat-select formControlName="bodyStyle">
+        @for (opt of bodyStyleOptions; track opt) {
+          <mat-option [value]="opt">{{ opt }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Mileage (optional)</mat-label>
       <input matInput type="number" formControlName="mileage" placeholder="85000" min="0" />
       <span matSuffix>mi</span>

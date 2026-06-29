@@ -24,8 +24,11 @@
 
 .results-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  // auto-fit + bounded max lets justify-content center partial rows.
+  // minmax(300px, 360px) naturally caps at 3 cols inside the 1100px container.
+  grid-template-columns: repeat(auto-fit, minmax(300px, 360px));
   gap: 16px;
+  justify-content: center;
 
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
@@ -157,11 +160,51 @@ mat-card-content {
   }
 }
 
+.parts-hint {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  color: var(--obd-text-muted);
+  margin: 0 0 8px;
+
+  mat-icon { font-size: 14px; width: 14px; height: 14px; color: var(--obd-blue); opacity: 0.7; }
+}
+
 .parts-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   padding-top: 4px;
+}
+
+.part-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid var(--obd-border);
+  background: var(--obd-surface-3);
+  color: var(--obd-text-dim);
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+
+  mat-icon { font-size: 14px; width: 14px; height: 14px; }
+
+  &:hover {
+    border-color: rgba(59, 130, 246, 0.4);
+    color: var(--obd-text);
+  }
+
+  &.part-chip--selected {
+    background: var(--obd-blue-dim);
+    border-color: var(--obd-blue);
+    color: var(--obd-blue);
+  }
 }
 
 .parts-summary {

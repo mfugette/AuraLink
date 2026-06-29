@@ -68,9 +68,21 @@
                     <mat-icon>shopping_cart</mat-icon> Parts That May Be Needed
                   </mat-panel-title>
                 </mat-expansion-panel-header>
+                <p class="parts-hint">
+                  <mat-icon>touch_app</mat-icon>
+                  Select parts to add them to your shopping list in Step 4.
+                </p>
                 <div class="parts-chips">
                   @for (part of result.relatedParts; track part) {
-                    <mat-chip-option color="primary">{{ part }}</mat-chip-option>
+                    <button
+                      type="button"
+                      class="part-chip"
+                      [class.part-chip--selected]="selectedParts().has(part)"
+                      (click)="togglePart(part)"
+                    >
+                      <mat-icon>{{ selectedParts().has(part) ? 'check' : 'add' }}</mat-icon>
+                      {{ part }}
+                    </button>
                   }
                 </div>
               </mat-expansion-panel>
@@ -81,13 +93,13 @@
     }
   </div>
 
-  <!-- Summary if multiple codes share parts -->
-  @if (results().length > 1 && allRelatedParts().length > 0) {
+  <!-- Selected parts summary -->
+  @if (selectedParts().size > 0) {
     <div class="parts-summary">
       <mat-icon>inventory_2</mat-icon>
       <div>
-        <strong>Parts needed across all codes:</strong>
-        <span class="summary-parts">{{ allRelatedParts().join(' · ') }}</span>
+        <strong>{{ selectedParts().size }} part{{ selectedParts().size !== 1 ? 's' : '' }} added to your list:</strong>
+        <span class="summary-parts">{{ selectedPartsArray.join(' · ') }}</span>
       </div>
     </div>
   }

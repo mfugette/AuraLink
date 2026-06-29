@@ -21,7 +21,7 @@
   </header>
 
   <!-- ── Hero ──────────────────────────────────────────────────────────────── -->
-  <section class="hero">
+  <section class="hero" [class.hero--gone]="heroHidden()">
     <div class="container hero-inner">
       <h1 class="hero-title">
         Diagnose your car.<br>
@@ -36,11 +36,17 @@
         <span class="badge"><mat-icon>check</mat-icon> Works on any device</span>
         <span class="badge"><mat-icon>check</mat-icon> 100% free</span>
       </div>
+      <div class="hero-cta">
+        <button mat-flat-button class="get-started-btn" (click)="scrollToForm()">
+          Get Started
+          <mat-icon iconPositionEnd>arrow_downward</mat-icon>
+        </button>
+      </div>
     </div>
   </section>
 
   <!-- ── Main content ───────────────────────────────────────────────────────── -->
-  <main class="container main-content">
+  <main id="main-form" class="container main-content">
 
     <!-- Step 1: Enter codes -->
     <section class="card-section">
@@ -102,11 +108,14 @@
               <p class="obd-section-subtitle">Detailed breakdown of each fault code.</p>
             </div>
           </div>
-          <app-code-results [codes]="codes()" />
+          <app-code-results
+            [codes]="codes()"
+            (selectedPartsChanged)="onSelectedPartsChanged($event)"
+          />
         </section>
 
-        <!-- Step 4: Parts locator (only if codes have related parts) -->
-        @if (relatedParts().length > 0) {
+        <!-- Step 4: Parts locator (only when user has selected parts in Step 3) -->
+        @if (selectedParts().length > 0) {
           <mat-divider class="section-divider" />
           <section class="card-section">
             <div class="section-label">
@@ -114,12 +123,12 @@
               <div>
                 <div class="obd-section-title"><mat-icon>store</mat-icon> Find Parts Near You</div>
                 <p class="obd-section-subtitle">
-                  Based on your codes, locate the parts you need at nearby auto stores and send your shopping list.
+                  Locate the parts you selected at nearby auto stores and send your shopping list.
                 </p>
               </div>
             </div>
             <app-parts-locator
-              [partNames]="relatedParts()"
+              [partNames]="selectedParts()"
               [vehicle]="vehicle()"
             />
           </section>

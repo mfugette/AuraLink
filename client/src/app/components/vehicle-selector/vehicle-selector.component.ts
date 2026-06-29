@@ -50,14 +50,24 @@ export class VehicleSelectorComponent implements OnInit, OnDestroy {
   private stream: MediaStream | null = null;
   private destroy$ = new Subject<void>();
 
+  readonly driveTypeOptions  = ['FWD', 'RWD', 'AWD', '4WD'];
+  readonly transmissionOptions = ['Automatic', 'Manual', 'CVT', 'DCT'];
+  readonly fuelTypeOptions   = ['Gasoline', 'Diesel', 'Hybrid', 'Plug-in Hybrid', 'Electric', 'Flex Fuel'];
+  readonly bodyStyleOptions  = ['Sedan', 'Coupe', 'Hatchback', 'SUV/Crossover', 'Truck', 'Van/Minivan', 'Wagon', 'Convertible'];
+
   constructor(private fb: FormBuilder, private vehicleService: VehicleService) {
     this.form = this.fb.group({
-      year:     [null],
-      make:     [{ value: null, disabled: true }],
-      model:    [{ value: null, disabled: true }],
-      subModel: [null],
-      mileage:  [null],
-      vin:      [null],
+      year:         [null],
+      make:         [{ value: null, disabled: true }],
+      model:        [{ value: null, disabled: true }],
+      subModel:     [null],
+      engine:       [null],
+      driveType:    [null],
+      transmission: [null],
+      fuelType:     [null],
+      bodyStyle:    [null],
+      mileage:      [null],
+      vin:          [null],
     });
   }
 
@@ -126,6 +136,14 @@ export class VehicleSelectorComponent implements OnInit, OnDestroy {
 
     this.vehicleService.decodeVin(vin).subscribe({
       next: result => {
+        // Non-cascaded fields can be set immediately
+        if (result.engine)       this.form.get('engine')!.setValue(result.engine);
+        if (result.driveType)    this.form.get('driveType')!.setValue(result.driveType);
+        if (result.transmission) this.form.get('transmission')!.setValue(result.transmission);
+        if (result.fuelType)     this.form.get('fuelType')!.setValue(result.fuelType);
+        if (result.bodyStyle)    this.form.get('bodyStyle')!.setValue(result.bodyStyle);
+
+        // Year → makes → model cascade requires timeouts
         if (result.year) this.form.get('year')!.setValue(result.year);
         if (result.make) {
           setTimeout(() => {

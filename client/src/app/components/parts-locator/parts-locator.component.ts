@@ -18,6 +18,13 @@ import { NotificationService } from '../../services/notification.service';
 import { Part, PartSearchResult } from '../../models/part.model';
 import { Vehicle } from '../../models/vehicle.model';
 
+interface Retailer {
+  name: string;
+  icon: string;
+  storeKeywords: string[];
+  buildUrl(parts: string[], vehicle: Vehicle): string;
+}
+
 @Component({
   selector: 'app-parts-locator',
   standalone: true,
@@ -33,7 +40,7 @@ import { Vehicle } from '../../models/vehicle.model';
 })
 export class PartsLocatorComponent implements OnChanges {
   @Input() partNames: string[] = [];
-  @Input() vehicle: Vehicle = { year: null, make: null, model: null, subModel: null, mileage: null, vin: null };
+  @Input() vehicle: Vehicle = { year: null, make: null, model: null, subModel: null, engine: null, driveType: null, transmission: null, fuelType: null, bodyStyle: null, mileage: null, vin: null };
 
   zipCode = '';
   locating = signal(false);
@@ -45,6 +52,64 @@ export class PartsLocatorComponent implements OnChanges {
   notifyRecipient = '';
   sendingNotification = signal(false);
   isMobile = signal(false);
+
+  readonly retailers: Retailer[] = [
+    {
+      name: 'AutoZone',
+      icon: 'storefront',
+      storeKeywords: ['autozone'],
+      buildUrl: (parts, v) => {
+        const params = new URLSearchParams({ searchText: parts.join(' ') });
+        if (v.year)  params.set('year',  String(v.year));
+        if (v.make)  params.set('make',  v.make);
+        if (v.model) params.set('model', v.model);
+        return `https://www.autozone.com/search?${params}`;
+      },
+    },
+    {
+      name: 'Advance Auto',
+      icon: 'storefront',
+      storeKeywords: ['advance'],
+      buildUrl: (parts, v) => {
+        const vehicleSlug = [v.year, v.make, v.model]
+          .filter(Boolean).join('-').toLowerCase().replace(/\s+/g, '-');
+        const partSlug = parts[0]?.toLowerCase().replace(/\s+/g, '-') ?? '';
+        if (vehicleSlug && partSlug)
+          return `https://shop.advanceautoparts.com/find/${vehicleSlug}/${partSlug}`;
+        return `https://shop.advanceautoparts.com/web/c/results?searchTerm=${encodeURIComponent(parts.join(' '))}`;
+      },
+    },
+    {
+      name: "O'Reilly",
+      icon: 'storefront',
+      storeKeywords: ["o'reilly", 'oreilly'],
+      buildUrl: (parts, v) => {
+        const params = new URLSearchParams({ q: parts.join(' ') });
+        if (v.year)  params.set('year',  String(v.year));
+        if (v.make)  params.set('make',  v.make);
+        if (v.model) params.set('model', v.model);
+        return `https://www.oreillyauto.com/shop/b/parts?${params}`;
+      },
+    },
+    {
+      name: 'NAPA',
+      icon: 'storefront',
+      storeKeywords: ['napa'],
+      buildUrl: (parts, v) => {
+        const q = [...parts, v.year, v.make, v.model].filter(Boolean).join(' ');
+        return `https://www.napaonline.com/en/search#q=${encodeURIComponent(q)}`;
+      },
+    },
+    {
+      name: 'Amazon',
+      icon: 'shopping_bag',
+      storeKeywords: ['amazon'],
+      buildUrl: (parts, v) => {
+        const k = [...parts, v.year, v.make, v.model].filter(Boolean).join(' ');
+        return `https://www.amazon.com/s?k=${encodeURIComponent(k)}&i=automotive`;
+      },
+    },
+  ];
 
   constructor(
     private partsService: PartsService,
@@ -145,5 +210,23 @@ export class PartsLocatorComponent implements OnChanges {
     const listText = this.notificationService.buildShoppingList(this.results());
     await this.notificationService.copyToClipboard(listText);
     this.snackBar.open('Parts list copied to clipboard!', 'Done', { duration: 2500 });
+  }
+
+  get selectedPartNames(): string[] {
+    return this.results().filter(i => i.selected).map(i => i.part.name);
+  }
+
+  get selectedRetailers(): Retailer[] {
+    const storeNames = this.results()
+      .filter(i => i.selected)
+      .map(i => i.part.store.name.toLowerCase());
+    return this.retailers.filter(r =>
+      r.storeKeywords.some(kw => storeNames.some(sn => sn.includes(kw)))
+    );
+  }
+
+  openRetailer(retailer: Retailer): void {
+    const url = retailer.buildUrl(this.selectedPartNames, this.vehicle);
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 }

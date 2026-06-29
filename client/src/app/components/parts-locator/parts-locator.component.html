@@ -112,67 +112,104 @@
         }
       </div>
 
-      <!-- Notification panel -->
+      <!-- Action panels (send list + order from retailer) -->
       @if (selectedCount > 0) {
-        <div class="notify-panel">
-          <h4 class="notify-title">
-            <mat-icon>send</mat-icon>
-            Send your parts list
-          </h4>
+        <div class="action-panels">
 
-          <div class="notify-method">
-            <mat-radio-group [(ngModel)]="notifyMethod" class="method-group">
-              <mat-radio-button value="sms">
-                <mat-icon>sms</mat-icon> Text Message
-              </mat-radio-button>
-              <mat-radio-button value="email">
-                <mat-icon>email</mat-icon> Email
-              </mat-radio-button>
-            </mat-radio-group>
-          </div>
+          <!-- Order from selected retailer -->
+          <div class="notify-panel retailer-panel">
+            <h4 class="notify-title">
+              <mat-icon>shopping_cart</mat-icon>
+              Order from selected retailer
+            </h4>
 
-          <div class="notify-row">
-            <mat-form-field appearance="outline" class="recipient-field">
-              <mat-label>{{ notifyMethod === 'sms' ? 'Phone number' : 'Email address' }}</mat-label>
-              <input
-                matInput
-                [(ngModel)]="notifyRecipient"
-                [type]="notifyMethod === 'sms' ? 'tel' : 'email'"
-                [placeholder]="notifyMethod === 'sms' ? '(555) 123-4567' : 'you@example.com'"
-              />
-              <mat-icon matPrefix>{{ notifyMethod === 'sms' ? 'phone' : 'alternate_email' }}</mat-icon>
-            </mat-form-field>
+            <p class="retailer-note">
+              Opens the retailer's site with your vehicle and selected parts pre-filled.
+            </p>
 
-            <button
-              mat-flat-button
-              class="send-btn"
-              (click)="sendList()"
-              [disabled]="sendingNotification()"
-            >
-              @if (sendingNotification()) {
-                <mat-spinner diameter="18" />
-              } @else {
-                <mat-icon>send</mat-icon>
+            <div class="retailer-list">
+              @for (retailer of selectedRetailers; track retailer.name) {
+                <button
+                  mat-stroked-button
+                  class="retailer-btn"
+                  (click)="openRetailer(retailer)"
+                >
+                  <mat-icon>{{ retailer.icon }}</mat-icon>
+                  {{ retailer.name }}
+                  <mat-icon class="retailer-arrow">open_in_new</mat-icon>
+                </button>
               }
-              Send
-            </button>
+            </div>
 
-            <button
-              mat-stroked-button
-              class="copy-btn"
-              (click)="copyList()"
-              matTooltip="Copy list to clipboard"
-            >
-              <mat-icon>content_copy</mat-icon>
-              Copy
-            </button>
+            <p class="notify-note">
+              <mat-icon>info</mat-icon>
+              Searches for {{ selectedCount }} selected part{{ selectedCount !== 1 ? 's' : '' }}.
+              Vehicle info pre-filled where supported.
+            </p>
           </div>
 
-          <p class="notify-note">
-            <mat-icon>info</mat-icon>
-            List includes {{ selectedCount }} item{{ selectedCount !== 1 ? 's' : '' }} — estimated total
-            <strong>${{ selectedTotal.toFixed(2) }}</strong>
-          </p>
+          <!-- Send your parts list -->
+          <div class="notify-panel">
+            <h4 class="notify-title">
+              <mat-icon>send</mat-icon>
+              Send your parts list
+            </h4>
+
+            <div class="notify-method">
+              <mat-radio-group [(ngModel)]="notifyMethod" class="method-group">
+                <mat-radio-button value="sms">
+                  <mat-icon>sms</mat-icon> Text Message
+                </mat-radio-button>
+                <mat-radio-button value="email">
+                  <mat-icon>email</mat-icon> Email
+                </mat-radio-button>
+              </mat-radio-group>
+            </div>
+
+            <div class="notify-row">
+              <mat-form-field appearance="outline" class="recipient-field">
+                <mat-label>{{ notifyMethod === 'sms' ? 'Phone number' : 'Email address' }}</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="notifyRecipient"
+                  [type]="notifyMethod === 'sms' ? 'tel' : 'email'"
+                  [placeholder]="notifyMethod === 'sms' ? '(555) 123-4567' : 'you@example.com'"
+                />
+                <mat-icon matPrefix>{{ notifyMethod === 'sms' ? 'phone' : 'alternate_email' }}</mat-icon>
+              </mat-form-field>
+
+              <button
+                mat-flat-button
+                class="send-btn"
+                (click)="sendList()"
+                [disabled]="sendingNotification()"
+              >
+                @if (sendingNotification()) {
+                  <mat-spinner diameter="18" />
+                } @else {
+                  <mat-icon>send</mat-icon>
+                }
+                Send
+              </button>
+
+              <button
+                mat-stroked-button
+                class="copy-btn"
+                (click)="copyList()"
+                matTooltip="Copy list to clipboard"
+              >
+                <mat-icon>content_copy</mat-icon>
+                Copy
+              </button>
+            </div>
+
+            <p class="notify-note">
+              <mat-icon>info</mat-icon>
+              List includes {{ selectedCount }} item{{ selectedCount !== 1 ? 's' : '' }} — estimated total
+              <strong>${{ selectedTotal.toFixed(2) }}</strong>
+            </p>
+          </div>
+
         </div>
       }
     </div>

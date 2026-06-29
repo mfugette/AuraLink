@@ -52,17 +52,81 @@ export class VehicleService {
       .pipe(
         map(r => {
           const find = (label: string) =>
-            r.Results.find(x => x.Variable === label)?.Value ?? null;
+            r.Results.find(x => x.Variable === label)?.Value?.trim() || null;
+
           const yearStr = find('Model Year');
+
+          // Build engine string: e.g. "3.5L V6"
+          const disp = find('Displacement (L)');
+          const cyl  = find('Engine Number of Cylinders');
+          const conf = find('Engine Configuration'); // "V", "Inline", "Opposed"
+          const engineParts: string[] = [];
+          if (disp) engineParts.push(`${parseFloat(disp).toFixed(1)}L`);
+          if (conf && cyl) {
+            const abbr = conf.toLowerCase().startsWith('inline') ? 'I' : conf.charAt(0).toUpperCase();
+            engineParts.push(`${abbr}${cyl}`);
+          }
+
           return {
-            year: yearStr ? parseInt(yearStr, 10) : null,
-            make: find('Make'),
-            model: find('Model'),
-            subModel: find('Trim'),
-            vin: vin.toUpperCase(),
+            year:         yearStr ? parseInt(yearStr, 10) : null,
+            make:         find('Make'),
+            model:        find('Model'),
+            subModel:     find('Trim'),
+            engine:       engineParts.length ? engineParts.join(' ') : null,
+            driveType:    this.normalizeDriveType(find('Drive Type')),
+            transmission: this.normalizeTransmission(find('Transmission Style')),
+            fuelType:     this.normalizeFuelType(find('Fuel Type - Primary')),
+            bodyStyle:    this.normalizeBodyStyle(find('Body Class')),
+            vin:          vin.toUpperCase(),
           } as Partial<Vehicle>;
         }),
         catchError(() => of({}))
       );
+  }
+
+  private normalizeDriveType(raw: string | null): string | null {
+    if (!raw) return null;
+    const r = raw.toUpperCase();
+    if (r.includes('AWD') || r.includes('ALL WHEEL')) return 'AWD';
+    if (r.includes('4WD') || r.includes('4X4') || r.includes('FOUR WHEEL')) return '4WD';
+    if (r.includes('FWD') || r.includes('FRONT WHEEL')) return 'FWD';
+    if (r.includes('RWD') || r.includes('REAR WHEEL')) return 'RWD';
+    return null;
+  }
+
+  private normalizeTransmission(raw: string | null): string | null {
+    if (!raw) return null;
+    const r = raw.toUpperCase();
+    if (r.includes('CVT') || r.includes('CONTINUOUSLY VARIABLE')) return 'CVT';
+    if (r.includes('DUAL') || r.includes('DCT') || r.includes('DSG')) return 'DCT';
+    if (r.includes('MANUAL') || r.includes('STANDARD')) return 'Manual';
+    if (r.includes('AUTOMATIC')) return 'Automatic';
+    return null;
+  }
+
+  private normalizeFuelType(raw: string | null): string | null {
+    if (!raw) return null;
+    const r = raw.toUpperCase();
+    if (r.includes('PLUG') || r.includes('PHEV')) return 'Plug-in Hybrid';
+    if (r.includes('HYBRID')) return 'Hybrid';
+    if (r.includes('ELECTRIC')) return 'Electric';
+    if (r.includes('DIESEL')) return 'Diesel';
+    if (r.includes('FLEX') || r.includes('FFV') || r.includes('E85')) return 'Flex Fuel';
+    if (r.includes('GAS') || r.includes('PETROL')) return 'Gasoline';
+    return null;
+  }
+
+  private normalizeBodyStyle(raw: string | null): string | null {
+    if (!raw) return null;
+    const r = raw.toUpperCase();
+    if (r.includes('CONVERTIBLE') || r.includes('CABRIOLET')) return 'Convertible';
+    if (r.includes('COUPE')) return 'Coupe';
+    if (r.includes('HATCHBACK')) return 'Hatchback';
+    if (r.includes('WAGON') || r.includes('ESTATE')) return 'Wagon';
+    if (r.includes('VAN') || r.includes('MINIVAN')) return 'Van/Minivan';
+    if (r.includes('PICKUP') || r.includes('TRUCK')) return 'Truck';
+    if (r.includes('SPORT UTILITY') || r.includes('SUV') || r.includes('MULTI-PURPOSE')) return 'SUV/Crossover';
+    if (r.includes('SEDAN') || r.includes('SALOON')) return 'Sedan';
+    return null;
   }
 }
