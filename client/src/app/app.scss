@@ -1,0 +1,298 @@
+// ── Shell ─────────────────────────────────────────────────────────────────────
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Container ─────────────────────────────────────────────────────────────────
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+
+  @media (max-width: 600px) {
+    padding: 0 16px;
+  }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(8, 12, 20, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--obd-border);
+
+  .container {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--obd-blue), #6366f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    color: #fff;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.logo-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--obd-text);
+  letter-spacing: -0.3px;
+}
+
+.logo-tagline {
+  font-size: 0.65rem;
+  color: var(--obd-text-muted);
+  letter-spacing: 0.3px;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    color: var(--obd-text-dim);
+    text-decoration: none;
+    transition: color 0.15s;
+
+    &:hover { color: var(--obd-blue); }
+
+    mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  }
+}
+
+// ── Hero ──────────────────────────────────────────────────────────────────────
+.hero {
+  padding: 72px 0 56px;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% -10%, rgba(59, 130, 246, 0.12), transparent),
+    radial-gradient(ellipse 40% 30% at 80% 60%, rgba(99, 102, 241, 0.07), transparent);
+}
+
+.hero-inner {
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hero-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -1px;
+  margin: 0;
+  color: var(--obd-text);
+}
+
+.hero-accent {
+  background: linear-gradient(90deg, var(--obd-blue), #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: 1.05rem;
+  color: var(--obd-text-dim);
+  line-height: 1.65;
+  margin: 0;
+  max-width: 560px;
+}
+
+.hero-badges {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  color: var(--obd-text-dim);
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: var(--obd-green);
+  }
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+.main-content {
+  flex: 1;
+  padding-bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+// ── Section card ──────────────────────────────────────────────────────────────
+.card-section {
+  padding: 36px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.section-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.step-num {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--obd-blue-dim);
+  border: 1px solid var(--obd-blue-glow);
+  color: var(--obd-blue);
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.section-divider {
+  border-color: var(--obd-border) !important;
+}
+
+// ── Lookup bar ────────────────────────────────────────────────────────────────
+.lookup-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0 36px;
+}
+
+.lookup-btn {
+  height: 52px;
+  padding: 0 32px !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  background: linear-gradient(135deg, var(--obd-blue), #6366f1) !important;
+  color: #fff !important;
+  border-radius: var(--obd-radius) !important;
+  box-shadow: 0 4px 20px var(--obd-blue-glow) !important;
+  transition: box-shadow 0.2s, transform 0.15s !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+
+  &:hover:not([disabled]) {
+    box-shadow: 0 6px 28px rgba(59, 130, 246, 0.4) !important;
+    transform: translateY(-1px);
+  }
+
+  &[disabled] {
+    opacity: 0.45;
+    box-shadow: none !important;
+  }
+
+  mat-icon { font-size: 20px; width: 20px; height: 20px; }
+}
+
+.reset-btn {
+  height: 52px;
+  border-color: var(--obd-border) !important;
+  color: var(--obd-text-dim) !important;
+  border-radius: var(--obd-radius) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+// ── Results region ────────────────────────────────────────────────────────────
+.results-region {
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────────
+.app-footer {
+  border-top: 1px solid var(--obd-border);
+  background: var(--obd-surface);
+  padding: 20px 0;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--obd-text-dim);
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--obd-blue); }
+}
+
+.footer-note {
+  font-size: 0.75rem;
+  color: var(--obd-text-muted);
+  max-width: 480px;
+  line-height: 1.5;
+  flex: 1;
+  text-align: center;
+}
+
+.footer-copy {
+  font-size: 0.75rem;
+  color: var(--obd-text-muted);
+}

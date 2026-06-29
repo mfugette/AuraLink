@@ -1,0 +1,316 @@
+.parts-locator {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+// ── Location row ─────────────────────────────────────────────────────────────
+.location-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+
+  .zip-field {
+    flex: 0 0 160px;
+  }
+
+  .locate-btn, .search-btn {
+    height: 52px;
+    margin-top: 4px;
+    border-radius: var(--obd-radius-sm) !important;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .locate-btn {
+    border-color: var(--obd-border) !important;
+    color: var(--obd-text-dim) !important;
+  }
+
+  .search-btn {
+    background: var(--obd-blue) !important;
+    color: #fff !important;
+  }
+}
+
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--obd-red);
+  font-size: 0.8rem;
+  margin: -12px 0 0;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+.parts-needed-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  .chip-label {
+    font-size: 0.75rem;
+    color: var(--obd-text-muted);
+    white-space: nowrap;
+  }
+
+  mat-chip {
+    --mdc-chip-label-text-size: 0.75rem;
+  }
+}
+
+// ── Loading ───────────────────────────────────────────────────────────────────
+.loading-state {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 24px;
+  color: var(--obd-text-dim);
+  font-size: 0.875rem;
+  justify-content: center;
+}
+
+// ── Results ───────────────────────────────────────────────────────────────────
+.results-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.results-title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--obd-text-dim);
+}
+
+.selected-summary {
+  font-size: 0.85rem;
+  color: var(--obd-text-dim);
+
+  strong { color: var(--obd-green); }
+}
+
+.parts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.part-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: rgba(59, 130, 246, 0.35);
+    background: var(--obd-surface-3);
+  }
+
+  &.selected {
+    border-color: var(--obd-blue);
+    background: var(--obd-blue-dim);
+  }
+}
+
+.part-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.part-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.part-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--obd-text);
+}
+
+.part-price {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--obd-green);
+  white-space: nowrap;
+}
+
+.part-number {
+  font-size: 0.73rem;
+  color: var(--obd-text-muted);
+  font-family: 'Courier New', monospace;
+}
+
+.store-info {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  color: var(--obd-text-dim);
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: var(--obd-blue);
+  }
+
+  .store-distance {
+    margin-left: auto;
+    color: var(--obd-text-muted);
+    font-size: 0.75rem;
+  }
+}
+
+.store-address {
+  font-size: 0.73rem;
+  color: var(--obd-text-muted);
+}
+
+.stock-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+  &.in-stock  { color: var(--obd-green); }
+  &.out-stock { color: var(--obd-text-muted); }
+}
+
+// ── Notification panel ────────────────────────────────────────────────────────
+.notify-panel {
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-blue-glow);
+  border-radius: var(--obd-radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.notify-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--obd-text);
+
+  mat-icon { color: var(--obd-blue); }
+}
+
+.method-group {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+
+  mat-radio-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    ::ng-deep .mdc-label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.875rem;
+      color: var(--obd-text);
+    }
+
+    mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--obd-blue); }
+  }
+}
+
+.notify-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+
+  .recipient-field { flex: 1; min-width: 200px; }
+
+  .send-btn {
+    height: 52px;
+    margin-top: 4px;
+    background: var(--obd-blue) !important;
+    color: #fff !important;
+    border-radius: var(--obd-radius-sm) !important;
+  }
+
+  .copy-btn {
+    height: 52px;
+    margin-top: 4px;
+    border-color: var(--obd-border) !important;
+    color: var(--obd-text-dim) !important;
+    border-radius: var(--obd-radius-sm) !important;
+  }
+}
+
+.notify-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--obd-text-muted);
+  margin: 0;
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); opacity: 0.7; }
+  strong { color: var(--obd-text); }
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 20px;
+  color: var(--obd-text-muted);
+  text-align: center;
+
+  mat-icon { font-size: 40px; width: 40px; height: 40px; opacity: 0.4; }
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    strong { color: var(--obd-text-dim); }
+  }
+}

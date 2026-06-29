@@ -1,0 +1,95 @@
+<div class="results-wrapper">
+
+  <!-- Unknown codes warning -->
+  @if (unknownCodes().length > 0) {
+    <div class="unknown-banner">
+      <mat-icon>help_outline</mat-icon>
+      <div>
+        <strong>Unrecognized code{{ unknownCodes().length > 1 ? 's' : '' }}:</strong>
+        {{ unknownCodes().join(', ') }} — not found in our database. These may be manufacturer-specific codes.
+      </div>
+    </div>
+  }
+
+  <!-- Result cards -->
+  <div class="results-grid">
+    @for (result of results(); track result.code) {
+      <mat-card class="result-card" [class]="'card-' + result.severity">
+        <mat-card-header>
+          <div class="card-header-inner">
+            <div class="code-badge">{{ result.code }}</div>
+            <div class="header-text">
+              <h3 class="code-name">{{ result.name }}</h3>
+              <span class="severity-badge {{ result.severity }}">
+                <mat-icon>{{ severityIcon(result.severity) }}</mat-icon>
+                {{ result.severity }}
+              </span>
+            </div>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content>
+          <p class="code-description">{{ result.description }}</p>
+
+          <mat-accordion class="details-accordion">
+            <!-- Symptoms -->
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-icon>visibility</mat-icon> Symptoms
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <ul class="detail-list">
+                @for (s of result.symptoms; track s) {
+                  <li>{{ s }}</li>
+                }
+              </ul>
+            </mat-expansion-panel>
+
+            <!-- Possible causes -->
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-icon>build</mat-icon> Possible Causes
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <ul class="detail-list">
+                @for (c of result.possibleCauses; track c) {
+                  <li>{{ c }}</li>
+                }
+              </ul>
+            </mat-expansion-panel>
+
+            <!-- Related parts -->
+            @if (result.relatedParts.length > 0) {
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <mat-icon>shopping_cart</mat-icon> Parts That May Be Needed
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="parts-chips">
+                  @for (part of result.relatedParts; track part) {
+                    <mat-chip-option color="primary">{{ part }}</mat-chip-option>
+                  }
+                </div>
+              </mat-expansion-panel>
+            }
+          </mat-accordion>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+
+  <!-- Summary if multiple codes share parts -->
+  @if (results().length > 1 && allRelatedParts().length > 0) {
+    <div class="parts-summary">
+      <mat-icon>inventory_2</mat-icon>
+      <div>
+        <strong>Parts needed across all codes:</strong>
+        <span class="summary-parts">{{ allRelatedParts().join(' · ') }}</span>
+      </div>
+    </div>
+  }
+
+</div>

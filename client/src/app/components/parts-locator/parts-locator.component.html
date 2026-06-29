@@ -1,0 +1,188 @@
+<div class="parts-locator">
+
+  <!-- Location / ZIP row -->
+  <div class="location-row">
+    <mat-form-field appearance="outline" class="zip-field">
+      <mat-label>ZIP Code</mat-label>
+      <input
+        matInput
+        [(ngModel)]="zipCode"
+        placeholder="e.g. 48201"
+        maxlength="5"
+        pattern="[0-9]{5}"
+        type="tel"
+      />
+      <mat-icon matPrefix>location_on</mat-icon>
+    </mat-form-field>
+
+    <button
+      mat-stroked-button
+      class="locate-btn"
+      (click)="useMyLocation()"
+      [disabled]="locating()"
+      matTooltip="Use your current location"
+    >
+      @if (locating()) {
+        <mat-spinner diameter="18" />
+      } @else {
+        <mat-icon>my_location</mat-icon>
+      }
+      My Location
+    </button>
+
+    <button
+      mat-flat-button
+      class="search-btn"
+      (click)="searchParts()"
+      [disabled]="!zipCode || partNames.length === 0 || searching()"
+    >
+      @if (searching()) {
+        <ng-container><mat-spinner diameter="18" /> Searching...</ng-container>
+      } @else {
+        <ng-container><mat-icon>search</mat-icon> Find Parts</ng-container>
+      }
+    </button>
+  </div>
+
+  @if (locationError()) {
+    <p class="field-error"><mat-icon>error_outline</mat-icon> {{ locationError() }}</p>
+  }
+
+  @if (partNames.length > 0) {
+    <div class="parts-needed-chips">
+      <span class="chip-label">Parts to find:</span>
+      @for (p of partNames; track p) {
+        <mat-chip>{{ p }}</mat-chip>
+      }
+    </div>
+  }
+
+  <!-- Searching spinner -->
+  @if (searching()) {
+    <div class="loading-state">
+      <mat-spinner diameter="32" />
+      <span>Searching nearby auto parts stores...</span>
+    </div>
+  }
+
+  <!-- Results -->
+  @if (!searching() && results().length > 0) {
+    <div class="results-section">
+      <div class="results-header">
+        <h4 class="results-title">
+          {{ results().length }} result{{ results().length !== 1 ? 's' : '' }} found
+        </h4>
+        @if (selectedCount > 0) {
+          <span class="selected-summary">
+            {{ selectedCount }} selected · <strong>${{ selectedTotal.toFixed(2) }}</strong>
+          </span>
+        }
+      </div>
+
+      <div class="parts-grid">
+        @for (item of results(); track item.part.id) {
+          <div class="part-card" [class.selected]="item.selected" (click)="toggleSelection(item)">
+            <mat-checkbox
+              [checked]="item.selected"
+              (change)="toggleSelection(item)"
+              (click)="$event.stopPropagation()"
+              color="primary"
+            />
+            <div class="part-info">
+              <div class="part-header">
+                <span class="part-name">{{ item.part.name }}</span>
+                <span class="part-price">${{ item.part.price.toFixed(2) }}</span>
+              </div>
+              <div class="part-number">Part #{{ item.part.partNumber }}</div>
+              <div class="store-info">
+                <mat-icon>storefront</mat-icon>
+                <span>{{ item.part.store.name }}</span>
+                <span class="store-distance">{{ item.part.store.distance }} mi</span>
+              </div>
+              <div class="store-address">{{ item.part.store.address }}</div>
+            </div>
+            <div class="stock-badge" [class.in-stock]="item.part.inStock" [class.out-stock]="!item.part.inStock">
+              @if (item.part.inStock) {
+                <mat-icon>check_circle</mat-icon> In Stock
+              } @else {
+                <mat-icon>cancel</mat-icon> Out of Stock
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Notification panel -->
+      @if (selectedCount > 0) {
+        <div class="notify-panel">
+          <h4 class="notify-title">
+            <mat-icon>send</mat-icon>
+            Send your parts list
+          </h4>
+
+          <div class="notify-method">
+            <mat-radio-group [(ngModel)]="notifyMethod" class="method-group">
+              <mat-radio-button value="sms">
+                <mat-icon>sms</mat-icon> Text Message
+              </mat-radio-button>
+              <mat-radio-button value="email">
+                <mat-icon>email</mat-icon> Email
+              </mat-radio-button>
+            </mat-radio-group>
+          </div>
+
+          <div class="notify-row">
+            <mat-form-field appearance="outline" class="recipient-field">
+              <mat-label>{{ notifyMethod === 'sms' ? 'Phone number' : 'Email address' }}</mat-label>
+              <input
+                matInput
+                [(ngModel)]="notifyRecipient"
+                [type]="notifyMethod === 'sms' ? 'tel' : 'email'"
+                [placeholder]="notifyMethod === 'sms' ? '(555) 123-4567' : 'you@example.com'"
+              />
+              <mat-icon matPrefix>{{ notifyMethod === 'sms' ? 'phone' : 'alternate_email' }}</mat-icon>
+            </mat-form-field>
+
+            <button
+              mat-flat-button
+              class="send-btn"
+              (click)="sendList()"
+              [disabled]="sendingNotification()"
+            >
+              @if (sendingNotification()) {
+                <mat-spinner diameter="18" />
+              } @else {
+                <mat-icon>send</mat-icon>
+              }
+              Send
+            </button>
+
+            <button
+              mat-stroked-button
+              class="copy-btn"
+              (click)="copyList()"
+              matTooltip="Copy list to clipboard"
+            >
+              <mat-icon>content_copy</mat-icon>
+              Copy
+            </button>
+          </div>
+
+          <p class="notify-note">
+            <mat-icon>info</mat-icon>
+            List includes {{ selectedCount }} item{{ selectedCount !== 1 ? 's' : '' }} — estimated total
+            <strong>${{ selectedTotal.toFixed(2) }}</strong>
+          </p>
+        </div>
+      }
+    </div>
+  }
+
+  @if (!searching() && results().length === 0 && zipCode) {
+    <div class="empty-state">
+      <mat-icon>search_off</mat-icon>
+      <p>No results yet — click <strong>Find Parts</strong> to search nearby stores.</p>
+    </div>
+  }
+
+</div>

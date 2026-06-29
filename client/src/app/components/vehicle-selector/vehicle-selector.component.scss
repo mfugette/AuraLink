@@ -1,0 +1,156 @@
+.vehicle-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vin-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+
+  .vin-field {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .vin-decode-btn, .scan-btn {
+    margin-top: 4px;
+    height: 52px;
+    border-radius: var(--obd-radius-sm) !important;
+    white-space: nowrap;
+  }
+
+  .vin-decode-btn {
+    background: var(--obd-blue) !important;
+    color: #fff !important;
+  }
+
+  .scan-btn {
+    border-color: var(--obd-border) !important;
+    color: var(--obd-text-dim) !important;
+  }
+}
+
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--obd-red);
+  font-size: 0.8rem;
+  margin: -8px 0 0;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.divider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  mat-divider {
+    flex: 1;
+    border-color: var(--obd-border) !important;
+  }
+
+  .divider-label {
+    font-size: 0.75rem;
+    color: var(--obd-text-muted);
+    white-space: nowrap;
+  }
+}
+
+.ymm-grid {
+  display: grid;
+  grid-template-columns: 120px 1fr 1fr 1fr;
+  gap: 12px;
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 440px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.optional-grid {
+  display: grid;
+  grid-template-columns: 200px;
+  gap: 12px;
+
+  @media (max-width: 440px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── VIN Scanner ───────────────────────────────────────────────────────────────
+.scanner-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.scanner-frame {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.scanner-video {
+  width: 100%;
+  border-radius: var(--obd-radius);
+  display: block;
+}
+
+.scanner-guide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 48px;
+  pointer-events: none;
+
+  .guide-line {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-color: var(--obd-blue);
+    border-style: solid;
+    border-width: 0;
+
+    &.top-left    { top: 12px; left: 12px;  border-top-width: 3px; border-left-width: 3px; border-radius: 4px 0 0 0; }
+    &.top-right   { top: 12px; right: 12px; border-top-width: 3px; border-right-width: 3px; border-radius: 0 4px 0 0; }
+    &.bottom-left { bottom: 12px; left: 12px;  border-bottom-width: 3px; border-left-width: 3px; border-radius: 0 0 0 4px; }
+    &.bottom-right{ bottom: 12px; right: 12px; border-bottom-width: 3px; border-right-width: 3px; border-radius: 0 0 4px 0; }
+  }
+}
+
+.scanner-hint {
+  font-size: 0.8rem;
+  color: var(--obd-text-dim);
+  text-align: center;
+  margin: 0;
+}
+
+.scanner-close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  background: var(--obd-surface-3) !important;
+  color: var(--obd-text) !important;
+}

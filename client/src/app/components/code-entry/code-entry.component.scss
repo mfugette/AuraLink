@@ -1,0 +1,109 @@
+.code-entry-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.code-field {
+  width: 100%;
+
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+
+  ::ng-deep .mat-mdc-chip-set {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  ::ng-deep .mdc-text-field--outlined {
+    background: var(--obd-surface-2);
+    border-radius: var(--obd-radius) !important;
+  }
+
+  ::ng-deep .mat-mdc-form-field-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.code-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--obd-text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  min-width: 200px;
+  caret-color: var(--obd-blue);
+}
+
+// Per-severity chip colors
+::ng-deep {
+  .chip-low    { --mdc-chip-label-text-color: var(--obd-green)  !important; --mdc-chip-outline-color: rgba(34,197,94,0.3) !important; }
+  .chip-moderate { --mdc-chip-label-text-color: var(--obd-yellow) !important; --mdc-chip-outline-color: rgba(234,179,8,0.3) !important; }
+  .chip-high   { --mdc-chip-label-text-color: var(--obd-orange) !important; --mdc-chip-outline-color: rgba(249,115,22,0.3) !important; }
+  .chip-critical { --mdc-chip-label-text-color: var(--obd-red)   !important; --mdc-chip-outline-color: rgba(239,68,68,0.3) !important; }
+}
+
+.suggestion-option {
+  padding: 0 !important;
+}
+
+.suggestion-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  width: 100%;
+}
+
+.suggestion-code {
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--obd-blue);
+  min-width: 56px;
+}
+
+.suggestion-name {
+  flex: 1;
+  font-size: 0.8rem;
+  color: var(--obd-text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.code-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--obd-text-muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  padding: 0 4px;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: var(--obd-blue);
+    opacity: 0.7;
+  }
+}
+
+.code-count-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.code-count {
+  font-size: 0.8rem;
+  color: var(--obd-text-dim);
+}

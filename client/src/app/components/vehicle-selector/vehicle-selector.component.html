@@ -1,0 +1,131 @@
+<div class="vehicle-selector" [formGroup]="form">
+
+  <!-- VIN Row -->
+  <div class="vin-row">
+    <mat-form-field appearance="outline" class="vin-field">
+      <mat-label>VIN (auto-fills year/make/model)</mat-label>
+      <input
+        matInput
+        formControlName="vin"
+        placeholder="1HGBH41JXMN109186"
+        maxlength="17"
+        autocapitalize="characters"
+        (input)="vinError.set(null)"
+      />
+      <mat-icon matPrefix>directions_car</mat-icon>
+      @if (loadingVin()) {
+        <mat-spinner matSuffix diameter="20" />
+      }
+    </mat-form-field>
+
+    <button
+      mat-flat-button
+      class="vin-decode-btn"
+      (click)="decodeVin()"
+      [disabled]="loadingVin()"
+    >
+      <mat-icon>search</mat-icon>
+      Decode VIN
+    </button>
+
+    @if (isMobile()) {
+      <button
+        mat-stroked-button
+        class="scan-btn"
+        (click)="scannerActive() ? stopScanner() : startScanner()"
+      >
+        <mat-icon>{{ scannerActive() ? 'camera_off' : 'photo_camera' }}</mat-icon>
+        {{ scannerActive() ? 'Cancel' : 'Scan VIN' }}
+      </button>
+    }
+  </div>
+
+  @if (vinError()) {
+    <p class="field-error"><mat-icon>error_outline</mat-icon> {{ vinError() }}</p>
+  }
+  @if (scanError()) {
+    <p class="field-error"><mat-icon>error_outline</mat-icon> {{ scanError() }}</p>
+  }
+
+  <!-- Camera scanner (mobile only) -->
+  @if (scannerActive()) {
+    <div class="scanner-overlay">
+      <div class="scanner-frame">
+        <video #videoPreview autoplay playsinline muted class="scanner-video"></video>
+        <div class="scanner-guide">
+          <span class="guide-line top-left"></span>
+          <span class="guide-line top-right"></span>
+          <span class="guide-line bottom-left"></span>
+          <span class="guide-line bottom-right"></span>
+        </div>
+        <p class="scanner-hint">Point camera at the barcode sticker on your door jamb or windshield</p>
+        <button mat-icon-button class="scanner-close" (click)="stopScanner()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Manual entry hint -->
+  <div class="divider-row">
+    <mat-divider />
+    <span class="divider-label">or select manually</span>
+    <mat-divider />
+  </div>
+
+  <!-- Year / Make / Model / Sub-model grid -->
+  <div class="ymm-grid">
+    <mat-form-field appearance="outline">
+      <mat-label>Year</mat-label>
+      <mat-select formControlName="year">
+        @for (y of years; track y) {
+          <mat-option [value]="y">{{ y }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>
+        @if (loadingMakes()) { Loading makes... } @else { Make }
+      </mat-label>
+      <mat-select formControlName="make">
+        @for (m of makes(); track m) {
+          <mat-option [value]="m">{{ m }}</mat-option>
+        }
+      </mat-select>
+      @if (loadingMakes()) {
+        <mat-spinner matSuffix diameter="18" />
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>
+        @if (loadingModels()) { Loading models... } @else { Model }
+      </mat-label>
+      <mat-select formControlName="model">
+        @for (m of models(); track m) {
+          <mat-option [value]="m">{{ m }}</mat-option>
+        }
+      </mat-select>
+      @if (loadingModels()) {
+        <mat-spinner matSuffix diameter="18" />
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Trim / Sub-model (optional)</mat-label>
+      <input matInput formControlName="subModel" placeholder="EX, Sport, Limited..." />
+    </mat-form-field>
+  </div>
+
+  <!-- Optional fields -->
+  <div class="optional-grid">
+    <mat-form-field appearance="outline">
+      <mat-label>Mileage (optional)</mat-label>
+      <input matInput type="number" formControlName="mileage" placeholder="85000" min="0" />
+      <span matSuffix>mi</span>
+      <mat-icon matPrefix>speed</mat-icon>
+    </mat-form-field>
+  </div>
+
+</div>

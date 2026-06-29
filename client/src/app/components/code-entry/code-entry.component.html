@@ -1,0 +1,67 @@
+<div class="code-entry-wrapper">
+  <mat-form-field appearance="outline" class="code-field">
+    <mat-label>
+      <mat-icon>search</mat-icon>
+      Enter DTC codes (e.g. P0420, P0171)
+    </mat-label>
+
+    <mat-chip-grid #chipGrid aria-label="DTC codes">
+      @for (code of selectedCodes(); track code) {
+        <mat-chip-row
+          [class]="'chip-' + severityFor(code)"
+          (removed)="removeCode(code)"
+        >
+          {{ code }}
+          <button matChipRemove [attr.aria-label]="'Remove ' + code">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip-row>
+      }
+    </mat-chip-grid>
+
+    <input
+      #codeInput
+      class="code-input"
+      placeholder="Type a code and press Enter..."
+      [ngModel]="inputValue"
+      (ngModelChange)="onInputChange($event)"
+      [matChipInputFor]="chipGrid"
+      [matChipInputSeparatorKeyCodes]="separatorKeys"
+      (matChipInputTokenEnd)="addCode($event)"
+      [matAutocomplete]="auto"
+      autocomplete="off"
+      autocapitalize="characters"
+    />
+
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onAutocompleteSelected($event)">
+      @for (s of suggestions(); track s.code) {
+        <mat-option [value]="s.code" class="suggestion-option">
+          <div class="suggestion-row">
+            <span class="suggestion-code">{{ s.code }}</span>
+            <span class="suggestion-name">{{ s.name }}</span>
+            <span class="severity-badge {{ s.severity }}">{{ s.severity }}</span>
+          </div>
+        </mat-option>
+      }
+    </mat-autocomplete>
+
+    @if (hasCode()) {
+      <button matSuffix mat-icon-button (click)="clearAll()" matTooltip="Clear all codes">
+        <mat-icon>clear_all</mat-icon>
+      </button>
+    }
+  </mat-form-field>
+
+  @if (!hasCode()) {
+    <div class="code-hint">
+      <mat-icon>info</mat-icon>
+      <span>Add codes from your OBD2 scanner — separate multiple codes with commas or Enter. Codes start with P, B, C, or U followed by 4 digits.</span>
+    </div>
+  }
+
+  @if (hasCode()) {
+    <div class="code-count-row">
+      <span class="code-count">{{ selectedCodes().length }} code{{ selectedCodes().length !== 1 ? 's' : '' }} entered</span>
+    </div>
+  }
+</div>

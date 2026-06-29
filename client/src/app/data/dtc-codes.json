@@ -1,0 +1,623 @@
+[
+  {
+    "code": "P0010",
+    "name": "Intake Camshaft Position Actuator Circuit (Bank 1)",
+    "description": "The ECM detected a malfunction in the intake camshaft position actuator oil control valve circuit for Bank 1.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Rough idle", "Poor acceleration", "Decreased fuel economy"],
+    "possibleCauses": ["Faulty oil control valve", "Wiring harness damage", "Low engine oil", "Dirty oil passages"],
+    "relatedParts": ["Camshaft Position Actuator", "Oil Control Valve", "Engine Oil"]
+  },
+  {
+    "code": "P0011",
+    "name": "Intake Camshaft Position Timing Over-Advanced (Bank 1)",
+    "description": "The intake camshaft timing is over-advanced or the system performance is not meeting specification for Bank 1.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Rough idle", "Poor engine performance", "Difficulty starting"],
+    "possibleCauses": ["Low engine oil", "Dirty oil control valve", "Faulty camshaft position sensor", "Timing chain stretched"],
+    "relatedParts": ["Camshaft Position Sensor", "Oil Control Valve", "Timing Chain Kit"]
+  },
+  {
+    "code": "P0016",
+    "name": "Crankshaft/Camshaft Position Correlation (Bank 1, Sensor A)",
+    "description": "The correlation between the crankshaft and camshaft position sensors is out of specification for Bank 1.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Engine won't start", "Poor idle quality", "Stalling"],
+    "possibleCauses": ["Stretched or damaged timing chain/belt", "Faulty crankshaft sensor", "Faulty camshaft sensor", "Low oil pressure"],
+    "relatedParts": ["Timing Chain Kit", "Crankshaft Position Sensor", "Camshaft Position Sensor"]
+  },
+  {
+    "code": "P0030",
+    "name": "HO2S Heater Control Circuit (Bank 1, Sensor 1)",
+    "description": "The oxygen sensor heater circuit for Bank 1 Sensor 1 is not functioning correctly.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Failed emissions test", "Reduced fuel economy"],
+    "possibleCauses": ["Faulty oxygen sensor", "Blown fuse", "Damaged wiring", "Bad PCM"],
+    "relatedParts": ["Oxygen Sensor", "Fuse Kit", "Wiring Repair Kit"]
+  },
+  {
+    "code": "P0101",
+    "name": "Mass Air Flow Sensor Circuit Range/Performance",
+    "description": "The signal from the Mass Air Flow (MAF) sensor is out of expected range or performance.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Black smoke from exhaust", "Rough idle", "Engine surging", "Hesitation during acceleration"],
+    "possibleCauses": ["Dirty or faulty MAF sensor", "Intake air leaks", "Clogged air filter", "Damaged wiring"],
+    "relatedParts": ["Mass Air Flow Sensor", "Air Filter", "MAF Sensor Cleaner"]
+  },
+  {
+    "code": "P0102",
+    "name": "Mass Air Flow Sensor Circuit Low Input",
+    "description": "The MAF sensor signal is lower than expected, indicating too little air is being measured.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Engine runs rich", "Black smoke", "Poor fuel economy"],
+    "possibleCauses": ["Faulty MAF sensor", "Damaged wiring", "Corroded connector", "Air intake leak before sensor"],
+    "relatedParts": ["Mass Air Flow Sensor", "Wiring Repair Kit", "Air Intake Boot"]
+  },
+  {
+    "code": "P0103",
+    "name": "Mass Air Flow Sensor Circuit High Input",
+    "description": "The MAF sensor signal is higher than expected.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Engine stalling", "Hard starting", "Rich fuel mixture"],
+    "possibleCauses": ["Faulty MAF sensor", "Short in wiring", "Air leak after MAF sensor"],
+    "relatedParts": ["Mass Air Flow Sensor", "Wiring Repair Kit"]
+  },
+  {
+    "code": "P0113",
+    "name": "Intake Air Temperature Sensor Circuit High Input",
+    "description": "The signal from the Intake Air Temperature (IAT) sensor is higher than expected.",
+    "severity": "low",
+    "symptoms": ["Check Engine Light", "Engine runs lean", "Poor performance in hot weather"],
+    "possibleCauses": ["Faulty IAT sensor", "Open circuit in wiring", "Corroded connector"],
+    "relatedParts": ["Intake Air Temperature Sensor", "Wiring Repair Kit"]
+  },
+  {
+    "code": "P0118",
+    "name": "Engine Coolant Temperature Sensor Circuit High Input",
+    "description": "The Engine Coolant Temperature (ECT) sensor is reporting an implausibly high temperature reading.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Temperature gauge malfunction", "Engine runs rough when cold", "Poor fuel economy"],
+    "possibleCauses": ["Faulty ECT sensor", "Open circuit in wiring", "Corroded connector", "Low coolant level"],
+    "relatedParts": ["Engine Coolant Temperature Sensor", "Coolant", "Wiring Repair Kit"]
+  },
+  {
+    "code": "P0128",
+    "name": "Coolant Thermostat Temperature Below Regulating Temperature",
+    "description": "The coolant temperature is taking too long to reach or maintain proper operating temperature.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Heater blows cold air", "Poor fuel economy", "Engine takes long to warm up"],
+    "possibleCauses": ["Stuck-open thermostat", "Faulty coolant temperature sensor", "Low coolant level"],
+    "relatedParts": ["Thermostat", "Thermostat Housing", "Coolant Temperature Sensor", "Coolant"]
+  },
+  {
+    "code": "P0131",
+    "name": "O2 Sensor Circuit Low Voltage (Bank 1, Sensor 1)",
+    "description": "The upstream oxygen sensor on Bank 1 is reading lower voltage than expected, indicating a lean condition.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Poor fuel economy", "Engine runs lean", "Rough idle"],
+    "possibleCauses": ["Exhaust leak near sensor", "Faulty oxygen sensor", "Lean fuel mixture", "Damaged wiring"],
+    "relatedParts": ["Oxygen Sensor (Upstream)", "Exhaust Gasket", "Wiring Repair Kit"]
+  },
+  {
+    "code": "P0133",
+    "name": "O2 Sensor Circuit Slow Response (Bank 1, Sensor 1)",
+    "description": "The upstream oxygen sensor on Bank 1 is responding too slowly to changes in the exhaust mixture.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Poor fuel economy", "Failed emissions test"],
+    "possibleCauses": ["Aging oxygen sensor", "Exhaust leaks", "Contaminated sensor"],
+    "relatedParts": ["Oxygen Sensor (Upstream)"]
+  },
+  {
+    "code": "P0171",
+    "name": "System Too Lean (Bank 1)",
+    "description": "The engine is running too lean on Bank 1 — there is too much air or not enough fuel in the air-fuel mixture.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Rough idle", "Hesitation", "Poor performance", "Engine surging"],
+    "possibleCauses": ["Vacuum leak", "Faulty MAF sensor", "Clogged fuel injectors", "Low fuel pressure", "Faulty O2 sensor"],
+    "relatedParts": ["Fuel Injectors", "MAF Sensor", "Oxygen Sensor", "Fuel Filter", "Vacuum Line Repair Kit"]
+  },
+  {
+    "code": "P0172",
+    "name": "System Too Rich (Bank 1)",
+    "description": "The engine is running too rich on Bank 1 — there is too much fuel or not enough air in the mixture.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Black smoke", "Smell of fuel", "Fouled spark plugs", "Poor fuel economy"],
+    "possibleCauses": ["Stuck open fuel injector", "Faulty MAF sensor", "Faulty coolant temp sensor", "High fuel pressure"],
+    "relatedParts": ["Fuel Injectors", "MAF Sensor", "Coolant Temperature Sensor", "Fuel Pressure Regulator"]
+  },
+  {
+    "code": "P0174",
+    "name": "System Too Lean (Bank 2)",
+    "description": "The engine is running too lean on Bank 2.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Rough idle", "Hesitation", "Poor performance"],
+    "possibleCauses": ["Vacuum leak", "Faulty MAF sensor", "Clogged fuel injectors", "Low fuel pressure"],
+    "relatedParts": ["Fuel Injectors", "MAF Sensor", "Oxygen Sensor", "Vacuum Line Repair Kit"]
+  },
+  {
+    "code": "P0175",
+    "name": "System Too Rich (Bank 2)",
+    "description": "The engine is running too rich on Bank 2.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Black smoke", "Smell of fuel", "Poor fuel economy"],
+    "possibleCauses": ["Stuck open fuel injector", "Faulty MAF sensor", "High fuel pressure"],
+    "relatedParts": ["Fuel Injectors", "MAF Sensor", "Fuel Pressure Regulator"]
+  },
+  {
+    "code": "P0217",
+    "name": "Engine Coolant Over Temperature Condition",
+    "description": "The engine coolant temperature has exceeded the maximum threshold.",
+    "severity": "critical",
+    "symptoms": ["Check Engine Light", "Temperature warning light", "Steam from engine", "Engine overheating"],
+    "possibleCauses": ["Low coolant level", "Stuck thermostat", "Failed water pump", "Clogged radiator", "Blown head gasket"],
+    "relatedParts": ["Coolant", "Thermostat", "Water Pump", "Radiator", "Head Gasket Set"]
+  },
+  {
+    "code": "P0261",
+    "name": "Cylinder 1 Injector Circuit Low",
+    "description": "The fuel injector circuit for cylinder 1 is reporting a lower than expected signal.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Engine misfire", "Rough idle", "Loss of power"],
+    "possibleCauses": ["Faulty fuel injector", "Open circuit in wiring", "Corroded connector", "Faulty PCM"],
+    "relatedParts": ["Fuel Injector (Cylinder 1)", "Wiring Repair Kit"]
+  },
+  {
+    "code": "P0300",
+    "name": "Random/Multiple Cylinder Misfire Detected",
+    "description": "The ECM has detected misfires in multiple cylinders or a random misfire that cannot be attributed to one cylinder.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light (flashing)", "Rough idle", "Shaking", "Loss of power", "Poor fuel economy", "Stalling"],
+    "possibleCauses": ["Worn spark plugs", "Faulty ignition coils", "Low fuel pressure", "Vacuum leaks", "Clogged fuel injectors", "Low compression"],
+    "relatedParts": ["Spark Plugs", "Ignition Coil Pack", "Fuel Injectors", "Ignition Wires"]
+  },
+  {
+    "code": "P0301",
+    "name": "Cylinder 1 Misfire Detected",
+    "description": "The ECM has detected a misfire in cylinder 1.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Rough idle", "Engine shaking", "Loss of power"],
+    "possibleCauses": ["Faulty spark plug", "Bad ignition coil", "Clogged injector", "Low compression in cylinder 1"],
+    "relatedParts": ["Spark Plug (Cylinder 1)", "Ignition Coil (Cylinder 1)", "Fuel Injector (Cylinder 1)"]
+  },
+  {
+    "code": "P0302",
+    "name": "Cylinder 2 Misfire Detected",
+    "description": "The ECM has detected a misfire in cylinder 2.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Rough idle", "Engine shaking", "Loss of power"],
+    "possibleCauses": ["Faulty spark plug", "Bad ignition coil", "Clogged injector", "Low compression in cylinder 2"],
+    "relatedParts": ["Spark Plug (Cylinder 2)", "Ignition Coil (Cylinder 2)", "Fuel Injector (Cylinder 2)"]
+  },
+  {
+    "code": "P0303",
+    "name": "Cylinder 3 Misfire Detected",
+    "description": "The ECM has detected a misfire in cylinder 3.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Rough idle", "Engine shaking", "Loss of power"],
+    "possibleCauses": ["Faulty spark plug", "Bad ignition coil", "Clogged injector", "Low compression in cylinder 3"],
+    "relatedParts": ["Spark Plug (Cylinder 3)", "Ignition Coil (Cylinder 3)", "Fuel Injector (Cylinder 3)"]
+  },
+  {
+    "code": "P0304",
+    "name": "Cylinder 4 Misfire Detected",
+    "description": "The ECM has detected a misfire in cylinder 4.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Rough idle", "Engine shaking", "Loss of power"],
+    "possibleCauses": ["Faulty spark plug", "Bad ignition coil", "Clogged injector", "Low compression in cylinder 4"],
+    "relatedParts": ["Spark Plug (Cylinder 4)", "Ignition Coil (Cylinder 4)", "Fuel Injector (Cylinder 4)"]
+  },
+  {
+    "code": "P0305",
+    "name": "Cylinder 5 Misfire Detected",
+    "description": "The ECM has detected a misfire in cylinder 5.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Rough idle", "Engine shaking", "Loss of power"],
+    "possibleCauses": ["Faulty spark plug", "Bad ignition coil", "Clogged injector", "Low compression in cylinder 5"],
+    "relatedParts": ["Spark Plug (Cylinder 5)", "Ignition Coil (Cylinder 5)", "Fuel Injector (Cylinder 5)"]
+  },
+  {
+    "code": "P0306",
+    "name": "Cylinder 6 Misfire Detected",
+    "description": "The ECM has detected a misfire in cylinder 6.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Rough idle", "Engine shaking", "Loss of power"],
+    "possibleCauses": ["Faulty spark plug", "Bad ignition coil", "Clogged injector", "Low compression in cylinder 6"],
+    "relatedParts": ["Spark Plug (Cylinder 6)", "Ignition Coil (Cylinder 6)", "Fuel Injector (Cylinder 6)"]
+  },
+  {
+    "code": "P0325",
+    "name": "Knock Sensor 1 Circuit Malfunction (Bank 1)",
+    "description": "The knock sensor circuit for Bank 1 is not functioning properly.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Engine knocking or pinging", "Reduced performance", "Poor fuel economy"],
+    "possibleCauses": ["Faulty knock sensor", "Damaged wiring", "Loose sensor", "Internal engine problems"],
+    "relatedParts": ["Knock Sensor", "Wiring Repair Kit"]
+  },
+  {
+    "code": "P0335",
+    "name": "Crankshaft Position Sensor A Circuit Malfunction",
+    "description": "The ECM is not receiving a proper signal from the crankshaft position sensor.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Engine won't start", "Engine stalling", "Rough running"],
+    "possibleCauses": ["Faulty crankshaft sensor", "Damaged reluctor wheel", "Wiring damage", "Faulty PCM"],
+    "relatedParts": ["Crankshaft Position Sensor", "Wiring Repair Kit"]
+  },
+  {
+    "code": "P0340",
+    "name": "Camshaft Position Sensor Circuit Malfunction (Bank 1)",
+    "description": "No signal or an erratic signal is being received from the camshaft position sensor on Bank 1.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Engine won't start", "Engine stalling", "Rough idle"],
+    "possibleCauses": ["Faulty camshaft sensor", "Damaged tone wheel", "Wiring issues", "Timing issues"],
+    "relatedParts": ["Camshaft Position Sensor", "Wiring Repair Kit"]
+  },
+  {
+    "code": "P0351",
+    "name": "Ignition Coil A Primary/Secondary Circuit Malfunction",
+    "description": "A fault has been detected in the primary or secondary circuit of ignition coil A.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Engine misfire", "Rough idle", "Hard starting"],
+    "possibleCauses": ["Faulty ignition coil", "Damaged spark plug", "Wiring issues", "Faulty PCM"],
+    "relatedParts": ["Ignition Coil", "Spark Plug", "Wiring Repair Kit"]
+  },
+  {
+    "code": "P0401",
+    "name": "Exhaust Gas Recirculation Flow Insufficient Detected",
+    "description": "The EGR system is not flowing enough exhaust gas to meet the commanded amount.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Rough idle", "Failed emissions test", "Engine pinging under load"],
+    "possibleCauses": ["Clogged EGR valve", "Faulty EGR valve", "Blocked EGR passages", "Faulty EGR position sensor"],
+    "relatedParts": ["EGR Valve", "EGR Valve Gasket", "EGR Sensor"]
+  },
+  {
+    "code": "P0402",
+    "name": "Exhaust Gas Recirculation Flow Excessive Detected",
+    "description": "Too much exhaust gas recirculation is being detected.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Rough idle", "Engine stalling", "Poor performance"],
+    "possibleCauses": ["Stuck-open EGR valve", "Faulty EGR position sensor", "Carbon buildup"],
+    "relatedParts": ["EGR Valve", "EGR Position Sensor"]
+  },
+  {
+    "code": "P0420",
+    "name": "Catalyst System Efficiency Below Threshold (Bank 1)",
+    "description": "The catalytic converter on Bank 1 is not operating as efficiently as required — it is no longer adequately converting exhaust gases.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Failed emissions test", "Sulfur smell from exhaust", "Reduced fuel economy"],
+    "possibleCauses": ["Failed catalytic converter", "Exhaust leaks near O2 sensors", "Faulty downstream O2 sensor", "Engine misfires", "Oil or coolant burning"],
+    "relatedParts": ["Catalytic Converter", "Oxygen Sensor (Downstream)", "Exhaust Gasket"]
+  },
+  {
+    "code": "P0421",
+    "name": "Warm Up Catalyst Efficiency Below Threshold (Bank 1)",
+    "description": "The warm-up catalytic converter on Bank 1 is not reaching efficiency targets.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Failed emissions test"],
+    "possibleCauses": ["Worn catalytic converter", "Faulty O2 sensors", "Exhaust leaks"],
+    "relatedParts": ["Catalytic Converter", "Oxygen Sensor"]
+  },
+  {
+    "code": "P0430",
+    "name": "Catalyst System Efficiency Below Threshold (Bank 2)",
+    "description": "The catalytic converter on Bank 2 is not operating as efficiently as required.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Failed emissions test", "Sulfur smell from exhaust"],
+    "possibleCauses": ["Failed catalytic converter", "Faulty downstream O2 sensor", "Engine misfires", "Exhaust leaks"],
+    "relatedParts": ["Catalytic Converter (Bank 2)", "Oxygen Sensor (Downstream Bank 2)", "Exhaust Gasket"]
+  },
+  {
+    "code": "P0440",
+    "name": "Evaporative Emission Control System Malfunction",
+    "description": "A general malfunction has been detected in the EVAP system, which captures fuel vapors from the fuel tank.",
+    "severity": "low",
+    "symptoms": ["Check Engine Light", "Fuel smell", "Failed emissions test"],
+    "possibleCauses": ["Loose or faulty gas cap", "Damaged EVAP purge valve", "Leak in EVAP hoses", "Failed charcoal canister"],
+    "relatedParts": ["Gas Cap", "EVAP Purge Valve", "Charcoal Canister", "EVAP Hoses"]
+  },
+  {
+    "code": "P0441",
+    "name": "Evaporative Emission Control System Incorrect Purge Flow",
+    "description": "The EVAP purge flow is not within the expected range.",
+    "severity": "low",
+    "symptoms": ["Check Engine Light", "Fuel smell", "Hard starting"],
+    "possibleCauses": ["Faulty EVAP purge valve", "Blocked EVAP lines", "Faulty vacuum line"],
+    "relatedParts": ["EVAP Purge Valve", "EVAP Hoses", "Vacuum Lines"]
+  },
+  {
+    "code": "P0442",
+    "name": "Evaporative Emission Control System Leak Detected (Small Leak)",
+    "description": "A small leak has been detected in the EVAP system.",
+    "severity": "low",
+    "symptoms": ["Check Engine Light", "Fuel smell"],
+    "possibleCauses": ["Loose gas cap", "Cracked EVAP hoses", "Faulty purge valve", "Leak in charcoal canister"],
+    "relatedParts": ["Gas Cap", "EVAP Hoses", "EVAP Purge Valve", "Charcoal Canister"]
+  },
+  {
+    "code": "P0446",
+    "name": "Evaporative Emission Control System Vent Control Circuit Malfunction",
+    "description": "The EVAP vent control valve circuit has a malfunction.",
+    "severity": "low",
+    "symptoms": ["Check Engine Light", "Fuel smell", "Hard time filling gas tank"],
+    "possibleCauses": ["Faulty EVAP vent valve", "Blocked charcoal canister", "Wiring issues"],
+    "relatedParts": ["EVAP Vent Control Valve", "Charcoal Canister"]
+  },
+  {
+    "code": "P0455",
+    "name": "Evaporative Emission Control System Leak Detected (Large Leak)",
+    "description": "A large leak has been detected in the EVAP system.",
+    "severity": "low",
+    "symptoms": ["Check Engine Light", "Strong fuel smell", "Fuel cap light on"],
+    "possibleCauses": ["Missing or loose gas cap", "Cracked fuel tank", "Broken EVAP hose", "Faulty purge valve"],
+    "relatedParts": ["Gas Cap", "EVAP Hoses", "EVAP Purge Valve"]
+  },
+  {
+    "code": "P0456",
+    "name": "Evaporative Emission Control System Leak Detected (Very Small Leak)",
+    "description": "A very small leak has been detected in the EVAP emission control system.",
+    "severity": "low",
+    "symptoms": ["Check Engine Light", "Faint fuel smell"],
+    "possibleCauses": ["Faulty gas cap seal", "Pinhole in EVAP hose", "Faulty purge or vent valve"],
+    "relatedParts": ["Gas Cap", "EVAP Hoses", "EVAP Purge Valve"]
+  },
+  {
+    "code": "P0480",
+    "name": "Cooling Fan 1 Control Circuit Malfunction",
+    "description": "The ECM has detected a problem with the cooling fan control circuit.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Engine overheating", "Fan not running at low speed"],
+    "possibleCauses": ["Faulty cooling fan relay", "Faulty cooling fan motor", "Wiring issues"],
+    "relatedParts": ["Cooling Fan Relay", "Cooling Fan Motor", "Wiring Repair Kit"]
+  },
+  {
+    "code": "P0500",
+    "name": "Vehicle Speed Sensor Malfunction",
+    "description": "The vehicle speed sensor is not sending the correct signal to the ECM.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Speedometer not working", "ABS light on", "Transmission shifting problems"],
+    "possibleCauses": ["Faulty vehicle speed sensor", "Damaged wiring", "Faulty ABS sensor", "Damaged tone ring"],
+    "relatedParts": ["Vehicle Speed Sensor", "ABS Sensor", "Wiring Repair Kit"]
+  },
+  {
+    "code": "P0506",
+    "name": "Idle Air Control System RPM Low",
+    "description": "The idle speed is lower than the expected target idle speed.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Low idle speed", "Engine stalling", "Rough idle"],
+    "possibleCauses": ["Faulty idle air control valve", "Carbon buildup in throttle body", "Vacuum leak", "Faulty throttle position sensor"],
+    "relatedParts": ["Idle Air Control Valve", "Throttle Body Cleaner", "Throttle Position Sensor"]
+  },
+  {
+    "code": "P0507",
+    "name": "Idle Air Control System RPM High",
+    "description": "The idle speed is higher than the expected target idle speed.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "High idle speed", "Engine racing at idle"],
+    "possibleCauses": ["Vacuum leak", "Faulty idle air control valve", "Throttle body stuck open", "Faulty MAF sensor"],
+    "relatedParts": ["Idle Air Control Valve", "Vacuum Line Kit", "Throttle Body Gasket"]
+  },
+  {
+    "code": "P0562",
+    "name": "System Voltage Low",
+    "description": "The system voltage is lower than expected.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Dim lights", "Electrical issues", "Battery warning light"],
+    "possibleCauses": ["Weak battery", "Faulty alternator", "Poor battery connections", "High electrical load"],
+    "relatedParts": ["Battery", "Alternator", "Battery Terminal Cleaning Kit"]
+  },
+  {
+    "code": "P0563",
+    "name": "System Voltage High",
+    "description": "The system voltage is higher than expected.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Bright lights", "Electrical component damage risk"],
+    "possibleCauses": ["Faulty voltage regulator", "Faulty alternator", "Wiring short"],
+    "relatedParts": ["Alternator", "Voltage Regulator", "Wiring Repair Kit"]
+  },
+  {
+    "code": "P0600",
+    "name": "Serial Communication Link Malfunction",
+    "description": "A malfunction has been detected in the serial communication link of the ECM.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Multiple warning lights", "Various system malfunctions"],
+    "possibleCauses": ["Faulty ECM/PCM", "Wiring issues", "Poor ground connection"],
+    "relatedParts": ["ECM/PCM", "Wiring Repair Kit", "Ground Strap"]
+  },
+  {
+    "code": "P0606",
+    "name": "PCM Processor Fault",
+    "description": "The PCM has detected an internal processor fault.",
+    "severity": "critical",
+    "symptoms": ["Check Engine Light", "Multiple system failures", "Engine stalling or not starting"],
+    "possibleCauses": ["Faulty PCM/ECM", "Power supply issues to PCM", "Software corruption"],
+    "relatedParts": ["PCM/ECM", "PCM Power Relay"]
+  },
+  {
+    "code": "P0700",
+    "name": "Transmission Control System Malfunction",
+    "description": "The transmission control module (TCM) has detected a malfunction and set a fault code.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Transmission warning light", "Harsh or erratic shifting", "Transmission stuck in gear"],
+    "possibleCauses": ["Faulty TCM", "Low transmission fluid", "Faulty shift solenoids", "Wiring issues"],
+    "relatedParts": ["Transmission Fluid", "Shift Solenoid", "TCM", "Transmission Filter"]
+  },
+  {
+    "code": "P0705",
+    "name": "Transmission Range Sensor Circuit Malfunction",
+    "description": "The transmission range sensor (or gear selector position) circuit has a malfunction.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Transmission not engaging", "Engine starts in any gear", "Erratic shifting"],
+    "possibleCauses": ["Faulty transmission range sensor", "Wiring issues", "Shifter cable misadjustment"],
+    "relatedParts": ["Transmission Range Sensor", "Wiring Repair Kit", "Shifter Cable"]
+  },
+  {
+    "code": "P0711",
+    "name": "Transmission Fluid Temperature Sensor Circuit Range/Performance",
+    "description": "The transmission fluid temperature sensor is not reading within the expected range.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "Harsh shifting", "Transmission overheating warning"],
+    "possibleCauses": ["Faulty transmission fluid temperature sensor", "Low fluid level", "Wiring damage"],
+    "relatedParts": ["Transmission Fluid Temperature Sensor", "Transmission Fluid", "Wiring Repair Kit"]
+  },
+  {
+    "code": "P0715",
+    "name": "Input/Turbine Speed Sensor Circuit Malfunction",
+    "description": "The input/turbine speed sensor circuit has a malfunction.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Erratic shifting", "Transmission slipping", "Speedometer issues"],
+    "possibleCauses": ["Faulty input speed sensor", "Damaged wiring", "Damaged reluctor ring"],
+    "relatedParts": ["Input Speed Sensor", "Wiring Repair Kit"]
+  },
+  {
+    "code": "P0720",
+    "name": "Output Speed Sensor Circuit Malfunction",
+    "description": "The output speed sensor circuit has a malfunction.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Erratic shifting", "Speedometer not working", "ABS issues"],
+    "possibleCauses": ["Faulty output speed sensor", "Wiring damage", "Damaged gear on sensor"],
+    "relatedParts": ["Output Speed Sensor", "Wiring Repair Kit"]
+  },
+  {
+    "code": "P0730",
+    "name": "Incorrect Gear Ratio",
+    "description": "The transmission is not achieving the expected gear ratio.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Transmission slipping", "Jerky acceleration", "Poor fuel economy"],
+    "possibleCauses": ["Low transmission fluid", "Worn transmission clutches", "Faulty shift solenoids", "Damaged planetary gears"],
+    "relatedParts": ["Transmission Fluid", "Transmission Filter", "Shift Solenoid Kit"]
+  },
+  {
+    "code": "P0740",
+    "name": "Torque Converter Clutch Circuit Malfunction",
+    "description": "The torque converter clutch solenoid circuit has a malfunction.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Poor fuel economy", "Transmission slipping", "Shuddering at highway speeds"],
+    "possibleCauses": ["Faulty TCC solenoid", "Low fluid pressure", "Internal transmission damage"],
+    "relatedParts": ["Torque Converter Clutch Solenoid", "Transmission Fluid", "Transmission Filter"]
+  },
+  {
+    "code": "P0741",
+    "name": "Torque Converter Clutch Circuit Performance or Stuck Off",
+    "description": "The torque converter clutch is not engaging properly.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Poor fuel economy at highway speeds", "Slipping sensation"],
+    "possibleCauses": ["Faulty TCC solenoid", "Worn torque converter", "Low fluid level"],
+    "relatedParts": ["Torque Converter", "TCC Solenoid", "Transmission Fluid"]
+  },
+  {
+    "code": "P0750",
+    "name": "Shift Solenoid A Malfunction",
+    "description": "Shift solenoid A circuit has a malfunction.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Transmission stuck in gear", "Harsh shifting", "No gear engagement"],
+    "possibleCauses": ["Faulty shift solenoid A", "Wiring issues", "Low fluid", "Clogged passages"],
+    "relatedParts": ["Shift Solenoid A", "Transmission Fluid", "Transmission Filter"]
+  },
+  {
+    "code": "P0800",
+    "name": "Transfer Case Control System MIL Request",
+    "description": "The transfer case control module has requested the MIL (Check Engine Light) to illuminate.",
+    "severity": "moderate",
+    "symptoms": ["Check Engine Light", "4WD warning light", "4WD system not engaging"],
+    "possibleCauses": ["Transfer case control module fault", "4WD actuator fault", "Wiring issues"],
+    "relatedParts": ["Transfer Case Control Module", "4WD Actuator Motor", "Wiring Repair Kit"]
+  },
+  {
+    "code": "P1000",
+    "name": "OBD System Readiness Test Not Complete",
+    "description": "The OBD system has not completed all required readiness monitors. This is not a fault code but indicates monitors have not run.",
+    "severity": "low",
+    "symptoms": ["Check Engine Light may not be present", "Failed emissions test"],
+    "possibleCauses": ["Recent battery disconnect", "Recent code clearing", "Not enough drive cycles completed"],
+    "relatedParts": []
+  },
+  {
+    "code": "B0001",
+    "name": "Driver Frontal Stage 1 Deployment Control",
+    "description": "A fault has been detected in the driver-side frontal airbag Stage 1 deployment circuit.",
+    "severity": "critical",
+    "symptoms": ["Airbag warning light", "SRS system disabled"],
+    "possibleCauses": ["Faulty airbag module", "Clock spring failure", "Wiring harness damage"],
+    "relatedParts": ["Driver Airbag Module", "Clock Spring", "SRS Wiring Harness"]
+  },
+  {
+    "code": "B0020",
+    "name": "Passenger Frontal Stage 1 Deployment Control",
+    "description": "A fault has been detected in the passenger-side frontal airbag Stage 1 deployment circuit.",
+    "severity": "critical",
+    "symptoms": ["Airbag warning light", "SRS system disabled"],
+    "possibleCauses": ["Faulty airbag module", "Seat occupant sensor", "Wiring harness damage"],
+    "relatedParts": ["Passenger Airbag Module", "Seat Occupant Sensor", "SRS Wiring Harness"]
+  },
+  {
+    "code": "C0031",
+    "name": "Right Front Wheel Speed Sensor Circuit",
+    "description": "The right front wheel speed sensor circuit has a malfunction.",
+    "severity": "high",
+    "symptoms": ["ABS warning light", "Traction control warning", "ABS not functioning", "Stability control disabled"],
+    "possibleCauses": ["Faulty wheel speed sensor", "Damaged tone ring", "Wiring damage", "Bearing hub failure"],
+    "relatedParts": ["Wheel Speed Sensor (Right Front)", "ABS Tone Ring", "Wiring Repair Kit", "Wheel Bearing Hub"]
+  },
+  {
+    "code": "C0032",
+    "name": "Left Front Wheel Speed Sensor Circuit",
+    "description": "The left front wheel speed sensor circuit has a malfunction.",
+    "severity": "high",
+    "symptoms": ["ABS warning light", "Traction control warning", "ABS not functioning"],
+    "possibleCauses": ["Faulty wheel speed sensor", "Damaged tone ring", "Wiring damage"],
+    "relatedParts": ["Wheel Speed Sensor (Left Front)", "ABS Tone Ring", "Wiring Repair Kit"]
+  },
+  {
+    "code": "C0033",
+    "name": "Right Rear Wheel Speed Sensor Circuit",
+    "description": "The right rear wheel speed sensor circuit has a malfunction.",
+    "severity": "high",
+    "symptoms": ["ABS warning light", "Traction control warning", "ABS not functioning"],
+    "possibleCauses": ["Faulty wheel speed sensor", "Damaged tone ring", "Wiring damage"],
+    "relatedParts": ["Wheel Speed Sensor (Right Rear)", "ABS Tone Ring", "Wiring Repair Kit"]
+  },
+  {
+    "code": "C0034",
+    "name": "Left Rear Wheel Speed Sensor Circuit",
+    "description": "The left rear wheel speed sensor circuit has a malfunction.",
+    "severity": "high",
+    "symptoms": ["ABS warning light", "Traction control warning", "ABS not functioning"],
+    "possibleCauses": ["Faulty wheel speed sensor", "Damaged tone ring", "Wiring damage"],
+    "relatedParts": ["Wheel Speed Sensor (Left Rear)", "ABS Tone Ring", "Wiring Repair Kit"]
+  },
+  {
+    "code": "U0001",
+    "name": "High Speed CAN Communication Bus",
+    "description": "A malfunction has been detected on the high speed CAN communication bus.",
+    "severity": "high",
+    "symptoms": ["Check Engine Light", "Multiple warning lights", "Various module malfunctions"],
+    "possibleCauses": ["Damaged CAN bus wiring", "Faulty module on CAN bus", "Poor connections", "Corrosion"],
+    "relatedParts": ["CAN Bus Wiring Harness", "Wiring Repair Kit", "Terminal Cleaning Kit"]
+  },
+  {
+    "code": "U0100",
+    "name": "Lost Communication With ECM/PCM",
+    "description": "Communication with the Engine Control Module/Powertrain Control Module has been lost.",
+    "severity": "critical",
+    "symptoms": ["Multiple warning lights", "Engine may not start", "Various system failures"],
+    "possibleCauses": ["Faulty ECM/PCM", "CAN bus wiring issues", "Poor power or ground to ECM"],
+    "relatedParts": ["ECM/PCM", "CAN Bus Wiring Harness", "Ground Strap"]
+  },
+  {
+    "code": "U0101",
+    "name": "Lost Communication With TCM",
+    "description": "Communication with the Transmission Control Module has been lost.",
+    "severity": "high",
+    "symptoms": ["Transmission warning light", "Transmission stuck in gear", "No shifting"],
+    "possibleCauses": ["Faulty TCM", "CAN bus wiring issues", "Poor power or ground to TCM"],
+    "relatedParts": ["TCM", "CAN Bus Wiring Harness", "Fuse Kit"]
+  },
+  {
+    "code": "U0121",
+    "name": "Lost Communication With Anti-Lock Brake System Control Module",
+    "description": "Communication with the ABS control module has been lost.",
+    "severity": "high",
+    "symptoms": ["ABS warning light", "Traction control warning", "Stability control warning", "ABS disabled"],
+    "possibleCauses": ["Faulty ABS module", "CAN bus wiring issues", "Blown fuse"],
+    "relatedParts": ["ABS Control Module", "CAN Bus Wiring Harness", "Fuse Kit"]
+  }
+]

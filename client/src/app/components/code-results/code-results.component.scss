@@ -1,0 +1,190 @@
+.results-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.unknown-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(234, 179, 8, 0.08);
+  border: 1px solid rgba(234, 179, 8, 0.25);
+  border-radius: var(--obd-radius);
+  color: var(--obd-yellow);
+  font-size: 0.875rem;
+  line-height: 1.5;
+
+  mat-icon {
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.result-card {
+  background: var(--obd-surface-2) !important;
+  border-radius: var(--obd-radius-lg) !important;
+  border: 1px solid var(--obd-border) !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: var(--obd-shadow) !important;
+  }
+
+  &.card-low      { border-left: 3px solid var(--obd-green)  !important; }
+  &.card-moderate { border-left: 3px solid var(--obd-yellow) !important; }
+  &.card-high     { border-left: 3px solid var(--obd-orange) !important; }
+  &.card-critical { border-left: 3px solid var(--obd-red)    !important; }
+}
+
+mat-card-header {
+  padding: 16px 16px 0 !important;
+}
+
+mat-card-content {
+  padding: 12px 16px 16px !important;
+}
+
+.card-header-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+}
+
+.code-badge {
+  font-family: 'Courier New', monospace;
+  font-weight: 800;
+  font-size: 1rem;
+  background: var(--obd-surface-3);
+  color: var(--obd-blue);
+  padding: 6px 10px;
+  border-radius: var(--obd-radius-sm);
+  letter-spacing: 1px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  border: 1px solid var(--obd-blue-dim);
+}
+
+.header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.code-name {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--obd-text);
+  line-height: 1.35;
+}
+
+.code-description {
+  font-size: 0.85rem;
+  color: var(--obd-text-dim);
+  line-height: 1.6;
+  margin: 0 0 12px;
+}
+
+// Accordion overrides
+.details-accordion {
+  background: transparent !important;
+
+  ::ng-deep {
+    .mat-expansion-panel {
+      background: var(--obd-surface-3) !important;
+      border: 1px solid var(--obd-border) !important;
+      border-radius: var(--obd-radius-sm) !important;
+      margin-bottom: 6px !important;
+      box-shadow: none !important;
+
+      &:last-child { margin-bottom: 0 !important; }
+    }
+
+    .mat-expansion-panel-header {
+      padding: 10px 14px !important;
+      height: auto !important;
+      min-height: 40px !important;
+    }
+
+    .mat-panel-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--obd-text-dim) !important;
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        color: var(--obd-blue);
+      }
+    }
+
+    .mat-expansion-panel-body {
+      padding: 0 14px 12px !important;
+    }
+  }
+}
+
+.detail-list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  li {
+    font-size: 0.8rem;
+    color: var(--obd-text-dim);
+    line-height: 1.5;
+  }
+}
+
+.parts-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 4px;
+}
+
+.parts-summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--obd-blue-dim);
+  border: 1px solid var(--obd-blue-glow);
+  border-radius: var(--obd-radius);
+  font-size: 0.85rem;
+  color: var(--obd-text);
+
+  mat-icon {
+    color: var(--obd-blue);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .summary-parts {
+    color: var(--obd-text-dim);
+    display: block;
+    margin-top: 4px;
+    font-size: 0.8rem;
+  }
+}

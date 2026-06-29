@@ -1,0 +1,46 @@
+# ── Dependencies ──────────────────────────────────────────────────────────────
+node_modules/
+
+# ── Build outputs ─────────────────────────────────────────────────────────────
+dist/
+out-tsc/
+client/dist/
+server/dist/
+
+# ── Environment / secrets ─────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets.*
+
+# ── Angular ───────────────────────────────────────────────────────────────────
+.angular/
+client/.angular/
+
+# ── Claude / AI tooling ───────────────────────────────────────────────────────
+.claude/
+.claude.json
+.claude.json.backup
+*.claude
+
+# ── OS / editor noise ─────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/settings.json
+*.suo
+*.user
+.idea/
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Test coverage ─────────────────────────────────────────────────────────────
+coverage/
