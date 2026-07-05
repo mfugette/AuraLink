@@ -1,425 +1,309 @@
-// ── Host element (<app-root>) ─────────────────────────────────────────────────
 :host {
   display: block;
   width: 100%;
 }
 
-// ── Shell ─────────────────────────────────────────────────────────────────────
 .app-shell {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-// ── Container ─────────────────────────────────────────────────────────────────
-.container {
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 24px;
-
-  @media (max-width: 600px) {
-    padding: 0 16px;
-  }
-}
-
-// ── Header ────────────────────────────────────────────────────────────────────
+// ── Top bar ───────────────────────────────────────────────────────────────────
 .app-header {
+  // Also serves as the positioning context for .header-ai-search's desktop
+  // centering (position: sticky establishes one, same as position: relative).
   position: sticky;
   top: 0;
   z-index: 100;
   width: 100%;
-  background: rgba(8, 12, 20, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  height: var(--obd-header-height);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+  background: var(--obd-header-bg);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
   border-bottom: 1px solid var(--obd-border);
+}
 
-  .container {
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  // Equal flex on left & right so the center slot is symmetric about the page,
+  // keeping the AI search truly centered regardless of each side's width.
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-start;
+
+  // On phones .header-ai-search is back in normal flow inside .header-right
+  // (not absolutely centered — see its own rule), so the 50/50 split no
+  // longer serves a centering purpose and only starves the logo of space.
+  // Let .header-left take whatever it needs and .header-right shrink instead.
+  @media (max-width: 520px) {
+    flex: 0 1 auto;
   }
+}
+
+.hamburger {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--obd-text-dim);
+  transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 24px; width: 24px; height: 24px; }
+  &:hover { background: var(--obd-surface-3); color: var(--obd-text); }
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 4px;
   text-decoration: none;
+  margin-left: 0;
+  // Let the wordmark truncate instead of overflowing into .header-right when
+  // both sides' flex-basis get squeezed on very narrow screens.
+  min-width: 0;
+  overflow: hidden;
+  // Match the sidebar's own width transition so the two move in sync
+  // instead of the logo snapping instantly while the sidebar animates.
+  transition: margin-left var(--obd-dur) var(--obd-ease);
+
+  // When the sidebar is collapsed, its right border sits at
+  // --obd-sidebar-collapsed-width from the viewport edge (same edge the
+  // header starts from). Push the logo's left edge out to meet it exactly.
+  // Only applied in the collapsed state per design — left alone (natural
+  // position after the hamburger) when the sidebar is open.
+  .sidebar-collapsed & {
+    margin-left: calc(var(--obd-sidebar-collapsed-width) - 16px - 40px - 10px);
+
+    // On phones the sidebar is an out-of-flow overlay drawer, not an in-flow
+    // rail — there's no fixed edge to align the logo to, so keep it in its
+    // natural position right after the hamburger.
+    @media (max-width: 520px) { margin-left: 0; }
+  }
 }
 
 .logo-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--obd-blue), #6366f1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 26px;
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(135deg, var(--obd-purple), var(--obd-blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 
-  mat-icon {
-    color: #fff;
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-  }
+  @media (max-width: 600px) { font-size: 22px; width: 22px; height: 22px; }
 }
 
 .logo-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-}
-
-.logo-name {
-  font-size: 1rem;
+  font-size: 22px;
   font-weight: 700;
+  letter-spacing: -0.5px;
   color: var(--obd-text);
-  letter-spacing: -0.3px;
-}
-
-.logo-tagline {
-  font-size: 0.65rem;
-  color: var(--obd-text-muted);
-  letter-spacing: 0.3px;
-}
-
-.header-nav {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-
-  a {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.8rem;
-    color: var(--obd-text-dim);
-    text-decoration: none;
-    transition: color 0.15s;
-
-    &:hover { color: var(--obd-blue); }
-
-    mat-icon { font-size: 16px; width: 16px; height: 16px; }
-  }
-}
-
-// ── Hero stage (horizontal slider viewport) ────────────────────────────────────
-.hero-stage {
-  height: calc(100vh - 60px);
+  white-space: nowrap;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse 60% 50% at 50% -10%, rgba(59, 130, 246, 0.12), transparent),
-    radial-gradient(ellipse 40% 30% at 80% 60%, rgba(99, 102, 241, 0.07), transparent);
+  text-overflow: ellipsis;
+  min-width: 0;
 
-  &.hero--gone {
-    display: none;
-  }
+  @media (max-width: 600px) { font-size: 19px; }
+  @media (max-width: 340px) { font-size: 16px; }
 }
 
-.stage-track {
-  display: flex;
-  height: 100%;
-  width: 100%;
-  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &.stage-track--live {
-    transform: translateX(-100%);
-  }
-}
-
-.stage-panel {
-  flex: 0 0 100%;
-  width: 100%;
-  height: 100%;
-
-  // Hero panel: vertical positioning carried over from the old .hero
-  &.hero {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    overflow-y: auto;
-    // Push content down so its vertical center lands on the upper/middle-third boundary.
-    padding-top: max(32px, calc((100vh - 60px) / 3 - 150px));
-  }
-
-  &.stage-panel--live {
-    overflow: hidden;
-  }
-}
-
-.live-host {
-  height: 100%;
-  display: flex;
-}
-
-.hero-inner {
-  max-width: 680px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  gap: 20px;
-}
-
-.hero-title {
-  font-size: clamp(2rem, 5vw, 3rem);
-  font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: -1px;
-  margin: 0;
-  color: var(--obd-text);
-}
-
-.hero-accent {
-  background: linear-gradient(90deg, var(--obd-blue), #818cf8);
+.logo-text-accent {
+  background: linear-gradient(135deg, var(--obd-purple), var(--obd-blue));
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  color: transparent;
 }
 
-.hero-sub {
-  font-size: 1.05rem;
-  color: var(--obd-text-dim);
-  line-height: 1.65;
-  margin: 0;
-  max-width: 560px;
-}
-
-.hero-badges {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 4px;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border);
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  color: var(--obd-text-dim);
-
-  mat-icon {
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
-    color: var(--obd-green);
-  }
-}
-
-// ── Hero CTA buttons ──────────────────────────────────────────────────────────
-.hero-cta {
-  margin-top: 8px;
-  opacity: 0;
-  animation: fadeInUp 0.6s ease forwards;
-  animation-delay: 0.7s;
-
+.header-right {
   display: flex;
   align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.cta-or {
-  font-size: 0.85rem;
-  color: var(--obd-text-muted);
-  font-style: italic;
-}
-
-.get-started-btn {
-  height: 52px;
-  padding: 0 32px !important;
-  font-size: 1rem !important;
-  font-weight: 600 !important;
-  background: linear-gradient(135deg, var(--obd-blue), #6366f1) !important;
-  color: #fff !important;
-  border-radius: var(--obd-radius) !important;
-  box-shadow: 0 4px 20px var(--obd-blue-glow) !important;
-  transition: box-shadow 0.2s, transform 0.15s !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-
-  &:hover {
-    box-shadow: 0 6px 28px rgba(59, 130, 246, 0.45) !important;
-    transform: translateY(-2px);
-  }
-
-  mat-icon { font-size: 20px; width: 20px; height: 20px; }
-}
-
-.detect-live-btn {
-  height: 52px;
-  padding: 0 28px !important;
-  font-size: 1rem !important;
-  font-weight: 600 !important;
-  color: var(--obd-text) !important;
-  border-color: var(--obd-border) !important;
-  border-radius: var(--obd-radius) !important;
-  background: var(--obd-surface-2) !important;
-  transition: border-color 0.2s, transform 0.15s, background 0.2s !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-
-  &:hover {
-    border-color: var(--obd-blue) !important;
-    background: var(--obd-surface-3) !important;
-    transform: translateY(-2px);
-  }
-
-  mat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--obd-blue); }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-// ── Main ──────────────────────────────────────────────────────────────────────
-.main-content {
+  gap: 8px;
+  // Mirror .header-left so the center stays symmetric about the page.
   flex: 1;
-  padding-bottom: 80px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+  min-width: 0;
+  justify-content: flex-end;
 }
 
-// ── Section card ──────────────────────────────────────────────────────────────
-.card-section {
-  padding: 36px 0;
+// TEMPORARY tier switcher (testing). Floats at the bottom-center of the screen:
+// a compact segmented pill (Test tier: Free | Plus | Pro) + a Plan-page shortcut.
+// Remove when real billing lands.
+.tier-switch {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 250;
   display: flex;
-  flex-direction: column;
-  gap: 24px;
+  align-items: center;
+  gap: 2px;
+  padding: 5px 6px 5px 12px;
+  border-radius: var(--obd-radius-pill);
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border-strong);
+  box-shadow: var(--obd-shadow);
 }
 
-.section-label {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-}
-
-.step-num {
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--obd-blue-dim);
-  border: 1px solid var(--obd-blue-glow);
-  color: var(--obd-blue);
-  font-size: 0.85rem;
+.tier-switch-tag {
+  font-size: 0.68rem;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--obd-text-muted);
+  margin-right: 4px;
+}
+
+.tier-switch-btn {
+  padding: 4px 11px;
+  border-radius: var(--obd-radius-pill);
+  background: transparent;
+  border: none;
+  color: var(--obd-text-dim);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  cursor: pointer;
+  transition: background var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { color: var(--obd-text); }
+
+  &.active {
+    background: var(--obd-blue);
+    color: #fff;
+  }
+}
+
+.tier-switch-plans {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 2px;
-}
-
-.section-divider {
-  border-color: var(--obd-border) !important;
-}
-
-// ── Lookup bar ────────────────────────────────────────────────────────────────
-.lookup-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 0 36px;
-}
-
-.lookup-btn {
-  height: 52px;
-  padding: 0 32px !important;
-  font-size: 1rem !important;
-  font-weight: 600 !important;
-  background: linear-gradient(135deg, var(--obd-blue), #6366f1) !important;
-  color: #fff !important;
-  border-radius: var(--obd-radius) !important;
-  box-shadow: 0 4px 20px var(--obd-blue-glow) !important;
-  transition: box-shadow 0.2s, transform 0.15s !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-
-  &:hover:not([disabled]) {
-    box-shadow: 0 6px 28px rgba(59, 130, 246, 0.4) !important;
-    transform: translateY(-1px);
-  }
-
-  &[disabled] {
-    opacity: 0.45;
-    box-shadow: none !important;
-  }
-
-  mat-icon { font-size: 20px; width: 20px; height: 20px; }
-}
-
-.reset-btn {
-  height: 52px;
-  border-color: var(--obd-border) !important;
-  color: var(--obd-text-dim) !important;
-  border-radius: var(--obd-radius) !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-}
-
-// ── Results region ────────────────────────────────────────────────────────────
-.results-region {
-  display: flex;
-  flex-direction: column;
-}
-
-// ── Footer ────────────────────────────────────────────────────────────────────
-.app-footer {
-  width: 100%;
-  border-top: 1px solid var(--obd-border);
-  background: var(--obd-surface);
-  padding: 20px 0;
-}
-
-.footer-inner {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-
-.footer-logo {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 700;
-  font-size: 0.9rem;
+  width: 26px;
+  height: 26px;
+  margin-left: 2px;
+  border-radius: 50%;
   color: var(--obd-text-dim);
 
-  mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--obd-blue); }
+  &:hover { color: var(--obd-blue); background: var(--obd-surface-3); }
+
+  mat-icon { font-size: 17px; width: 17px; height: 17px; }
 }
 
-.footer-note {
-  font-size: 0.75rem;
-  color: var(--obd-text-muted);
-  max-width: 480px;
-  line-height: 1.5;
+// The single <app-ai-search> instance physically lives in .header-right (so
+// there's only ever one component/overlay state), but on wider screens it's
+// pulled out of that flex flow and centered over .header-center's slot —
+// visually identical to being centered, without a second instance.
+.header-ai-search {
+  // Centered over the header on desktop. Deliberately does NOT use `transform`
+  // to center: a transformed ancestor becomes the containing block for any
+  // `position: fixed` descendant, which would trap the AI overlay (rendered
+  // inside this component) inside this ~560px box instead of letting it fill
+  // the viewport. Centering via auto side-margins + a fixed top offset keeps
+  // this element free of a transform so the overlay stays viewport-anchored.
+  @media (min-width: 521px) {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-inline: auto;
+    // width comes from :host (min(560px, 46vw)); auto margins center it.
+    // Vertically center the 42px-tall trigger within the header row.
+    top: calc((var(--obd-header-height) - 42px) / 2);
+  }
+}
+
+.header-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--obd-text-dim);
+  text-decoration: none;
+  transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 22px; width: 22px; height: 22px; }
+  &:hover { background: var(--obd-surface-3); color: var(--obd-text); }
+
+  // Hidden on phones by default (kept for the OBD2 guide link) — the theme
+  // toggle specifically opts back in via .theme-toggle below, sitting next
+  // to the AI icon and account menu.
+  @media (max-width: 520px) { display: none; }
+}
+
+.theme-toggle {
+  @media (max-width: 520px) { display: flex; }
+}
+
+// ── Body ──────────────────────────────────────────────────────────────────────
+.app-body {
   flex: 1;
-  text-align: center;
+  display: flex;
+  align-items: stretch;
+  min-height: 0;
 }
 
-.footer-copy {
-  font-size: 0.75rem;
-  color: var(--obd-text-muted);
+.app-sidebar {
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--obd-header-height);
+  align-self: flex-start;
+  height: calc(100vh - var(--obd-header-height));
+  border-right: 1px solid var(--obd-border);
+  background: var(--obd-bg);
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 50;
+
+  scrollbar-width: thin;
+
+  // On phones the sidebar leaves the layout flow and becomes an overlay
+  // drawer: fixed to the left edge below the header, slid off-screen by
+  // default, sliding in over the content (not compressing it) when opened
+  // via the hamburger. The scrim (.drawer-scrim) sits behind it.
+  @media (max-width: 520px) {
+    position: fixed;
+    top: var(--obd-header-height);
+    left: 0;
+    height: calc(100vh - var(--obd-header-height));
+    width: var(--obd-sidebar-width);
+    max-width: 82vw;
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform var(--obd-dur) var(--obd-ease);
+    box-shadow: var(--obd-shadow-lg);
+
+    &.drawer-open {
+      transform: translateX(0);
+    }
+  }
+}
+
+// Dim scrim behind the mobile drawer (phones only — never created on desktop).
+.drawer-scrim {
+  position: fixed;
+  top: var(--obd-header-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 150;
+  background: var(--obd-overlay-scrim, rgba(6, 8, 12, 0.6));
+  animation: drawer-scrim-fade var(--obd-dur-fast) var(--obd-ease);
+}
+
+@keyframes drawer-scrim-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
 }

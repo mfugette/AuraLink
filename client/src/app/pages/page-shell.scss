@@ -1,0 +1,48 @@
+// Shared layout for the content pages (Part Lookup, My Vehicles, Issue
+// History). Full-width shell with a comfortable inner reading column.
+:host {
+  display: block;
+  width: 100%;
+}
+
+.page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 32px 80px;
+
+  @media (max-width: 900px) { padding: 24px 20px 64px; }
+  @media (max-width: 600px) { padding: 20px 16px 56px; }
+}
+
+.page-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--obd-text);
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    color: var(--obd-blue);
+  }
+}
+
+.page-subtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--obd-text-dim);
+  line-height: 1.5;
+}

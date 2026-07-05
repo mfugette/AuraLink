@@ -2,25 +2,28 @@
 
   <!-- VIN Row -->
   <div class="vin-row">
-    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="vin-field">
-      <mat-label>VIN (auto-fills year/make/model)</mat-label>
-      <input
-        matInput
-        formControlName="vin"
-        placeholder="1HGBH41JXMN109186"
-        maxlength="17"
-        autocapitalize="characters"
-        (input)="vinError.set(null)"
-      />
-      <mat-icon matPrefix>directions_car</mat-icon>
-      @if (loadingVin()) {
-        <mat-spinner matSuffix diameter="20" />
-      }
-    </mat-form-field>
+    <div class="field vin-field">
+      <label class="field-label" for="vin-input">VIN (auto-fills year/make/model)</label>
+      <div class="field-control">
+        <mat-icon>directions_car</mat-icon>
+        <input
+          id="vin-input"
+          class="field-input"
+          formControlName="vin"
+          placeholder="1HGBH41JXMN109186"
+          maxlength="17"
+          autocapitalize="characters"
+          (input)="vinError.set(null)"
+        />
+        @if (loadingVin()) {
+          <mat-spinner diameter="18" />
+        }
+      </div>
+    </div>
 
     <button
-      mat-flat-button
-      class="vin-decode-btn"
+      type="button"
+      class="btn vin-decode-btn"
       (click)="decodeVin()"
       [disabled]="loadingVin()"
     >
@@ -30,8 +33,8 @@
 
     @if (isMobile()) {
       <button
-        mat-stroked-button
-        class="scan-btn"
+        type="button"
+        class="btn scan-btn"
         (click)="scannerActive() ? stopScanner() : startScanner()"
       >
         <mat-icon>{{ scannerActive() ? 'camera_off' : 'photo_camera' }}</mat-icon>
@@ -59,7 +62,7 @@
           <span class="guide-line bottom-right"></span>
         </div>
         <p class="scanner-hint">Point camera at the barcode sticker on your door jamb or windshield</p>
-        <button mat-icon-button class="scanner-close" (click)="stopScanner()">
+        <button type="button" class="btn scanner-close" (click)="stopScanner()" aria-label="Close scanner">
           <mat-icon>close</mat-icon>
         </button>
       </div>
@@ -68,106 +71,166 @@
 
   <!-- Manual entry hint -->
   <div class="divider-row">
-    <mat-divider />
+    <hr class="divider" />
     <span class="divider-label">or select manually</span>
-    <mat-divider />
+    <hr class="divider" />
   </div>
 
-  <!-- Year / Make / Model / Sub-model grid -->
+  <!-- Year / Make / Model / Sub-model / Engine — always visible -->
   <div class="ymm-grid">
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Year</mat-label>
-      <mat-select formControlName="year">
-        @for (y of years; track y) {
-          <mat-option [value]="y">{{ y }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+    <!-- Year -->
+    <div class="field">
+      <label class="field-label" for="year-input">Year <span class="req">*</span></label>
+      <app-custom-select
+        formControlName="year"
+        [options]="yearOptions()"
+        placeholder="Year"
+      />
+    </div>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>
-        @if (loadingMakes()) { Loading makes... } @else { Make }
-      </mat-label>
-      <mat-select formControlName="make">
-        @for (m of makes(); track m) {
-          <mat-option [value]="m">{{ m }}</mat-option>
-        }
-      </mat-select>
-      @if (loadingMakes()) {
-        <mat-spinner matSuffix diameter="18" />
-      }
-    </mat-form-field>
+    <!-- Make -->
+    <div class="field">
+      <label class="field-label">
+        @if (loadingMakes()) { Loading makes… } @else { Make <span class="req">*</span> }
+      </label>
+      <app-custom-select
+        formControlName="make"
+        [options]="makeOptions()"
+        placeholder="Make"
+        searchPlaceholder="Type to search makes…"
+        [searchable]="true"
+        [loading]="loadingMakes()"
+      />
+    </div>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>
-        @if (loadingModels()) { Loading models... } @else { Model }
-      </mat-label>
-      <mat-select formControlName="model">
-        @for (m of models(); track m) {
-          <mat-option [value]="m">{{ m }}</mat-option>
-        }
-      </mat-select>
-      @if (loadingModels()) {
-        <mat-spinner matSuffix diameter="18" />
-      }
-    </mat-form-field>
+    <!-- Model -->
+    <div class="field">
+      <label class="field-label">
+        @if (loadingModels()) { Loading models… } @else { Model <span class="req">*</span> }
+      </label>
+      <app-custom-select
+        formControlName="model"
+        [options]="modelOptions()"
+        placeholder="Model"
+        searchPlaceholder="Type to search models…"
+        [searchable]="true"
+        [loading]="loadingModels()"
+      />
+    </div>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Trim / Sub-model (optional)</mat-label>
-      <input matInput formControlName="subModel" placeholder="EX, Sport, Limited..." />
-    </mat-form-field>
+    <!-- Trim / Sub-model -->
+    @if (trims().length > 0) {
+      <div class="field">
+        <label class="field-label">Trim / Sub-model</label>
+        <app-custom-select
+          [options]="trimOptions()"
+          placeholder="Select trim…"
+          [value]="selectedTrimIndex()"
+          (valueChange)="onTrimChange($event)"
+        />
+      </div>
+    } @else {
+      <div class="field">
+        <label class="field-label">
+          @if (loadingTrims()) { Looking up trims… } @else { Trim / Sub-model }
+        </label>
+        <div class="field-control">
+          <input class="field-input" formControlName="subModel" placeholder="EX, Sport, Limited..." />
+          @if (loadingTrims()) {
+            <mat-spinner diameter="18" />
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Engine -->
+    <div class="field">
+      <label class="field-label" for="engine-input">Engine</label>
+      <div class="field-control">
+        <mat-icon>settings</mat-icon>
+        <input id="engine-input" class="field-input" formControlName="engine" placeholder="3.5L V6" />
+      </div>
+    </div>
   </div>
 
-  <!-- Engine / Drive / Transmission / Fuel / Body / Mileage -->
-  <div class="details-grid">
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Engine (optional)</mat-label>
-      <input matInput formControlName="engine" placeholder="3.5L V6" />
-      <mat-icon matPrefix>settings</mat-icon>
-    </mat-form-field>
+  <!-- Additional details — shown after model is selected -->
+  @if (modelSelected()) {
+    @if (vinFilledDetails()) {
+      <!-- VIN decode populated extra fields — show them automatically -->
+      <div class="details-header">
+        <mat-icon>verified</mat-icon>
+        <span>Additional details filled from VIN</span>
+      </div>
+      <div class="details-grid">
+        <div class="field">
+          <label class="field-label">Drive Type</label>
+          <app-custom-select formControlName="driveType" [options]="driveTypeOptions" placeholder="Select…" />
+        </div>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Drive Type (optional)</mat-label>
-      <mat-select formControlName="driveType">
-        @for (opt of driveTypeOptions; track opt) {
-          <mat-option [value]="opt">{{ opt }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+        <div class="field">
+          <label class="field-label">Transmission</label>
+          <app-custom-select formControlName="transmission" [options]="transmissionOptions" placeholder="Select…" />
+        </div>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Transmission (optional)</mat-label>
-      <mat-select formControlName="transmission">
-        @for (opt of transmissionOptions; track opt) {
-          <mat-option [value]="opt">{{ opt }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+        <div class="field">
+          <label class="field-label">Fuel Type</label>
+          <app-custom-select formControlName="fuelType" [options]="fuelTypeOptions" placeholder="Select…" />
+        </div>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Fuel Type (optional)</mat-label>
-      <mat-select formControlName="fuelType">
-        @for (opt of fuelTypeOptions; track opt) {
-          <mat-option [value]="opt">{{ opt }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+        <div class="field">
+          <label class="field-label">Body Style</label>
+          <app-custom-select formControlName="bodyStyle" [options]="bodyStyleOptions" placeholder="Select…" />
+        </div>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Body Style (optional)</mat-label>
-      <mat-select formControlName="bodyStyle">
-        @for (opt of bodyStyleOptions; track opt) {
-          <mat-option [value]="opt">{{ opt }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
+        <div class="field">
+          <label class="field-label">Mileage (optional)</label>
+          <div class="field-control">
+            <mat-icon>speed</mat-icon>
+            <input class="field-input" type="number" formControlName="mileage" placeholder="85000" min="0" />
+            <span class="field-suffix">mi</span>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <!-- No VIN decode — offer an expandable section -->
+      <button type="button" class="btn details-toggle" (click)="toggleDetails()">
+        <mat-icon>{{ detailsExpanded() ? 'expand_less' : 'expand_more' }}</mat-icon>
+        Additional info (optional)
+      </button>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Mileage (optional)</mat-label>
-      <input matInput type="number" formControlName="mileage" placeholder="85000" min="0" />
-      <span matSuffix>mi</span>
-      <mat-icon matPrefix>speed</mat-icon>
-    </mat-form-field>
-  </div>
+      @if (detailsExpanded()) {
+        <div class="details-grid">
+          <div class="field">
+            <label class="field-label">Drive Type</label>
+            <app-custom-select formControlName="driveType" [options]="driveTypeOptions" placeholder="Select…" />
+          </div>
+
+          <div class="field">
+            <label class="field-label">Transmission</label>
+            <app-custom-select formControlName="transmission" [options]="transmissionOptions" placeholder="Select…" />
+          </div>
+
+          <div class="field">
+            <label class="field-label">Fuel Type</label>
+            <app-custom-select formControlName="fuelType" [options]="fuelTypeOptions" placeholder="Select…" />
+          </div>
+
+          <div class="field">
+            <label class="field-label">Body Style</label>
+            <app-custom-select formControlName="bodyStyle" [options]="bodyStyleOptions" placeholder="Select…" />
+          </div>
+
+          <div class="field">
+            <label class="field-label">Mileage (optional)</label>
+            <div class="field-control">
+              <mat-icon>speed</mat-icon>
+              <input class="field-input" type="number" formControlName="mileage" placeholder="85000" min="0" />
+              <span class="field-suffix">mi</span>
+            </div>
+          </div>
+        </div>
+      }
+    }
+  }
 
 </div>

@@ -1,0 +1,207 @@
+@use '../page-shell' as *;
+
+.search-field {
+  margin-bottom: 16px;
+}
+
+.clear-search {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--obd-text-muted);
+  flex-shrink: 0;
+  transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  &:hover { background: var(--obd-surface-4); color: var(--obd-text); }
+}
+
+// ── Category chips ──────────────────────────────────────────────────────────
+.category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.cat-chip {
+  height: 34px;
+  padding: 0 16px;
+  border-radius: var(--obd-radius-pill);
+  border: 1px solid var(--obd-border-strong);
+  background: var(--obd-surface-2);
+  color: var(--obd-text-dim);
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: border-color var(--obd-dur-fast) var(--obd-ease),
+              background var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { border-color: var(--obd-blue); color: var(--obd-text); }
+
+  &.active {
+    background: var(--obd-blue-dim);
+    border-color: var(--obd-blue);
+    color: var(--obd-blue);
+  }
+}
+
+// ── Result meta ─────────────────────────────────────────────────────────────
+.result-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  font-size: 0.85rem;
+  color: var(--obd-text-muted);
+}
+
+.clear-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--obd-text-muted);
+  font-size: 0.82rem;
+  padding: 4px 8px;
+  border-radius: var(--obd-radius-sm);
+  transition: color var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+  &:hover { color: var(--obd-red); }
+}
+
+// ── Parts grid ──────────────────────────────────────────────────────────────
+.parts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+}
+
+.part-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius-lg);
+  box-shadow: var(--obd-shadow-sm);
+  transition: border-color var(--obd-dur) var(--obd-ease),
+              box-shadow var(--obd-dur) var(--obd-ease),
+              transform var(--obd-dur) var(--obd-ease-spring);
+
+  &:hover {
+    border-color: var(--obd-border-strong);
+    box-shadow: var(--obd-shadow);
+    transform: translateY(-3px);
+  }
+}
+
+.part-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.part-category {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--obd-blue);
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--obd-blue-dim);
+}
+
+.part-price {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--obd-green);
+  white-space: nowrap;
+}
+
+.part-name {
+  margin: 2px 0 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--obd-text);
+  line-height: 1.3;
+}
+
+.part-desc {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--obd-text-dim);
+  line-height: 1.5;
+}
+
+.part-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.part-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  color: var(--obd-text-dim);
+
+  mat-icon { font-size: 14px; width: 14px; height: 14px; color: var(--obd-blue); opacity: 0.7; }
+}
+
+.part-number {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: var(--obd-text-muted);
+}
+
+.part-fitment {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--obd-text-muted);
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; flex-shrink: 0; }
+}
+
+.part-codes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.code-tag {
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--obd-orange);
+  padding: 2px 7px;
+  border-radius: var(--obd-radius-sm);
+  background: rgba(249, 115, 22, 0.12);
+}
+
+// ── Empty state ─────────────────────────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 56px 20px;
+  color: var(--obd-text-muted);
+  text-align: center;
+
+  mat-icon { font-size: 40px; width: 40px; height: 40px; opacity: 0.4; }
+  p { margin: 0; font-size: 0.9rem; }
+
+  .clear-all { border: 1px solid var(--obd-border-strong); padding: 8px 16px; border-radius: var(--obd-radius-pill); }
+}

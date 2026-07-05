@@ -1,128 +1,84 @@
-import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core'; // computed kept for canLookup
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
+import { NavigationEnd, Router, RouterOutlet, RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map, startWith } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { CodeEntryComponent } from './components/code-entry/code-entry.component';
-import { VehicleSelectorComponent } from './components/vehicle-selector/vehicle-selector.component';
-import { CodeResultsComponent } from './components/code-results/code-results.component';
-import { PartsLocatorComponent } from './components/parts-locator/parts-locator.component';
-import { LiveDtcComponent } from './components/live-dtc/live-dtc.component';
-import { Vehicle } from './models/vehicle.model';
+import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { AiSearchComponent } from './components/ai-search/ai-search.component';
+import { AccountMenuComponent } from './components/account-menu/account-menu.component';
+import { ThemeService } from './services/theme.service';
+import { AuthService } from './services/auth.service';
+import { TierService } from './services/tier.service';
+import { Tier } from './models/tier.model';
 
+// App shell: persistent chrome (top bar with AI search + account menu, a
+// collapsible left sidebar) around a <router-outlet>. Full-width, YouTube-style
+// layout. The previous single-page hero/lookup flow now lives at /home.
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
     CommonModule,
-    MatButtonModule, MatIconModule, MatDividerModule, MatTooltipModule,
-    CodeEntryComponent,
-    VehicleSelectorComponent,
-    CodeResultsComponent,
-    PartsLocatorComponent,
-    LiveDtcComponent,
+    RouterOutlet, RouterLink,
+    MatIconModule, MatTooltipModule,
+    SidebarComponent,
+    AiSearchComponent,
+    AccountMenuComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
-export class App implements OnInit, OnDestroy {
-  codes = signal<string[]>([]);
-  vehicle = signal<Vehicle>({ year: null, make: null, model: null, subModel: null, engine: null, driveType: null, transmission: null, fuelType: null, bodyStyle: null, mileage: null, vin: null });
-  showResults = signal(false);
-  heroHidden = signal(false);
-  liveMode = signal(false);
-  selectedParts = signal<string[]>([]);
+export class App {
+  private readonly router = inject(Router);
+  // Injected so it's constructed at app start: applies the theme and wires the
+  // account-settings sync. Also exposed to the template for the header toggle.
+  protected readonly theme = inject(ThemeService);
+  // Guests get a stripped shell: no sidebar, hamburger, or AI search — only the
+  // free /home pipeline. The chrome appears once signed in. (Exposed to the
+  // template.)
+  protected readonly auth = inject(AuthService);
+  // Temporary tier switcher in the header (billing isn't built yet). Exposed to
+  // the template; remove this toggle once real subscription state exists.
+  protected readonly tierService = inject(TierService);
+  readonly tiers: Tier[] = ['free', 'plus', 'pro'];
 
-  readonly canLookup = computed(() => this.codes().length > 0);
+  sidebarCollapsed = signal(true);
+  // Separate mobile state: on phones the sidebar isn't part of the layout flow
+  // (see .app-sidebar's breakpoint) — instead the hamburger opens it as a
+  // fixed overlay drawer on top of the content. Closed by default.
+  mobileDrawerOpen = signal(false);
+
   readonly currentYear = new Date().getFullYear();
 
-  constructor() {}
+  // Hide the top-bar AI search on the dedicated assistant page — it's redundant
+  // there since the whole page is the conversation.
+  private readonly currentUrl = toSignal(
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map(e => e.urlAfterRedirects),
+      startWith(this.router.url),
+    ),
+    { initialValue: this.router.url },
+  );
 
-  ngOnInit(): void {
-    document.documentElement.style.overflow = 'hidden';
+  // AI search is a signed-in feature, and it's redundant on the dedicated
+  // assistant page (the whole page is the conversation there).
+  readonly showAiSearch = () =>
+    this.auth.isSignedIn() && !this.currentUrl().startsWith('/assistant');
+
+  // On phones (≤520px) the hamburger toggles the overlay drawer; on larger
+  // screens it toggles the in-flow collapse. Matching the CSS breakpoint.
+  toggleSidebar(): void {
+    if (window.innerWidth <= 520) {
+      this.mobileDrawerOpen.update(v => !v);
+    } else {
+      this.sidebarCollapsed.update(v => !v);
+    }
   }
 
-  ngOnDestroy(): void {
-    document.documentElement.style.overflow = '';
-  }
-
-  onCodesChanged(codes: string[]): void {
-    this.codes.set(codes);
-    if (codes.length === 0) this.showResults.set(false);
-  }
-
-  onSelectedPartsChanged(parts: string[]): void {
-    this.selectedParts.set(parts);
-  }
-
-  onVehicleChanged(v: Vehicle): void {
-    this.vehicle.set(v);
-  }
-
-  lookup(): void {
-    if (!this.canLookup()) return;
-    this.showResults.set(true);
-    setTimeout(() => {
-      document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 50);
-  }
-
-  scrollToForm(): void {
-    document.documentElement.style.overflow = '';
-    document.getElementById('main-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-    // Guard against both scrollend and the fallback timeout firing
-    let done = false;
-
-    const finish = () => {
-      if (done) return;
-      done = true;
-      this.heroHidden.set(true);
-      // Double rAF: first frame lets Angular remove the hero from the DOM,
-      // second frame lets the browser paint it, then we snap scroll to top.
-      requestAnimationFrame(() =>
-        requestAnimationFrame(() =>
-          window.scrollTo({ top: 0, behavior: 'instant' })
-        )
-      );
-    };
-
-    // Primary: fires exactly when smooth scroll ends
-    window.addEventListener('scrollend', finish, { once: true });
-
-    // Fallback for browsers that don't support scrollend
-    setTimeout(finish, 1500);
-  }
-
-  reset(): void {
-    this.codes.set([]);
-    this.showResults.set(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  // ── Live DTC flow (Bluetooth dongle demo) ──────────────────────────────────
-  enterLiveMode(): void {
-    this.liveMode.set(true);
-  }
-
-  exitLiveMode(): void {
-    this.liveMode.set(false);
-  }
-
-  onUseDetectedCodes(codes: string[]): void {
-    // Carry the scanned codes into the main lookup flow and reveal results.
-    this.codes.set(codes);
-    this.liveMode.set(false);
-    this.heroHidden.set(true);
-    this.showResults.set(true);
-    document.documentElement.style.overflow = '';
-
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        window.scrollTo({ top: 0, behavior: 'instant' });
-        document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      })
-    );
+  closeMobileDrawer(): void {
+    this.mobileDrawerOpen.set(false);
   }
 }

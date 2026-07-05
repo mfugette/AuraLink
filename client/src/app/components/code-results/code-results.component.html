@@ -11,85 +11,93 @@
     </div>
   }
 
-  <!-- Result cards -->
-  <div class="results-grid">
+  <!-- Result list -->
+  <div class="results-accordion">
     @for (result of results(); track result.code) {
-      <mat-card class="result-card" [class]="'card-' + result.severity">
-        <mat-card-header>
-          <div class="card-header-inner">
-            <div class="code-badge">{{ result.code }}</div>
-            <div class="header-text">
-              <h3 class="code-name">{{ result.name }}</h3>
-              <span class="severity-badge {{ result.severity }}">
-                <mat-icon>{{ severityIcon(result.severity) }}</mat-icon>
-                {{ result.severity }}
-              </span>
+      <div class="result-panel" [class]="'panel-' + result.severity" [class.expanded]="isExpanded(result.code)">
+
+        <button
+          type="button"
+          class="btn panel-header"
+          [attr.aria-expanded]="isExpanded(result.code)"
+          (click)="toggleExpanded(result.code)"
+        >
+          <div class="panel-summary">
+            <span class="code-badge">{{ result.code }}</span>
+            <span class="code-name">{{ result.name }}</span>
+            <span class="severity-badge {{ result.severity }}">
+              <mat-icon>{{ severityIcon(result.severity) }}</mat-icon>
+              {{ result.severity }}
+            </span>
+          </div>
+          <mat-icon class="panel-chevron">expand_more</mat-icon>
+        </button>
+
+        <!-- Expanded content (CSS grid height animation) -->
+        <div class="panel-body-wrap">
+          <div class="panel-body-clip">
+            <div class="panel-body">
+              <p class="code-description">{{ result.description }}</p>
+
+              <div class="detail-sections">
+                <!-- Symptoms -->
+                <div class="detail-section">
+                  <div class="detail-heading">
+                    <mat-icon>visibility</mat-icon>
+                    Symptoms
+                  </div>
+                  <ul class="detail-list">
+                    @for (s of result.symptoms; track s) {
+                      <li>{{ s }}</li>
+                    }
+                  </ul>
+                </div>
+
+                <!-- Possible causes -->
+                <div class="detail-section">
+                  <div class="detail-heading">
+                    <mat-icon>build</mat-icon>
+                    Possible Causes
+                  </div>
+                  <ul class="detail-list">
+                    @for (c of result.possibleCauses; track c) {
+                      <li>{{ c }}</li>
+                    }
+                  </ul>
+                </div>
+
+                <!-- Related parts -->
+                @if (result.relatedParts.length > 0) {
+                  <div class="detail-section">
+                    <div class="detail-heading">
+                      <mat-icon>shopping_cart</mat-icon>
+                      Parts That May Be Needed
+                    </div>
+                    <p class="parts-hint">
+                      <mat-icon>touch_app</mat-icon>
+                      Select parts to add them to your shopping list in Step 4.
+                    </p>
+                    <div class="parts-chips">
+                      @for (part of result.relatedParts; track part) {
+                        <button
+                          type="button"
+                          class="part-chip"
+                          [class.part-chip--selected]="selectedParts().has(part)"
+                          (click)="togglePart(part)"
+                        >
+                          <mat-icon>{{ selectedParts().has(part) ? 'check' : 'add' }}</mat-icon>
+                          {{ part }}
+                        </button>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
             </div>
           </div>
-        </mat-card-header>
+        </div>
 
-        <mat-card-content>
-          <p class="code-description">{{ result.description }}</p>
-
-          <mat-accordion class="details-accordion">
-            <!-- Symptoms -->
-            <mat-expansion-panel>
-              <mat-expansion-panel-header>
-                <mat-panel-title>
-                  <mat-icon>visibility</mat-icon> Symptoms
-                </mat-panel-title>
-              </mat-expansion-panel-header>
-              <ul class="detail-list">
-                @for (s of result.symptoms; track s) {
-                  <li>{{ s }}</li>
-                }
-              </ul>
-            </mat-expansion-panel>
-
-            <!-- Possible causes -->
-            <mat-expansion-panel>
-              <mat-expansion-panel-header>
-                <mat-panel-title>
-                  <mat-icon>build</mat-icon> Possible Causes
-                </mat-panel-title>
-              </mat-expansion-panel-header>
-              <ul class="detail-list">
-                @for (c of result.possibleCauses; track c) {
-                  <li>{{ c }}</li>
-                }
-              </ul>
-            </mat-expansion-panel>
-
-            <!-- Related parts -->
-            @if (result.relatedParts.length > 0) {
-              <mat-expansion-panel>
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
-                    <mat-icon>shopping_cart</mat-icon> Parts That May Be Needed
-                  </mat-panel-title>
-                </mat-expansion-panel-header>
-                <p class="parts-hint">
-                  <mat-icon>touch_app</mat-icon>
-                  Select parts to add them to your shopping list in Step 4.
-                </p>
-                <div class="parts-chips">
-                  @for (part of result.relatedParts; track part) {
-                    <button
-                      type="button"
-                      class="part-chip"
-                      [class.part-chip--selected]="selectedParts().has(part)"
-                      (click)="togglePart(part)"
-                    >
-                      <mat-icon>{{ selectedParts().has(part) ? 'check' : 'add' }}</mat-icon>
-                      {{ part }}
-                    </button>
-                  }
-                </div>
-              </mat-expansion-panel>
-            }
-          </mat-accordion>
-        </mat-card-content>
-      </mat-card>
+      </div>
     }
   </div>
 

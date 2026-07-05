@@ -5,7 +5,7 @@
   box-sizing: border-box;
 }
 
-// OpenOBD dark automotive theme
+// AuraLink dark automotive theme
 html {
   @include mat.theme((
     color: (
@@ -23,26 +23,106 @@ html {
 
 // ─── CSS Custom Properties ────────────────────────────────────────────────────
 :root {
-  --obd-bg:         #080c14;
-  --obd-surface:    #0e1420;
-  --obd-surface-2:  #141c2e;
-  --obd-surface-3:  #1a2540;
-  --obd-border:     rgba(255, 255, 255, 0.08);
+  // Surfaces — neutral cool-graphite. Depth reads from tonal steps + soft
+  // shadow rather than hard outlines (Material 3 / Apple elevation model).
+  --obd-bg:         #0b0d11;
+  --obd-surface:    #131519;
+  --obd-surface-2:  #1a1d23;
+  --obd-surface-3:  #23262e;
+  --obd-surface-4:  #2d313a;
+
+  // Hairlines — nearly invisible; present only to define an edge, not a box.
+  --obd-border:        rgba(255, 255, 255, 0.06);
+  --obd-border-strong: rgba(255, 255, 255, 0.11);
+
+  // Accent (kept in-family so any hardcoded rgba(59,130,246,…) stays coherent).
   --obd-blue:       #3b82f6;
-  --obd-blue-dim:   rgba(59, 130, 246, 0.15);
-  --obd-blue-glow:  rgba(59, 130, 246, 0.25);
+  --obd-blue-2:     #6366f1;
+  --obd-blue-dim:   rgba(59, 130, 246, 0.14);
+  --obd-blue-glow:  rgba(59, 130, 246, 0.28);
+  --obd-purple:     #8b5cf6;
+
   --obd-orange:     #f97316;
   --obd-green:      #22c55e;
   --obd-yellow:     #eab308;
   --obd-red:        #ef4444;
-  --obd-text:       #f1f5f9;
-  --obd-text-dim:   #94a3b8;
-  --obd-text-muted: #475569;
-  --obd-radius:     12px;
-  --obd-radius-sm:  8px;
-  --obd-radius-lg:  16px;
-  --obd-shadow:     0 4px 24px rgba(0, 0, 0, 0.4);
-  --obd-shadow-lg:  0 8px 48px rgba(0, 0, 0, 0.6);
+  --obd-teal:       #14b8a6;
+
+  --obd-text:       #f2f4f8;
+  --obd-text-dim:   #9aa4b2;
+  --obd-text-muted: #5b6472;
+
+  // Generous, soft corners.
+  --obd-radius-sm:  10px;
+  --obd-radius:     16px;
+  --obd-radius-lg:  24px;
+  --obd-radius-pill: 999px;
+
+  // Elevation — soft, layered, diffuse. Two-part shadow for realistic falloff.
+  --obd-shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(0, 0, 0, 0.22);
+  --obd-shadow:     0 2px 8px rgba(0, 0, 0, 0.26), 0 12px 32px rgba(0, 0, 0, 0.36);
+  --obd-shadow-lg:  0 8px 24px rgba(0, 0, 0, 0.4), 0 24px 64px rgba(0, 0, 0, 0.55);
+
+  // Motion — one shared vocabulary of easings + durations.
+  --obd-ease:            cubic-bezier(0.4, 0, 0.2, 1);
+  --obd-ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --obd-ease-spring:     cubic-bezier(0.34, 1.3, 0.64, 1);
+  --obd-dur-fast:   0.16s;
+  --obd-dur:        0.26s;
+  --obd-dur-slow:   0.42s;
+
+  --obd-header-height: 60px;
+  --obd-sidebar-width: 240px;
+  --obd-sidebar-collapsed-width: 72px;
+
+  // Frosted top-bar background (translucent so backdrop-filter shows through).
+  --obd-header-bg: rgba(11, 13, 17, 0.82);
+
+  // Modal/overlay scrim behind dialogs (AI overlay, account panels).
+  --obd-overlay-scrim: rgba(6, 8, 12, 0.82);
+}
+
+// ─── Light theme ──────────────────────────────────────────────────────────────
+// Every component reads from the --obd-* variables above, so a full light theme
+// is just an override of those tokens under [data-theme="light"] on <html>.
+// Warm-neutral surfaces, dark text, softer shadows — same accent family.
+:root[data-theme='light'] {
+  --obd-bg:         #f6f7f9;
+  --obd-surface:    #ffffff;
+  --obd-surface-2:  #ffffff;
+  --obd-surface-3:  #eef0f3;
+  --obd-surface-4:  #e3e6ea;
+
+  // Hairlines are dark-on-light now (the inverse of the dark theme's).
+  --obd-border:        rgba(15, 23, 42, 0.09);
+  --obd-border-strong: rgba(15, 23, 42, 0.16);
+
+  // Accent stays in-family; dim/glow re-tuned for a light backdrop.
+  --obd-blue:       #2563eb;
+  --obd-blue-2:     #4f46e5;
+  --obd-blue-dim:   rgba(37, 99, 235, 0.10);
+  --obd-blue-glow:  rgba(37, 99, 235, 0.30);
+  --obd-purple:     #7c3aed;
+
+  --obd-orange:     #ea580c;
+  --obd-green:      #16a34a;
+  --obd-yellow:     #ca8a04;
+  --obd-red:        #dc2626;
+  --obd-teal:       #0d9488;
+
+  --obd-text:       #101319;
+  --obd-text-dim:   #5b6472;
+  --obd-text-muted: #98a2b3;
+
+  // Elevation — lighter, tighter shadows (dark diffuse shadows look muddy on white).
+  --obd-shadow-sm:  0 1px 2px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.05);
+  --obd-shadow:     0 2px 8px rgba(15, 23, 42, 0.07), 0 12px 32px rgba(15, 23, 42, 0.10);
+  --obd-shadow-lg:  0 8px 24px rgba(15, 23, 42, 0.12), 0 24px 64px rgba(15, 23, 42, 0.16);
+
+  --obd-header-bg: rgba(255, 255, 255, 0.80);
+
+  // Lighter scrim on light mode — dims without a heavy near-black wash.
+  --obd-overlay-scrim: rgba(15, 23, 42, 0.42);
 }
 
 html, body {
@@ -50,51 +130,47 @@ html, body {
   color-scheme: dark;
 }
 
+// Native form controls / OS-drawn UI (select popups, date pickers) follow this.
+:root[data-theme='light'] { color-scheme: light; }
+
 body {
   margin: 0;
   font-family: 'Inter', 'Helvetica Neue', sans-serif;
   background-color: var(--obd-bg);
   color: var(--obd-text);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  letter-spacing: -0.011em;   // subtle optical tightening, à la SF/Google Sans
 }
 
-// ─── Material overrides ───────────────────────────────────────────────────────
-.mat-mdc-form-field {
-  width: 100%;
+// ─── Scrollbar (Google/Material style: thin, borderless, translucent) ─────────
+// Thumb color is a variable so it flips with the theme (translucent-white on
+// dark, translucent-black on light).
+:root {
+  --obd-scroll-thumb:       rgba(255, 255, 255, 0.16);
+  --obd-scroll-thumb-hover: rgba(255, 255, 255, 0.32);
+}
+:root[data-theme='light'] {
+  --obd-scroll-thumb:       rgba(15, 23, 42, 0.20);
+  --obd-scroll-thumb-hover: rgba(15, 23, 42, 0.36);
 }
 
-.mat-mdc-card {
-  background: var(--obd-surface-2) !important;
-  border: 1px solid var(--obd-border) !important;
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--obd-scroll-thumb) transparent;
 }
-
-.mat-mdc-option {
-  color: var(--obd-text) !important;
-}
-
-.mdc-text-field--outlined .mdc-notched-outline__leading,
-.mdc-text-field--outlined .mdc-notched-outline__notch,
-.mdc-text-field--outlined .mdc-notched-outline__trailing {
-  border-color: var(--obd-border) !important;
-}
-
-.mdc-text-field--outlined:not(.mdc-text-field--disabled):hover .mdc-notched-outline__leading,
-.mdc-text-field--outlined:not(.mdc-text-field--disabled):hover .mdc-notched-outline__notch,
-.mdc-text-field--outlined:not(.mdc-text-field--disabled):hover .mdc-notched-outline__trailing {
-  border-color: var(--obd-blue) !important;
-}
-
-// ─── Scrollbar ────────────────────────────────────────────────────────────────
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
-::-webkit-scrollbar-track { background: var(--obd-surface); }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: var(--obd-surface-3);
-  border-radius: 3px;
+  background: var(--obd-scroll-thumb);
+  border-radius: 999px;
 }
-::-webkit-scrollbar-thumb:hover { background: var(--obd-blue); }
+::-webkit-scrollbar-thumb:hover { background: var(--obd-scroll-thumb-hover); }
+::-webkit-scrollbar-corner { background: transparent; }
 
 // ─── Utility ─────────────────────────────────────────────────────────────────
 .obd-section {
@@ -140,3 +216,121 @@ body {
   &.high    { background: rgba(249, 115, 22, 0.15); color: var(--obd-orange); }
   &.critical{ background: rgba(239, 68, 68, 0.15);  color: var(--obd-red); }
 }
+
+// ─── Custom control primitives (post-Material) ─────────────────────────────────
+// Native <button> reset so our own classes fully own the look, no framework to
+// fight. Specific button classes still supply size/color/radius.
+.btn {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  text-decoration: none;
+  line-height: 1;
+
+  &:disabled { cursor: default; }
+}
+
+// Hairline rule replacing <mat-divider>.
+.divider {
+  border: none;
+  border-top: 1px solid var(--obd-border);
+  margin: 0;
+  height: 0;
+  width: 100%;
+}
+
+// Custom form field: a static label sitting above a control box (modern SaaS
+// style — cleaner and more bespoke than Material's floating notched outline).
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--obd-text-dim);
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-text-muted); }
+  .req { color: var(--obd-blue); }
+}
+
+.field-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 14px;
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius);
+  transition: border-color var(--obd-dur-fast) var(--obd-ease),
+              box-shadow var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { border-color: var(--obd-text-muted); }
+
+  &:focus-within,
+  &.focused {
+    border-color: var(--obd-blue);
+    box-shadow: 0 0 0 3px var(--obd-blue-dim);
+  }
+
+  // Leading/trailing icons inside the box.
+  > mat-icon {
+    flex-shrink: 0;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--obd-text-muted);
+  }
+
+  &.field-control--disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+.field-input {
+  flex: 1;
+  min-width: 0;
+  height: 46px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--obd-text);
+  font: inherit;
+  font-size: 0.9rem;
+
+  &::placeholder { color: var(--obd-text-muted); }
+
+  &:disabled { color: var(--obd-text-muted); cursor: not-allowed; }
+}
+
+// Trailing static text (units, etc.)
+.field-suffix {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  color: var(--obd-text-muted);
+}
+
+// Dim the whole control when its input/select is disabled.
+.field-control:has(.field-input:disabled) {
+  background: var(--obd-surface);
+  border-color: var(--obd-border);
+  opacity: 0.6;
+}
+

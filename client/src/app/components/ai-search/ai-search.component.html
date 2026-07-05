@@ -1,0 +1,54 @@
+<!-- Compact top-bar trigger -->
+<button type="button" class="ai-trigger" (click)="activate()" aria-label="Ask Aura">
+  <mat-icon>auto_awesome</mat-icon>
+  <span class="ai-trigger-text">Ask Aura about your car…</span>
+  <kbd class="ai-trigger-kbd">Enter</kbd>
+</button>
+
+<!-- Activated AI-focused overlay. Submitting hands off to the /assistant page. -->
+@if (active()) {
+  <div class="ai-overlay" (click)="close()">
+    <div class="ai-panel" (click)="$event.stopPropagation()">
+      <button type="button" class="btn ai-close" (click)="close()" aria-label="Close Aura">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <div class="ai-hero">
+        <div class="ai-badge"><mat-icon>auto_awesome</mat-icon> Aura</div>
+        <h2 class="ai-heading">What’s going on with your car?</h2>
+        <p class="ai-sub">Describe a symptom, ask about a code, or pick a common question below.</p>
+      </div>
+
+      <!-- Suggestion chips -->
+      <div class="ai-chips">
+        @for (s of suggestions; track s) {
+          <button type="button" class="btn ai-chip" (click)="useSuggestion(s)">
+            <mat-icon>bolt</mat-icon> {{ s }}
+          </button>
+        }
+      </div>
+
+      <!-- Input -->
+      <div class="ai-input-row">
+        <div class="ai-input-control">
+          <mat-icon>auto_awesome</mat-icon>
+          <input
+            #overlayInput
+            class="ai-input"
+            [(ngModel)]="input"
+            (keydown.enter)="send()"
+            placeholder="Ask Aura anything about your car…"
+            autocomplete="off"
+          />
+          <button type="button" class="btn ai-send" [disabled]="!input.trim()" (click)="send()" aria-label="Send">
+            <mat-icon>arrow_upward</mat-icon>
+          </button>
+        </div>
+        <p class="ai-disclaimer">
+          <mat-icon>info</mat-icon>
+          Demo preview — Aura isn’t connected yet. Responses are placeholders.
+        </p>
+      </div>
+    </div>
+  </div>
+}

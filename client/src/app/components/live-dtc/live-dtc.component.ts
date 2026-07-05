@@ -1,17 +1,16 @@
 import { Component, EventEmitter, Output, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DtcService } from '../../services/dtc.service';
-import { DtcCode, Severity } from '../../models/dtc-code.model';
+import { DtcCode, SEVERITY_RANK } from '../../models/dtc-code.model';
 
 @Component({
   selector: 'app-live-dtc',
   standalone: true,
   imports: [
     CommonModule,
-    MatButtonModule, MatIconModule, MatProgressSpinnerModule,
+    MatIconModule, MatProgressSpinnerModule,
   ],
   templateUrl: './live-dtc.component.html',
   styleUrl: './live-dtc.component.scss',
@@ -19,6 +18,7 @@ import { DtcCode, Severity } from '../../models/dtc-code.model';
 export class LiveDtcComponent implements OnDestroy {
   @Output() back = new EventEmitter<void>();
   @Output() useCodes = new EventEmitter<string[]>();
+  @Output() stepChanged = new EventEmitter<number>();
 
   // 0 = instructions, 1 = connecting/scanning, 2 = detected codes
   step = signal(0);
@@ -30,7 +30,53 @@ export class LiveDtcComponent implements OnDestroy {
     this.fakeDetected
       .map(c => this.dtcService.lookup(c))
       .filter((c): c is DtcCode => !!c)
+      .sort((a, b) => SEVERITY_RANK[b.severity] - SEVERITY_RANK[a.severity])
   );
+
+  // Secondary scanner feature panels
+  showFreezeFrame = signal(false);
+  showReadiness   = signal(false);
+  confirmingClear = signal(false);
+  codesCleared    = signal(false);
+
+  readonly freezeFrame = [
+    { label: 'Engine RPM',      value: '2,100 rpm'  },
+    { label: 'Vehicle Speed',   value: '35 mph'     },
+    { label: 'Coolant Temp',    value: '195 °F'     },
+    { label: 'Engine Load',     value: '47 %'       },
+    { label: 'ST Fuel Trim B1', value: '+12.5 %'    },
+    { label: 'MAF Rate',        value: '2.1 g/s'    },
+  ];
+
+  readonly readinessMonitors = [
+    { name: 'Misfire',      status: 'complete'   },
+    { name: 'Fuel System',  status: 'complete'   },
+    { name: 'Components',   status: 'complete'   },
+    { name: 'Catalyst',     status: 'incomplete' },
+    { name: 'O₂ Sensor',   status: 'complete'   },
+    { name: 'O₂ Heater',   status: 'complete'   },
+    { name: 'Evap System',  status: 'complete'   },
+    { name: 'EGR System',   status: 'na'         },
+  ];
+
+  toggleFreezeFrame(): void {
+    this.showFreezeFrame.update(v => !v);
+    if (this.showFreezeFrame()) this.showReadiness.set(false);
+  }
+
+  toggleReadiness(): void {
+    this.showReadiness.update(v => !v);
+    if (this.showReadiness()) this.showFreezeFrame.set(false);
+  }
+
+  clearCodes(): void {
+    this.confirmingClear.set(false);
+    this.codesCleared.set(true);
+    setTimeout(() => {
+      this.codesCleared.set(false);
+      this.setStep(0);
+    }, 2000);
+  }
 
   private connectTimer?: ReturnType<typeof setTimeout>;
 
@@ -39,7 +85,7 @@ export class LiveDtcComponent implements OnDestroy {
     {
       icon: 'usb',
       title: 'Plug in the dongle',
-      text: 'Locate the OBD2 port under your dashboard (usually near the steering column) and plug in your OpenOBD Bluetooth adapter.',
+      text: 'Locate the OBD2 port under your dashboard (usually near the steering column) and plug in your AuraLink Bluetooth adapter.',
     },
     {
       icon: 'vpn_key',
@@ -49,7 +95,7 @@ export class LiveDtcComponent implements OnDestroy {
     {
       icon: 'bluetooth',
       title: 'Pair via Bluetooth',
-      text: 'Open your phone’s Bluetooth settings and pair with “OpenOBD”. Then come back here and tap Connect.',
+      text: 'Open your phone’s Bluetooth settings and pair with “AuraLink”. Then come back here and tap Connect.',
     },
   ];
 
@@ -59,28 +105,29 @@ export class LiveDtcComponent implements OnDestroy {
     if (this.connectTimer) clearTimeout(this.connectTimer);
   }
 
+  private setStep(n: number): void {
+    this.step.set(n);
+    this.stepChanged.emit(n);
+  }
+
   connect(): void {
-    this.step.set(1);
+    this.setStep(1);
     // DEMO: simulate handshake + scan, then reveal detected codes
-    this.connectTimer = setTimeout(() => this.step.set(2), 2800);
+    this.connectTimer = setTimeout(() => this.setStep(2), 2800);
   }
 
   rescan(): void {
-    this.step.set(1);
-    this.connectTimer = setTimeout(() => this.step.set(2), 2200);
+    this.setStep(1);
+    this.connectTimer = setTimeout(() => this.setStep(2), 2200);
   }
 
   goBack(): void {
     if (this.connectTimer) clearTimeout(this.connectTimer);
-    this.step.set(0);
+    this.setStep(0);
     this.back.emit();
   }
 
   lookupDetected(): void {
     this.useCodes.emit(this.detected().map(d => d.code));
-  }
-
-  severityIcon(severity: Severity): string {
-    return { low: 'check_circle', moderate: 'warning', high: 'error', critical: 'dangerous' }[severity];
   }
 }

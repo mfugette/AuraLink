@@ -2,18 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>OpenOBD — Free OBD2 Code Lookup</title>
+  <title>AuraLink — Connect with your car</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Free OBD2 diagnostic code lookup, vehicle-specific parts finder, and repair guidance. OpenOBD — diagnose your car.">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="description" content="Free OBD2 diagnostic code lookup, vehicle-specific parts finder, and repair guidance. AuraLink — diagnose your car.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
+  <link rel="icon" type="image/x-icon" href="favicon.ico?v=2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 </head>
 <body>
+  <!-- Apply the saved theme before first paint to avoid a flash. Mirrors
+       ThemeService's precedence (localStorage → OS preference → dark). -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('obd-theme');
+        if (t !== 'dark' && t !== 'light') {
+          t = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
   <app-root></app-root>
 </body>
 </html>

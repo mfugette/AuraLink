@@ -1,0 +1,54 @@
+<div class="panel-backdrop" (click)="close()">
+  <div class="panel-modal" (click)="$event.stopPropagation()">
+    <div class="panel-header">
+      <h3 class="panel-title"><mat-icon>person</mat-icon> My Profile</h3>
+      <button type="button" class="btn panel-close" (click)="close()" aria-label="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="panel-body">
+      <div class="field">
+        <label class="field-label" for="profile-name">Display name</label>
+        <div class="field-control">
+          <mat-icon>badge</mat-icon>
+          <input
+            id="profile-name"
+            class="field-input"
+            [(ngModel)]="displayName"
+            placeholder="Your name"
+          />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="profile-email">Email address</label>
+        <div class="field-control">
+          <mat-icon>alternate_email</mat-icon>
+          <input
+            id="profile-email"
+            class="field-input"
+            type="email"
+            [(ngModel)]="email"
+            placeholder="you@example.com"
+          />
+        </div>
+      </div>
+
+      <p class="panel-note">
+        <mat-icon>info</mat-icon>
+        This is a preview of account settings — profile changes are stored in-memory on the demo server and reset on restart.
+      </p>
+    </div>
+
+    <div class="panel-footer">
+      @if (saved()) {
+        <span class="save-confirm"><mat-icon>check_circle</mat-icon> Saved</span>
+      }
+      <button type="button" class="btn panel-cancel-btn" (click)="close()">Cancel</button>
+      <button type="button" class="btn panel-save-btn" [disabled]="saving()" (click)="save()">
+        @if (saving()) { Saving… } @else { Save changes }
+      </button>
+    </div>
+  </div>
+</div>

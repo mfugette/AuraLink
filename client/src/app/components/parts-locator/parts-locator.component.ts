@@ -1,39 +1,24 @@
-import { Component, Input, OnChanges, SimpleChanges, signal } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatRadioModule } from '@angular/material/radio';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { forkJoin } from 'rxjs';
 import { PartsService } from '../../services/parts.service';
 import { NotificationService } from '../../services/notification.service';
-import { Part, PartSearchResult } from '../../models/part.model';
+import { PartCondition, PartSearchResult } from '../../models/part.model';
 import { Vehicle } from '../../models/vehicle.model';
-
-interface Retailer {
-  name: string;
-  icon: string;
-  storeKeywords: string[];
-  buildUrl(parts: string[], vehicle: Vehicle): string;
-}
 
 @Component({
   selector: 'app-parts-locator',
   standalone: true,
   imports: [
     CommonModule, FormsModule,
-    MatFormFieldModule, MatInputModule, MatButtonModule,
-    MatIconModule, MatCardModule, MatCheckboxModule,
-    MatProgressSpinnerModule, MatChipsModule, MatSnackBarModule,
-    MatRadioModule, MatTooltipModule,
+    MatIconModule,
+    MatProgressSpinnerModule, MatSnackBarModule,
+    MatTooltipModule,
   ],
   templateUrl: './parts-locator.component.html',
   styleUrl: './parts-locator.component.scss',
@@ -42,74 +27,59 @@ export class PartsLocatorComponent implements OnChanges {
   @Input() partNames: string[] = [];
   @Input() vehicle: Vehicle = { year: null, make: null, model: null, subModel: null, engine: null, driveType: null, transmission: null, fuelType: null, bodyStyle: null, mileage: null, vin: null };
 
-  zipCode = '';
-  locating = signal(false);
   searching = signal(false);
+  searchError = signal<string | null>(null);
   results = signal<PartSearchResult[]>([]);
-  locationError = signal<string | null>(null);
 
   notifyMethod: 'sms' | 'email' = 'sms';
   notifyRecipient = '';
   sendingNotification = signal(false);
   isMobile = signal(false);
 
-  readonly retailers: Retailer[] = [
-    {
-      name: 'AutoZone',
-      icon: 'storefront',
-      storeKeywords: ['autozone'],
-      buildUrl: (parts, v) => {
-        const params = new URLSearchParams({ searchText: parts.join(' ') });
-        if (v.year)  params.set('year',  String(v.year));
-        if (v.make)  params.set('make',  v.make);
-        if (v.model) params.set('model', v.model);
-        return `https://www.autozone.com/search?${params}`;
-      },
-    },
-    {
-      name: 'Advance Auto',
-      icon: 'storefront',
-      storeKeywords: ['advance'],
-      buildUrl: (parts, v) => {
-        const vehicleSlug = [v.year, v.make, v.model]
-          .filter(Boolean).join('-').toLowerCase().replace(/\s+/g, '-');
-        const partSlug = parts[0]?.toLowerCase().replace(/\s+/g, '-') ?? '';
-        if (vehicleSlug && partSlug)
-          return `https://shop.advanceautoparts.com/find/${vehicleSlug}/${partSlug}`;
-        return `https://shop.advanceautoparts.com/web/c/results?searchTerm=${encodeURIComponent(parts.join(' '))}`;
-      },
-    },
-    {
-      name: "O'Reilly",
-      icon: 'storefront',
-      storeKeywords: ["o'reilly", 'oreilly'],
-      buildUrl: (parts, v) => {
-        const params = new URLSearchParams({ q: parts.join(' ') });
-        if (v.year)  params.set('year',  String(v.year));
-        if (v.make)  params.set('make',  v.make);
-        if (v.model) params.set('model', v.model);
-        return `https://www.oreillyauto.com/shop/b/parts?${params}`;
-      },
-    },
-    {
-      name: 'NAPA',
-      icon: 'storefront',
-      storeKeywords: ['napa'],
-      buildUrl: (parts, v) => {
-        const q = [...parts, v.year, v.make, v.model].filter(Boolean).join(' ');
-        return `https://www.napaonline.com/en/search#q=${encodeURIComponent(q)}`;
-      },
-    },
-    {
-      name: 'Amazon',
-      icon: 'shopping_bag',
-      storeKeywords: ['amazon'],
-      buildUrl: (parts, v) => {
-        const k = [...parts, v.year, v.make, v.model].filter(Boolean).join(' ');
-        return `https://www.amazon.com/s?k=${encodeURIComponent(k)}&i=automotive`;
-      },
-    },
+  // ── Filters ────────────────────────────────────────────────────────────────
+  readonly conditionOptions: PartCondition[] = ['New', 'Used', 'Refurbished'];
+  readonly ratingOptions = [
+    { label: 'Any rating', value: 0 },
+    { label: '95%+', value: 95 },
+    { label: '98%+', value: 98 },
+    { label: '99%+', value: 99 },
   ];
+
+  filterConditions = signal<Set<PartCondition>>(new Set());
+  filterMinRating = signal(0);
+  filterFreeShippingOnly = signal(false);
+  filterBestOfferOnly = signal(false);
+  filterMinPrice = signal<number | null>(null);
+  filterMaxPrice = signal<number | null>(null);
+
+  readonly hasActiveFilters = computed(() =>
+    this.filterConditions().size > 0 ||
+    this.filterMinRating() > 0 ||
+    this.filterFreeShippingOnly() ||
+    this.filterBestOfferOnly() ||
+    this.filterMinPrice() !== null ||
+    this.filterMaxPrice() !== null
+  );
+
+  readonly filteredResults = computed(() => {
+    const conditions = this.filterConditions();
+    const minRating = this.filterMinRating();
+    const freeShippingOnly = this.filterFreeShippingOnly();
+    const bestOfferOnly = this.filterBestOfferOnly();
+    const minPrice = this.filterMinPrice();
+    const maxPrice = this.filterMaxPrice();
+
+    return this.results().filter(item => {
+      const p = item.part;
+      if (conditions.size > 0 && (!p.condition || !conditions.has(p.condition))) return false;
+      if (minRating > 0 && (p.sellerRating ?? 0) < minRating) return false;
+      if (freeShippingOnly && !p.freeShipping) return false;
+      if (bestOfferOnly && !p.bestOffer) return false;
+      if (minPrice !== null && p.price < minPrice) return false;
+      if (maxPrice !== null && p.price > maxPrice) return false;
+      return true;
+    });
+  });
 
   constructor(
     private partsService: PartsService,
@@ -120,40 +90,20 @@ export class PartsLocatorComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['partNames'] && this.partNames.length > 0 && this.zipCode) {
+    if (changes['partNames'] && this.partNames.length > 0) {
       this.searchParts();
     }
   }
 
-  useMyLocation(): void {
-    if (!navigator.geolocation) {
-      this.locationError.set('Geolocation is not supported by your browser.');
-      return;
-    }
-    this.locating.set(true);
-    this.locationError.set(null);
-    navigator.geolocation.getCurrentPosition(
-      async position => {
-        // Reverse geocode to get ZIP via a simple fetch
-        // TODO: replace with a real reverse geocoding API
-        this.locating.set(false);
-        this.locationError.set(null);
-        this.snackBar.open('Location obtained — please enter your ZIP code to search nearby stores.', 'OK', { duration: 4000 });
-      },
-      () => {
-        this.locating.set(false);
-        this.locationError.set('Location access denied. Please enter your ZIP code manually.');
-      }
-    );
-  }
-
   searchParts(): void {
-    if (!this.zipCode || this.partNames.length === 0) return;
+    if (this.partNames.length === 0) return;
     this.searching.set(true);
+    this.searchError.set(null);
     this.results.set([]);
+    this.clearFilters();
 
     const requests = this.partNames.map(p =>
-      this.partsService.searchParts(p, this.vehicle, this.zipCode)
+      this.partsService.searchParts(p, this.vehicle)
     );
 
     forkJoin(requests).subscribe({
@@ -162,13 +112,78 @@ export class PartsLocatorComponent implements OnChanges {
         this.results.set(all);
         this.searching.set(false);
       },
-      error: () => this.searching.set(false),
+      error: (err) => {
+        this.searching.set(false);
+        this.searchError.set(err?.error?.error ?? 'Could not load results. Check that the server is running.');
+      },
     });
   }
 
   toggleSelection(item: PartSearchResult): void {
     this.results.update(list =>
       list.map(i => i === item ? { ...i, selected: !i.selected } : i)
+    );
+  }
+
+  toggleCondition(condition: PartCondition): void {
+    this.filterConditions.update(set => {
+      const next = new Set(set);
+      if (next.has(condition)) next.delete(condition); else next.add(condition);
+      return next;
+    });
+  }
+
+  setMinRating(value: number): void {
+    this.filterMinRating.set(value);
+  }
+
+  toggleFreeShippingOnly(): void {
+    this.filterFreeShippingOnly.update(v => !v);
+  }
+
+  toggleBestOfferOnly(): void {
+    this.filterBestOfferOnly.update(v => !v);
+  }
+
+  onMinPriceInput(value: string): void {
+    this.filterMinPrice.set(value === '' ? null : Number(value));
+  }
+
+  onMaxPriceInput(value: string): void {
+    this.filterMaxPrice.set(value === '' ? null : Number(value));
+  }
+
+  clearFilters(): void {
+    this.filterConditions.set(new Set());
+    this.filterMinRating.set(0);
+    this.filterFreeShippingOnly.set(false);
+    this.filterBestOfferOnly.set(false);
+    this.filterMinPrice.set(null);
+    this.filterMaxPrice.set(null);
+  }
+
+  nextImage(item: PartSearchResult, event: Event): void {
+    event.stopPropagation();
+    const count = item.part.images?.length ?? 0;
+    if (count < 2) return;
+    this.results.update(list =>
+      list.map(i => i === item ? { ...i, imageIndex: ((i.imageIndex ?? 0) + 1) % count } : i)
+    );
+  }
+
+  prevImage(item: PartSearchResult, event: Event): void {
+    event.stopPropagation();
+    const count = item.part.images?.length ?? 0;
+    if (count < 2) return;
+    this.results.update(list =>
+      list.map(i => i === item ? { ...i, imageIndex: ((i.imageIndex ?? 0) - 1 + count) % count } : i)
+    );
+  }
+
+  setImage(item: PartSearchResult, index: number, event: Event): void {
+    event.stopPropagation();
+    this.results.update(list =>
+      list.map(i => i === item ? { ...i, imageIndex: index } : i)
     );
   }
 
@@ -212,21 +227,13 @@ export class PartsLocatorComponent implements OnChanges {
     this.snackBar.open('Parts list copied to clipboard!', 'Done', { duration: 2500 });
   }
 
-  get selectedPartNames(): string[] {
-    return this.results().filter(i => i.selected).map(i => i.part.name);
+  get groupedResults(): { partName: string; items: PartSearchResult[] }[] {
+    const map = new Map<string, PartSearchResult[]>();
+    for (const item of this.filteredResults()) {
+      if (!map.has(item.part.name)) map.set(item.part.name, []);
+      map.get(item.part.name)!.push(item);
+    }
+    return Array.from(map.entries()).map(([partName, items]) => ({ partName, items }));
   }
 
-  get selectedRetailers(): Retailer[] {
-    const storeNames = this.results()
-      .filter(i => i.selected)
-      .map(i => i.part.store.name.toLowerCase());
-    return this.retailers.filter(r =>
-      r.storeKeywords.some(kw => storeNames.some(sn => sn.includes(kw)))
-    );
-  }
-
-  openRetailer(retailer: Retailer): void {
-    const url = retailer.buildUrl(this.selectedPartNames, this.vehicle);
-    window.open(url, '_blank', 'noopener,noreferrer');
-  }
 }

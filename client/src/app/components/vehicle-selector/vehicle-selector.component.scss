@@ -7,7 +7,7 @@
 .vin-row {
   display: flex;
   gap: 10px;
-  align-items: flex-start;
+  align-items: flex-end;
   flex-wrap: wrap;
 
   .vin-field {
@@ -16,20 +16,32 @@
   }
 
   .vin-decode-btn, .scan-btn {
-    margin-top: 4px;
     height: 52px;
-    border-radius: var(--obd-radius-sm) !important;
+    gap: 6px;
+    padding: 0 22px;
+    border-radius: var(--obd-radius-pill);
     white-space: nowrap;
+    transition: background var(--obd-dur-fast) var(--obd-ease),
+                border-color var(--obd-dur-fast) var(--obd-ease),
+                color var(--obd-dur-fast) var(--obd-ease),
+                opacity var(--obd-dur-fast) var(--obd-ease);
+
+    mat-icon { font-size: 20px; width: 20px; height: 20px; }
   }
 
   .vin-decode-btn {
-    background: var(--obd-blue) !important;
-    color: #fff !important;
+    background: var(--obd-blue);
+    color: #fff;
+
+    &:hover:not(:disabled) { background: #2f74e0; }
+    &:disabled { opacity: 0.5; }
   }
 
   .scan-btn {
-    border-color: var(--obd-border) !important;
-    color: var(--obd-text-dim) !important;
+    border: 1px solid var(--obd-border-strong);
+    color: var(--obd-text-dim);
+
+    &:hover { border-color: var(--obd-blue); color: var(--obd-text); }
   }
 }
 
@@ -53,9 +65,9 @@
   align-items: center;
   gap: 12px;
 
-  mat-divider {
+  .divider {
     flex: 1;
-    border-color: var(--obd-border) !important;
+    width: auto;
   }
 
   .divider-label {
@@ -67,16 +79,46 @@
 
 .ymm-grid {
   display: grid;
-  grid-template-columns: 120px 1fr 1fr 1fr;
+  // Large screens: Year, Make, Model, Sub-model, Engine all in one row.
+  grid-template-columns: 100px repeat(4, 1fr);
   gap: 12px;
 
-  @media (max-width: 700px) {
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  @media (max-width: 600px) {
     grid-template-columns: 1fr 1fr;
   }
 
-  @media (max-width: 440px) {
+  @media (max-width: 380px) {
     grid-template-columns: 1fr;
   }
+}
+
+.details-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--obd-blue);
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+}
+
+.details-toggle {
+  align-self: flex-start;
+  color: var(--obd-text-dim) !important;
+  font-size: 0.85rem !important;
+  padding: 0 8px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
 }
 
 .details-grid {
@@ -155,6 +197,13 @@
   position: absolute;
   top: -12px;
   right: -12px;
-  background: var(--obd-surface-3) !important;
-  color: var(--obd-text) !important;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--obd-surface-3);
+  color: var(--obd-text);
+  box-shadow: var(--obd-shadow-sm);
+  transition: background var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { background: var(--obd-surface-4); }
 }

@@ -1,0 +1,187 @@
+@use '../page-shell' as *;
+
+.faq-page { max-width: 800px; }
+
+// ── Search ────────────────────────────────────────────────────────────────────
+.faq-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 14px;
+  margin-bottom: 28px;
+  border-radius: var(--obd-radius-sm);
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border-strong);
+  transition: border-color var(--obd-dur-fast) var(--obd-ease),
+              box-shadow var(--obd-dur-fast) var(--obd-ease);
+
+  &:focus-within {
+    border-color: var(--obd-blue);
+    box-shadow: 0 0 0 3px var(--obd-blue-dim);
+  }
+
+  > mat-icon { color: var(--obd-text-muted); flex-shrink: 0; }
+}
+
+.faq-search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  color: var(--obd-text);
+  font-size: 0.95rem;
+
+  &:focus { outline: none; }
+  &::placeholder { color: var(--obd-text-muted); }
+}
+
+.faq-search-clear {
+  display: flex;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--obd-text-muted);
+  padding: 4px;
+  border-radius: 50%;
+
+  &:hover { color: var(--obd-text); background: var(--obd-surface-3); }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+
+// ── Sections ──────────────────────────────────────────────────────────────────
+.faq-section { margin-bottom: 30px; }
+
+.faq-section-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--obd-text);
+
+  mat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--obd-blue); }
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--obd-radius);
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border);
+  overflow: hidden;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--obd-border);
+  &:last-child { border-bottom: none; }
+}
+
+.faq-q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 16px 18px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--obd-text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: background var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { background: var(--obd-surface-3); }
+}
+
+.faq-chevron {
+  flex-shrink: 0;
+  color: var(--obd-text-muted);
+  transition: transform var(--obd-dur-fast) var(--obd-ease);
+
+  .faq-item.open & {
+    transform: rotate(180deg);
+    color: var(--obd-blue);
+  }
+}
+
+.faq-a {
+  padding: 0 18px 18px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--obd-text-dim);
+  animation: faq-reveal 0.18s var(--obd-ease) both;
+
+  a {
+    color: var(--obd-blue);
+    text-decoration: none;
+    font-weight: 500;
+    &:hover { text-decoration: underline; }
+  }
+}
+
+@keyframes faq-reveal {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Empty ─────────────────────────────────────────────────────────────────────
+.faq-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--obd-text-dim);
+
+  mat-icon { font-size: 36px; width: 36px; height: 36px; color: var(--obd-text-muted); }
+  p { margin: 8px 0 0; }
+  .faq-empty-sub { font-size: 0.88rem; color: var(--obd-text-muted); }
+  a { color: var(--obd-blue); text-decoration: none; &:hover { text-decoration: underline; } }
+}
+
+// ── CTA ───────────────────────────────────────────────────────────────────────
+.faq-cta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+  padding: 18px 20px;
+  border-radius: var(--obd-radius);
+  background: linear-gradient(135deg, var(--obd-blue-dim), transparent 75%), var(--obd-surface-2);
+  border: 1px solid var(--obd-border);
+
+  > mat-icon {
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+    color: var(--obd-blue);
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+.faq-cta-copy { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.faq-cta-title { font-size: 0.98rem; font-weight: 650; color: var(--obd-text); }
+.faq-cta-sub { font-size: 0.85rem; color: var(--obd-text-dim); }
+
+.faq-cta-btn {
+  flex-shrink: 0;
+  justify-content: center;
+  height: 42px;
+  padding: 0 20px;
+  border-radius: var(--obd-radius-sm);
+  background: var(--obd-blue);
+  border: 1px solid var(--obd-blue);
+  color: #fff;
+  font-weight: 600;
+
+  &:hover { filter: brightness(1.08); }
+
+  @media (max-width: 480px) { width: 100%; }
+}

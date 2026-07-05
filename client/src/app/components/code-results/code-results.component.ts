@@ -1,21 +1,15 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { DtcService } from '../../services/dtc.service';
-import { DtcCode, Severity } from '../../models/dtc-code.model';
+import { DtcCode, Severity, SEVERITY_RANK } from '../../models/dtc-code.model';
 
 @Component({
   selector: 'app-code-results',
   standalone: true,
   imports: [
     CommonModule,
-    MatCardModule, MatIconModule, MatButtonModule,
-    MatChipsModule, MatExpansionModule, MatTooltipModule,
+    MatIconModule,
   ],
   templateUrl: './code-results.component.html',
   styleUrl: './code-results.component.scss',
@@ -27,8 +21,19 @@ export class CodeResultsComponent implements OnChanges {
   results = signal<DtcCode[]>([]);
   unknownCodes = signal<string[]>([]);
   selectedParts = signal<Set<string>>(new Set());
+  expanded = signal<Set<string>>(new Set());
 
   constructor(private dtcService: DtcService) {}
+
+  isExpanded(code: string): boolean {
+    return this.expanded().has(code);
+  }
+
+  toggleExpanded(code: string): void {
+    const next = new Set(this.expanded());
+    if (next.has(code)) next.delete(code); else next.add(code);
+    this.expanded.set(next);
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['codes']) {
@@ -39,7 +44,7 @@ export class CodeResultsComponent implements OnChanges {
         if (result) found.push(result);
         else unknown.push(code);
       }
-      this.results.set(found);
+      this.results.set(found.sort((a, b) => SEVERITY_RANK[b.severity] - SEVERITY_RANK[a.severity]));
       this.unknownCodes.set(unknown);
 
       // Drop selections for parts no longer present in any result

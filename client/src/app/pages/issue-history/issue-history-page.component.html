@@ -1,0 +1,72 @@
+<div class="page">
+  <div class="page-head">
+    <h1 class="page-title"><mat-icon>history</mat-icon> Issue History</h1>
+    <p class="page-subtitle">Every diagnostic issue logged across your vehicles. Filter by vehicle to focus in.</p>
+  </div>
+
+  <!-- Vehicle filter -->
+  <div class="vehicle-filter">
+    <button
+      type="button"
+      class="btn filter-chip"
+      [class.active]="activeVehicleId() === null"
+      (click)="setVehicle(null)"
+    >All vehicles</button>
+    @for (v of accountService.vehicles(); track v.id) {
+      <button
+        type="button"
+        class="btn filter-chip"
+        [class.active]="activeVehicleId() === v.id"
+        (click)="setVehicle(v.id)"
+      >{{ v.nickname || (v.year + ' ' + v.make + ' ' + v.model) }}</button>
+    }
+  </div>
+
+  <!-- Summary -->
+  <div class="history-summary">
+    <span>{{ filtered().length }} issue{{ filtered().length !== 1 ? 's' : '' }}</span>
+    <span class="sep">·</span>
+    <span class="stat-resolved">{{ resolvedCount() }} resolved</span>
+    <span class="sep">·</span>
+    <span class="stat-open">{{ openCount() }} open</span>
+  </div>
+
+  <!-- Timeline -->
+  @if (filtered().length > 0) {
+    <div class="issue-list">
+      @for (issue of filtered(); track issue.id) {
+        <div class="issue-card" [class]="'sev-' + issue.severity">
+          <div class="issue-card-head">
+            <div class="issue-code-wrap">
+              <span class="issue-code">{{ issue.code }}</span>
+              <span class="issue-status" [class]="'status-' + issue.status">
+                {{ issue.status === 'in-progress' ? 'In Progress' : (issue.status === 'open' ? 'Open' : 'Resolved') }}
+              </span>
+            </div>
+            <span class="issue-date">{{ issue.date | date:'mediumDate' }}</span>
+          </div>
+
+          <h3 class="issue-title">{{ issue.title }}</h3>
+
+          <div class="issue-vehicle"><mat-icon>directions_car</mat-icon> {{ issue.vehicleLabel }}</div>
+
+          <p class="issue-notes">{{ issue.notes }}</p>
+
+          @if (issue.partsUsed.length > 0) {
+            <div class="issue-parts">
+              <span class="parts-label">Parts used:</span>
+              @for (part of issue.partsUsed; track part) {
+                <span class="part-pill">{{ part }}</span>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <mat-icon>check_circle</mat-icon>
+      <p>No issues logged for this vehicle.</p>
+    </div>
+  }
+</div>

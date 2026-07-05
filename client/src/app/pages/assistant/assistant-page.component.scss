@@ -1,0 +1,345 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.assistant {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 24px 20px;
+  // Fill the routed area so the input can sit at the bottom in chat mode.
+  min-height: calc(100vh - var(--obd-header-height));
+
+  @media (max-width: 600px) { padding: 20px 16px 16px; }
+
+  // Empty state centers the hero + input vertically.
+  &--empty {
+    justify-content: center;
+  }
+}
+
+// ── Empty-state hero ─────────────────────────────────────────────────────────
+.assistant-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.assistant-heading {
+  margin: 0;
+  font-size: clamp(1.7rem, 4vw, 2.3rem);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--obd-text);
+}
+
+.assistant-sub {
+  margin: 0;
+  font-size: 0.98rem;
+  color: var(--obd-text-dim);
+}
+
+// ── Chat-mode toolbar ────────────────────────────────────────────────────────
+.assistant-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.assistant-newchat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--obd-radius-pill);
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border-strong);
+  color: var(--obd-text-dim);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: border-color var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease),
+              background var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+  &:hover {
+    border-color: var(--obd-blue);
+    color: var(--obd-text);
+    background: var(--obd-surface-3);
+  }
+}
+
+// ── Shared AI pieces (mirrors the former overlay styling) ────────────────────
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--obd-blue-dim);
+  color: var(--obd-blue);
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+// ── Conversation ─────────────────────────────────────────────────────────────
+.ai-thread {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding: 4px 4px 8px;
+  scrollbar-width: thin;
+}
+
+.ai-msg {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 88%;
+
+  &--user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+
+    .ai-msg-bubble {
+      background: var(--obd-blue);
+      color: #fff;
+      border-color: transparent;
+    }
+  }
+}
+
+.ai-msg-avatar {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--obd-blue-dim);
+  color: var(--obd-blue);
+
+  mat-icon { font-size: 17px; width: 17px; height: 17px; }
+}
+
+.ai-msg-bubble {
+  padding: 12px 16px;
+  border-radius: var(--obd-radius);
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border);
+  color: var(--obd-text);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+// Rendered Markdown in Aura's replies (see AuraMarkdownPipe). Themed so bold
+// terms pop with the brand accent and lists/code read cleanly.
+.ai-msg-bubble--md {
+  .md-p { margin: 0 0 8px; &:last-child { margin-bottom: 0; } }
+
+  .md-strong {
+    font-weight: 650;
+    color: var(--obd-blue);
+  }
+
+  .md-list {
+    margin: 6px 0 8px;
+    padding-left: 20px;
+    &:last-child { margin-bottom: 0; }
+    li { margin: 3px 0; }
+  }
+
+  .md-code {
+    font-family: var(--obd-font-mono, ui-monospace, monospace);
+    font-size: 0.85em;
+    padding: 1px 5px;
+    border-radius: 5px;
+    background: var(--obd-surface-3);
+    border: 1px solid var(--obd-border);
+  }
+
+  br { display: block; content: ''; height: 4px; }
+}
+
+.ai-typing {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--obd-text-muted);
+    animation: ai-bounce 1.2s infinite ease-in-out;
+
+    &:nth-child(2) { animation-delay: 0.15s; }
+    &:nth-child(3) { animation-delay: 0.3s; }
+  }
+}
+
+@keyframes ai-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30%           { transform: translateY(-5px); opacity: 1; }
+}
+
+// ── Suggestion chips ─────────────────────────────────────────────────────────
+.ai-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.ai-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 16px;
+  border-radius: var(--obd-radius-pill);
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border-strong);
+  color: var(--obd-text-dim);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: border-color var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease),
+              background var(--obd-dur-fast) var(--obd-ease),
+              transform var(--obd-dur-fast) var(--obd-ease-spring);
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); }
+
+  &:hover:not(:disabled) {
+    border-color: var(--obd-blue);
+    color: var(--obd-text);
+    background: var(--obd-surface-3);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+// Compact chip strip above the composer in chat mode: a single scrollable row
+// (never wraps into a tall block that pushes the input down), left-aligned.
+.ai-chips--bar {
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  gap: 8px;
+  margin-top: 0;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+
+  .ai-chip {
+    flex: 0 0 auto;
+    padding: 7px 13px;
+    font-size: 0.8rem;
+  }
+
+  // Hide the scrollbar on WebKit while keeping the row scrollable.
+  &::-webkit-scrollbar { height: 4px; }
+  &::-webkit-scrollbar-thumb { background: var(--obd-border-strong); border-radius: 2px; }
+}
+
+// ── Input ────────────────────────────────────────────────────────────────────
+.assistant-input-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 14px;
+
+  // In chat mode the thread scrolls; keep the composer pinned to the bottom.
+  .assistant:not(.assistant--empty) & {
+    position: sticky;
+    bottom: 0;
+    background: linear-gradient(to top, var(--obd-bg) 72%, transparent);
+    padding-bottom: 6px;
+  }
+}
+
+.ai-input-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 56px;
+  padding: 0 8px 0 18px;
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-pill);
+  transition: border-color var(--obd-dur-fast) var(--obd-ease),
+              box-shadow var(--obd-dur-fast) var(--obd-ease);
+
+  &:focus-within {
+    border-color: var(--obd-blue);
+    box-shadow: 0 0 0 3px var(--obd-blue-dim);
+  }
+
+  > mat-icon {
+    flex-shrink: 0;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--obd-blue);
+  }
+}
+
+.ai-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--obd-text);
+  font: inherit;
+  font-size: 1rem;
+
+  &::placeholder { color: var(--obd-text-muted); }
+}
+
+.ai-send {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--obd-blue);
+  color: #fff;
+  transition: background var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 20px; width: 20px; height: 20px; }
+
+  &:hover:not(:disabled) { background: #2f74e0; }
+  &:disabled { opacity: 0.4; }
+}
+
+.ai-disclaimer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--obd-text-muted);
+
+  mat-icon { font-size: 14px; width: 14px; height: 14px; color: var(--obd-blue); opacity: 0.7; }
+}

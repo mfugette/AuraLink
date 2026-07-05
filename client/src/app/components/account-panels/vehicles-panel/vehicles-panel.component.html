@@ -1,0 +1,107 @@
+<div class="panel-backdrop" (click)="close()">
+  <div class="panel-modal" (click)="$event.stopPropagation()">
+    <div class="panel-header">
+      <h3 class="panel-title"><mat-icon>directions_car</mat-icon> My Vehicles</h3>
+      <button type="button" class="btn panel-close" (click)="close()" aria-label="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="panel-body">
+      @if (accountService.vehicles().length === 0 && !showAddForm()) {
+        <div class="vehicles-empty">
+          <mat-icon>directions_car</mat-icon>
+          <p>No saved vehicles yet.</p>
+        </div>
+      }
+
+      @for (v of accountService.vehicles(); track v.id) {
+        <div class="vehicle-card" [class.primary]="v.isPrimary">
+          <div class="vehicle-card-main">
+            <div class="vehicle-card-title">
+              <span>{{ v.nickname || (v.year + ' ' + v.make + ' ' + v.model) }}</span>
+              @if (v.isPrimary) {
+                <span class="primary-badge"><mat-icon>star</mat-icon> Primary</span>
+              }
+            </div>
+            <div class="vehicle-card-sub">
+              {{ v.year }} {{ v.make }} {{ v.model }}
+              @if (v.subModel) { · {{ v.subModel }} }
+              @if (v.engine) { · {{ v.engine }} }
+            </div>
+          </div>
+          <div class="vehicle-card-actions">
+            @if (!v.isPrimary) {
+              <button type="button" class="btn vehicle-action-btn" (click)="setPrimary(v.id)" title="Set as primary">
+                <mat-icon>star_outline</mat-icon>
+              </button>
+            }
+            <button type="button" class="btn vehicle-action-btn vehicle-action-btn--danger" (click)="remove(v.id)" title="Remove">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (showAddForm()) {
+        <div class="add-vehicle-form">
+          @if (addError()) {
+            <p class="field-error"><mat-icon>error_outline</mat-icon> {{ addError() }}</p>
+          }
+          <div class="add-form-grid">
+            <div class="field">
+              <label class="field-label">Nickname (optional)</label>
+              <div class="field-control">
+                <input class="field-input" [(ngModel)]="form.nickname" placeholder="My Daily" />
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">Year <span class="req">*</span></label>
+              <div class="field-control">
+                <input class="field-input" type="number" [(ngModel)]="form.year" placeholder="2020" />
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">Make <span class="req">*</span></label>
+              <div class="field-control">
+                <input class="field-input" [(ngModel)]="form.make" placeholder="Honda" />
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">Model <span class="req">*</span></label>
+              <div class="field-control">
+                <input class="field-input" [(ngModel)]="form.model" placeholder="Civic" />
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">Trim / Sub-model</label>
+              <div class="field-control">
+                <input class="field-input" [(ngModel)]="form.subModel" placeholder="EX" />
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">Engine</label>
+              <div class="field-control">
+                <input class="field-input" [(ngModel)]="form.engine" placeholder="1.5L I4" />
+              </div>
+            </div>
+          </div>
+          <div class="add-form-actions">
+            <button type="button" class="btn panel-cancel-btn" (click)="toggleAddForm()">Cancel</button>
+            <button type="button" class="btn panel-save-btn" [disabled]="adding()" (click)="submitAdd()">
+              @if (adding()) { Saving… } @else { Save vehicle }
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="panel-footer">
+      @if (!showAddForm()) {
+        <button type="button" class="btn add-vehicle-btn" (click)="toggleAddForm()">
+          <mat-icon>add</mat-icon> Add a vehicle
+        </button>
+      }
+    </div>
+  </div>
+</div>

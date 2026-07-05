@@ -1,13 +1,14 @@
 :host {
-  display: block;
+  display: flex;
+  flex: 1;
   width: 100%;
-  height: 100%;
 }
 
 .live-dtc {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  min-width: 0;
   width: 100%;
 }
 
@@ -21,12 +22,18 @@
 }
 
 .back-btn {
-  border-color: var(--obd-border) !important;
+  height: 40px;
+  padding: 0 18px !important;
+  border: 1px solid var(--obd-border-strong) !important;
   color: var(--obd-text-dim) !important;
-  border-radius: var(--obd-radius-sm) !important;
+  border-radius: var(--obd-radius-pill) !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 4px !important;
+  transition: border-color var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease) !important;
+
+  &:hover { border-color: var(--obd-blue) !important; color: var(--obd-text) !important; }
 
   mat-icon { font-size: 18px; width: 18px; height: 18px; }
 }
@@ -49,27 +56,35 @@
   }
 }
 
-// ── Step slider ─────────────────────────────────────────────────────────────
+// ── Step slider (auto-height carousel) ───────────────────────────────────────
 .step-viewport {
   flex: 1;
-  overflow: hidden;
-  min-height: 0;
+  // Clip the off-screen panels horizontally; let the active panel's content
+  // grow the page vertically (no inner scrollbar). `clip` avoids a scroll box.
+  overflow-x: clip;
+  display: flex;
 }
 
-.step-track {
-  display: flex;
-  height: 100%;
-  width: 100%;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+.step-stack {
+  position: relative;
+  flex: 1;
+  min-width: 0;
 }
 
 .step-panel {
-  flex: 0 0 100%;
+  // Inactive panels are taken out of flow and slid off-screen, so the stack
+  // height tracks only the active panel — short steps don't add empty scroll.
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
-  overflow-y: auto;
   display: flex;
   justify-content: center;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.active {
+    position: relative;
+  }
 }
 
 .panel-inner {
@@ -79,6 +94,10 @@
   flex-direction: column;
   gap: 18px;
   padding: 12px 0 48px;
+}
+
+.results-inner {
+  max-width: 620px;
 }
 
 .eyebrow {
@@ -123,10 +142,11 @@
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  padding: 16px;
+  padding: 18px;
   background: var(--obd-surface-2);
   border: 1px solid var(--obd-border);
   border-radius: var(--obd-radius);
+  box-shadow: var(--obd-shadow-sm);
   position: relative;
 }
 
@@ -180,24 +200,28 @@
 
 .connect-btn {
   align-self: flex-start;
-  height: 52px;
-  padding: 0 32px !important;
+  height: 54px;
+  padding: 0 34px !important;
   font-size: 1rem !important;
   font-weight: 600 !important;
-  background: linear-gradient(135deg, var(--obd-blue), #6366f1) !important;
+  letter-spacing: 0.01em !important;
+  background: linear-gradient(135deg, var(--obd-blue), var(--obd-blue-2)) !important;
   color: #fff !important;
-  border-radius: var(--obd-radius) !important;
-  box-shadow: 0 4px 20px var(--obd-blue-glow) !important;
-  transition: box-shadow 0.2s, transform 0.15s !important;
+  border-radius: var(--obd-radius-pill) !important;
+  box-shadow: 0 6px 20px var(--obd-blue-glow) !important;
+  transition: box-shadow var(--obd-dur) var(--obd-ease),
+              transform var(--obd-dur) var(--obd-ease-spring) !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 8px !important;
   margin-top: 4px;
 
   &:hover {
-    box-shadow: 0 6px 28px rgba(59, 130, 246, 0.45) !important;
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.5) !important;
     transform: translateY(-2px);
   }
+
+  &:active { transform: translateY(0) scale(0.98); }
 
   mat-icon { font-size: 20px; width: 20px; height: 20px; }
 }
@@ -217,8 +241,10 @@
 .connecting-inner {
   align-items: center;
   text-align: center;
-  justify-content: center;
-  min-height: 60vh;
+  justify-content: flex-start;
+  // Align content with the hero block. Hero uses (100vh-60)/3 - 150 from the
+  // stage top; here the ~68px live-header sits above, so subtract it too.
+  padding-top: max(8px, calc((100vh - var(--obd-header-height)) / 3 - 218px));
 }
 
 .radar {
@@ -272,80 +298,229 @@
   }
 }
 
-// ── Detected results ────────────────────────────────────────────────────────
+// ── Detected code list ───────────────────────────────────────────────────────
 .detected-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 4px;
+  gap: 8px;
 }
 
-.detected-card {
+.detected-item {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 16px;
+  align-items: baseline;
+  gap: 12px;
+  padding: 14px 16px;
   background: var(--obd-surface-2);
   border: 1px solid var(--obd-border);
   border-radius: var(--obd-radius);
-  border-left-width: 3px;
-
-  &.sev-low      { border-left-color: var(--obd-green); }
-  &.sev-moderate { border-left-color: var(--obd-yellow); }
-  &.sev-high     { border-left-color: var(--obd-orange); }
-  &.sev-critical { border-left-color: var(--obd-red); }
+  box-shadow: var(--obd-shadow-sm);
 }
 
 .detected-code {
   flex-shrink: 0;
   font-family: 'Courier New', monospace;
-  font-weight: 800;
-  font-size: 1rem;
-  background: var(--obd-surface-3);
+  font-size: 0.85rem;
+  font-weight: 700;
   color: var(--obd-blue);
-  padding: 6px 10px;
-  border-radius: var(--obd-radius-sm);
-  letter-spacing: 1px;
-  border: 1px solid var(--obd-blue-dim);
+  letter-spacing: 0.5px;
 }
 
-.detected-info {
-  flex: 1;
-  min-width: 0;
+.detected-name {
+  font-size: 0.875rem;
+  color: var(--obd-text-dim);
+  line-height: 1.4;
+}
+
+// ── Secondary scanner actions ─────────────────────────────────────────────────
+.scanner-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.scanner-btn {
+  height: 38px;
+  font-size: 0.8rem !important;
+  border: 1px solid var(--obd-border-strong) !important;
+  color: var(--obd-text-dim) !important;
+  border-radius: var(--obd-radius-pill) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 0 16px !important;
+  transition: border-color var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease),
+              background var(--obd-dur-fast) var(--obd-ease) !important;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+
+  &.active, &:hover {
+    border-color: var(--obd-blue) !important;
+    color: var(--obd-blue) !important;
+    background: var(--obd-blue-dim) !important;
+  }
+
+  &--danger {
+    &.active, &:hover {
+      border-color: var(--obd-red) !important;
+      color: var(--obd-red) !important;
+      background: rgba(239, 68, 68, 0.08) !important;
+    }
+  }
+}
+
+// ── Scanner info panels ───────────────────────────────────────────────────────
+.scanner-panel {
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius);
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 14px;
+  box-shadow: var(--obd-shadow-sm);
 
-  h3 {
-    margin: 0;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--obd-text);
+  &--warn {
+    border-color: rgba(234, 179, 8, 0.35);
+    background: rgba(234, 179, 8, 0.05);
+
+    .scanner-panel-header mat-icon { color: #eab308; }
   }
 
-  p {
-    margin: 0;
-    font-size: 0.85rem;
-    line-height: 1.55;
-    color: var(--obd-text-dim);
+  &--success {
+    border-color: rgba(34, 197, 94, 0.35);
+    background: rgba(34, 197, 94, 0.07);
+
+    .scanner-panel-header mat-icon { color: var(--obd-green); }
   }
 }
 
+.scanner-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--obd-text);
+  flex-wrap: wrap;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--obd-blue); flex-shrink: 0; }
+}
+
+.scanner-panel-sub {
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--obd-text-muted);
+  width: 100%;
+  line-height: 1.45;
+}
+
+// Freeze frame
+.freeze-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 16px;
+
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+}
+
+.freeze-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--obd-border);
+}
+
+.freeze-label {
+  font-size: 0.78rem;
+  color: var(--obd-text-muted);
+}
+
+.freeze-value {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--obd-text);
+  font-family: 'Courier New', monospace;
+}
+
+// I/M Readiness
+.readiness-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.readiness-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--obd-text-dim);
+  padding: 6px 10px;
+  border-radius: var(--obd-radius-sm);
+  background: var(--obd-surface-3);
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+
+  &.readiness-complete   { mat-icon { color: var(--obd-green); } }
+  &.readiness-incomplete { mat-icon { color: var(--obd-red); } color: var(--obd-text); }
+  &.readiness-na         { mat-icon { color: var(--obd-text-muted); } opacity: 0.6; }
+}
+
+// Clear codes
+.clear-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.clear-confirm-btn {
+  height: 40px;
+  padding: 0 20px !important;
+  background: var(--obd-red) !important;
+  color: #fff !important;
+  border-radius: var(--obd-radius-pill) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 0.875rem !important;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+
+.clear-cancel-btn {
+  height: 40px;
+  padding: 0 20px !important;
+  font-size: 0.875rem !important;
+  border: 1px solid var(--obd-border-strong) !important;
+  color: var(--obd-text-dim) !important;
+  border-radius: var(--obd-radius-pill) !important;
+}
+
+// ── Actions ──────────────────────────────────────────────────────────────────
 .results-actions {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
   margin-top: 8px;
+  justify-content: space-between;
 
   .connect-btn { margin-top: 0; }
 
   .rescan-btn {
-    height: 52px;
-    border-color: var(--obd-border) !important;
+    height: 54px;
+    padding: 0 24px !important;
+    border: 1px solid var(--obd-border-strong) !important;
     color: var(--obd-text-dim) !important;
-    border-radius: var(--obd-radius) !important;
+    border-radius: var(--obd-radius-pill) !important;
     display: inline-flex !important;
     align-items: center !important;
     gap: 6px !important;
+    transition: border-color var(--obd-dur-fast) var(--obd-ease),
+                color var(--obd-dur-fast) var(--obd-ease) !important;
+
+    &:hover { border-color: var(--obd-blue) !important; color: var(--obd-text) !important; }
   }
 }

@@ -1,0 +1,136 @@
+@use '../panel-shell' as *;
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-group-title {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--obd-text-muted);
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--obd-surface-3);
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius-sm);
+  color: var(--obd-text);
+  transition: border-color var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { border-color: var(--obd-border-strong); }
+}
+
+.setting-row-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--obd-text-muted); }
+}
+
+// ── Toggle switch ────────────────────────────────────────────────────────────
+.toggle {
+  position: relative;
+  flex-shrink: 0;
+  width: 40px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--obd-surface-4);
+  transition: background var(--obd-dur-fast) var(--obd-ease);
+
+  &.on { background: var(--obd-blue); }
+}
+
+.toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform var(--obd-dur-fast) var(--obd-ease-spring);
+
+  .toggle.on & { transform: translateX(16px); }
+}
+
+// ── Unit toggle ───────────────────────────────────────────────────────────────
+.unit-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.unit-option {
+  flex: 1;
+  height: 40px;
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-pill);
+  color: var(--obd-text-dim);
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: border-color var(--obd-dur-fast) var(--obd-ease),
+              background var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { border-color: var(--obd-blue); }
+
+  &.active {
+    background: var(--obd-blue-dim);
+    border-color: var(--obd-blue);
+    color: var(--obd-blue);
+  }
+}
+
+.settings-loading {
+  color: var(--obd-text-muted);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.panel-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 14px;
+  background: var(--obd-surface-3);
+  border-radius: var(--obd-radius-sm);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--obd-text-muted);
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); opacity: 0.7; flex-shrink: 0; margin-top: 1px; }
+}
+
+.save-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: auto;
+  font-size: 0.82rem;
+  color: var(--obd-green);
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+.panel-cancel-btn {
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid var(--obd-border-strong);
+  color: var(--obd-text-dim);
+  border-radius: var(--obd-radius-pill);
+  transition: border-color var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { border-color: var(--obd-blue); color: var(--obd-text); }
+}

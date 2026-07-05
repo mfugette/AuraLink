@@ -1,0 +1,136 @@
+.custom-select {
+  position: relative;
+  width: 100%;
+
+  &.disabled { opacity: 0.5; pointer-events: none; }
+}
+
+.select-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius);
+  color: var(--obd-text);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--obd-dur-fast) var(--obd-ease),
+              box-shadow var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { border-color: var(--obd-text-muted); }
+
+  &.open {
+    border-color: var(--obd-blue);
+    box-shadow: 0 0 0 3px var(--obd-blue-dim);
+  }
+
+  &:disabled { cursor: not-allowed; }
+
+  > mat-icon:first-child {
+    flex-shrink: 0;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--obd-text-muted);
+  }
+}
+
+.select-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &.placeholder { color: var(--obd-text-muted); }
+}
+
+.chevron {
+  flex-shrink: 0;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: var(--obd-text-muted);
+}
+
+.spin {
+  flex-shrink: 0;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--obd-blue);
+  animation: custom-select-spin 0.9s linear infinite;
+}
+
+@keyframes custom-select-spin {
+  to { transform: rotate(360deg); }
+}
+
+// ── Dropdown panel — fully ours, matches the DTC suggestion list ────────────────
+.select-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  background: var(--obd-surface-3);
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius);
+  box-shadow: var(--obd-shadow-lg);
+  overflow: hidden;
+}
+
+.select-search {
+  flex-shrink: 0;
+  height: 40px;
+  padding: 0 12px;
+  margin: 6px 6px 0;
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius-sm);
+  color: var(--obd-text);
+  font: inherit;
+  font-size: 0.85rem;
+  outline: none;
+
+  &::placeholder { color: var(--obd-text-muted); }
+  &:focus { border-color: var(--obd-blue); }
+}
+
+.select-list {
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.select-option {
+  padding: 9px 12px;
+  border-radius: var(--obd-radius-sm);
+  font-size: 0.875rem;
+  color: var(--obd-text-dim);
+  cursor: pointer;
+  transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.active { background: var(--obd-blue-dim); color: var(--obd-text); }
+  &.selected { color: var(--obd-blue); font-weight: 600; }
+}
+
+.select-empty {
+  padding: 12px;
+  font-size: 0.85rem;
+  color: var(--obd-text-muted);
+  text-align: center;
+}

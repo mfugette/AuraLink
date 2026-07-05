@@ -1,0 +1,53 @@
+<div #host class="account-menu">
+  @if (auth.isSignedIn()) {
+    <button
+      type="button"
+      class="btn account-trigger"
+      (click)="toggleMenu()"
+      [class.open]="open()"
+      aria-haspopup="menu"
+      [attr.aria-expanded]="open()"
+      aria-label="Account menu"
+    >
+      <span class="avatar">{{ initial }}</span>
+    </button>
+  } @else {
+    <button type="button" class="btn account-signin" (click)="toggleMenu()">
+      <mat-icon>login</mat-icon>
+      <span class="account-signin-text">Sign in</span>
+    </button>
+  }
+
+  @if (open() && auth.isSignedIn()) {
+    <div class="account-panel" role="menu">
+      <div class="account-summary">
+        <span class="avatar avatar--lg">{{ initial }}</span>
+        <div class="summary-text">
+          <span class="summary-name">{{ accountService.account()?.displayName ?? 'Loading…' }}</span>
+          <span class="summary-email">{{ accountService.account()?.email }}</span>
+        </div>
+      </div>
+
+      <div class="account-items">
+        <button type="button" class="btn account-item" role="menuitem" (click)="openPanel('profile')">
+          <mat-icon>person</mat-icon> My Profile
+        </button>
+        <button type="button" class="btn account-item" role="menuitem" (click)="openPanel('vehicles')">
+          <mat-icon>directions_car</mat-icon> My Vehicles
+        </button>
+        <button type="button" class="btn account-item" role="menuitem" (click)="goTo('/my-plan')">
+          <mat-icon>workspace_premium</mat-icon> My Plan
+        </button>
+        <button type="button" class="btn account-item" role="menuitem" (click)="openPanel('settings')">
+          <mat-icon>settings</mat-icon> Settings
+        </button>
+      </div>
+
+      <hr class="divider" />
+
+      <button type="button" class="btn account-item account-item--danger" role="menuitem" (click)="signOut()">
+        <mat-icon>logout</mat-icon> Sign out
+      </button>
+    </div>
+  }
+</div>

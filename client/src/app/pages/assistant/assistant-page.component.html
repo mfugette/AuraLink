@@ -1,0 +1,88 @@
+<div class="assistant" [class.assistant--empty]="messages().length === 0">
+
+  <!-- Empty state: centered hero + suggestion chips -->
+  @if (messages().length === 0) {
+    <div class="assistant-hero">
+      <div class="ai-badge"><mat-icon>auto_awesome</mat-icon> Aura</div>
+      <h1 class="assistant-heading">Need a hand?</h1>
+      <p class="assistant-sub">Describe a symptom, ask about a code, or pick a common question below.</p>
+
+      <div class="ai-chips">
+        @for (s of suggestions; track s) {
+          <button type="button" class="btn ai-chip" (click)="useSuggestion(s)">
+            <mat-icon>bolt</mat-icon> {{ s }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Conversation: full-page thread -->
+  @if (messages().length > 0) {
+    <div class="assistant-toolbar">
+      <div class="ai-badge"><mat-icon>auto_awesome</mat-icon> Aura</div>
+      <button type="button" class="btn assistant-newchat" (click)="newChat()">
+        <mat-icon>add</mat-icon> New chat
+      </button>
+    </div>
+
+    <div class="ai-thread" #thread>
+      @for (msg of messages(); track $index) {
+        <div class="ai-msg" [class.ai-msg--user]="msg.role === 'user'">
+          @if (msg.role === 'assistant') {
+            <span class="ai-msg-avatar"><mat-icon>auto_awesome</mat-icon></span>
+            <div class="ai-msg-bubble ai-msg-bubble--md" [innerHTML]="msg.text | auraMarkdown"></div>
+          } @else {
+            <div class="ai-msg-bubble">{{ msg.text }}</div>
+          }
+        </div>
+      }
+      @if (thinking()) {
+        <div class="ai-msg">
+          <span class="ai-msg-avatar"><mat-icon>auto_awesome</mat-icon></span>
+          <div class="ai-msg-bubble ai-typing">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Input (sticky at the bottom in chat mode, centered under the hero when empty) -->
+  <div class="assistant-input-row">
+    <!-- Quick-question chips above the input — always available, so users can
+         click a common question instead of typing. Hidden on the empty state,
+         which already shows the full chip grid in the hero. -->
+    @if (messages().length > 0) {
+      <div class="ai-chips ai-chips--bar">
+        @for (s of suggestions; track s) {
+          <button type="button" class="btn ai-chip" [disabled]="thinking()" (click)="useSuggestion(s)">
+            <mat-icon>bolt</mat-icon> {{ s }}
+          </button>
+        }
+      </div>
+    }
+
+    <div class="ai-input-control">
+      <mat-icon>auto_awesome</mat-icon>
+      <input
+        #inputEl
+        class="ai-input"
+        [ngModel]="input()"
+        (ngModelChange)="input.set($event)"
+        (keydown.enter)="send()"
+        [maxlength]="maxInputChars"
+        placeholder="Ask Aura anything about your car…"
+        autocomplete="off"
+      />
+      <button type="button" class="btn ai-send" [disabled]="!input().trim() || thinking()" (click)="send()" aria-label="Send">
+        <mat-icon>arrow_upward</mat-icon>
+      </button>
+    </div>
+    <p class="ai-disclaimer">
+      <mat-icon>info</mat-icon>
+      Aura can make mistakes — always confirm safety-critical repairs with a professional.
+    </p>
+  </div>
+
+</div>

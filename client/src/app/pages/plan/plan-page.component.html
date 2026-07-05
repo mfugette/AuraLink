@@ -1,0 +1,135 @@
+<div class="page plan-page">
+  <div class="page-head">
+    <h1 class="page-title"><mat-icon>workspace_premium</mat-icon> Plans &amp; Pricing</h1>
+    <p class="page-subtitle">Pick the plan that fits how you wrench. Upgrade or downgrade anytime.</p>
+  </div>
+
+  <!-- Contextual banner when redirected from a gated page -->
+  @if (lockedInfo(); as locked) {
+    <div class="locked-banner">
+      <mat-icon>lock</mat-icon>
+      <span>
+        <strong>{{ locked.label }}</strong> is a
+        {{ locked.tier === 'pro' ? 'Pro' : 'Plus' }} feature.
+        Upgrade below to unlock it.
+      </span>
+    </div>
+  }
+
+  <!-- Monthly / Annual billing toggle -->
+  <div class="interval-toggle" role="group" aria-label="Billing interval">
+    <button type="button" class="interval-btn" [class.active]="interval() === 'monthly'"
+            (click)="interval.set('monthly')">
+      Monthly
+    </button>
+    <button type="button" class="interval-btn" [class.active]="interval() === 'annual'"
+            (click)="interval.set('annual')">
+      Annual
+      <span class="interval-save">2 months free</span>
+    </button>
+  </div>
+
+  <!-- ── Tier cards ─────────────────────────────────────────────────────────── -->
+  <div class="tier-grid">
+    @for (t of tiers; track t.tier) {
+      <div class="tier-card" [class.tier-card--highlight]="t.highlight"
+           [class.tier-card--current]="current() === t.tier">
+        @if (t.highlight) { <span class="tier-flag">Most popular</span> }
+
+        <div class="tier-head">
+          <h2 class="tier-name">{{ t.name }}</h2>
+          <p class="tier-price">
+            @if (t.priceMonthly === 0) {
+              <span class="price-amount">Free</span>
+            } @else {
+              <span class="price-amount">${{ price(t.priceMonthly) }}</span>
+              <span class="price-per">{{ interval() === 'annual' ? '/yr' : '/mo' }}</span>
+            }
+          </p>
+          @if (t.priceMonthly > 0 && interval() === 'annual') {
+            <p class="price-annual-note">${{ annualPerMonth(t.priceMonthly) }}/mo billed annually</p>
+          } @else {
+            <p class="price-annual-note price-annual-note--ghost">&nbsp;</p>
+          }
+          <p class="tier-tagline">{{ t.tagline }}</p>
+        </div>
+
+        <ul class="tier-features">
+          @for (f of t.features; track f.label) {
+            <li [class.feature--off]="!f.included">
+              <mat-icon>{{ f.included ? 'check_circle' : 'cancel' }}</mat-icon>
+              <span>
+                {{ f.label }}
+                @if (f.note) { <em class="feature-note">({{ f.note }})</em> }
+              </span>
+            </li>
+          }
+        </ul>
+
+        <button
+          type="button"
+          class="btn tier-cta"
+          [class.tier-cta--primary]="t.highlight"
+          [disabled]="current() === t.tier"
+          (click)="selectPlan(t.tier)"
+        >
+          @if (current() === t.tier) {
+            <mat-icon>check</mat-icon> Current plan
+          } @else if (t.priceMonthly === 0) {
+            Switch to Free
+          } @else {
+            Choose {{ t.name }}
+          }
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- ── AuraLink adapter ───────────────────────────────────────────────────── -->
+  <section class="adapter-section">
+    <div class="adapter-card">
+      <div class="adapter-info">
+        <div class="adapter-badge"><mat-icon>bluetooth</mat-icon> Hardware</div>
+        <h2 class="adapter-name">{{ adapter.name }}</h2>
+        <p class="adapter-blurb">{{ adapter.blurb }}</p>
+        <p class="adapter-hint">
+          <mat-icon>info</mat-icon>
+          Required for the live dashboard's real-time telemetry. Plus members can
+          scan with any Bluetooth adapter; the AuraLink adapter unlocks streaming.
+        </p>
+      </div>
+
+      <div class="adapter-buy">
+        <div class="adapter-price-row">
+          <div class="adapter-price">
+            <span class="adapter-amount">${{ adapter.price }}</span>
+            <span class="adapter-once">one-time</span>
+          </div>
+          <button type="button" class="btn adapter-cta" (click)="buyAdapter(false)">
+            <mat-icon>shopping_cart</mat-icon> Buy adapter
+          </button>
+        </div>
+
+        <div class="adapter-bundle">
+          <div class="bundle-label">
+            <mat-icon>local_offer</mat-icon>
+            <span>Pro bundle — adapter + Pro plan</span>
+          </div>
+          <div class="bundle-price">
+            <span class="bundle-was">${{ adapter.price }}</span>
+            <span class="bundle-now">${{ adapter.bundlePrice }}</span>
+            <span class="adapter-once">+ Pro</span>
+          </div>
+          <button type="button" class="btn adapter-cta adapter-cta--primary" (click)="buyAdapter(true)">
+            <mat-icon>workspace_premium</mat-icon> Get the bundle
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <p class="plan-disclaimer">
+    <mat-icon>construction</mat-icon>
+    Payment processing is simulated for now — no card is charged. Real billing is coming soon.
+  </p>
+</div>

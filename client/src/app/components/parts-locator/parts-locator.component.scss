@@ -4,47 +4,36 @@
   gap: 20px;
 }
 
-// ── Location row ─────────────────────────────────────────────────────────────
-.location-row {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  flex-wrap: wrap;
-
-  .zip-field {
-    flex: 0 0 160px;
-  }
-
-  .locate-btn, .search-btn {
-    height: 52px;
-    margin-top: 4px;
-    border-radius: var(--obd-radius-sm) !important;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .locate-btn {
-    border-color: var(--obd-border) !important;
-    color: var(--obd-text-dim) !important;
-  }
-
-  .search-btn {
-    background: var(--obd-blue) !important;
-    color: #fff !important;
-  }
-}
-
-.field-error {
+// ── Error state ───────────────────────────────────────────────────────────────
+.error-state {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
+  padding: 16px 20px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--obd-radius);
   color: var(--obd-red);
-  font-size: 0.8rem;
-  margin: -12px 0 0;
+  font-size: 0.875rem;
 
-  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  mat-icon { flex-shrink: 0; font-size: 18px; width: 18px; height: 18px; }
+
+  .retry-btn {
+    margin-left: auto;
+    gap: 5px;
+    padding: 0 16px;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: var(--obd-red);
+    height: 36px;
+    border-radius: var(--obd-radius-pill);
+    white-space: nowrap;
+    transition: border-color var(--obd-dur-fast) var(--obd-ease),
+                background var(--obd-dur-fast) var(--obd-ease);
+
+    &:hover { background: rgba(239, 68, 68, 0.08); border-color: var(--obd-red); }
+
+    mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  }
 }
 
 .parts-needed-chips {
@@ -58,10 +47,18 @@
     color: var(--obd-text-muted);
     white-space: nowrap;
   }
+}
 
-  mat-chip {
-    --mdc-chip-label-text-size: 0.75rem;
-  }
+.parts-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: var(--obd-radius-pill);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--obd-text);
+  background: var(--obd-surface-3);
+  border: 1px solid var(--obd-border);
 }
 
 // ── Loading ───────────────────────────────────────────────────────────────────
@@ -79,7 +76,7 @@
 .results-section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .results-header {
@@ -104,64 +101,345 @@
   strong { color: var(--obd-green); }
 }
 
+// ── Filters bar ───────────────────────────────────────────────────────────────
+.filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 18px;
+  padding: 16px 18px;
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius);
+  box-shadow: var(--obd-shadow-sm);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--obd-text-muted);
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 12px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--obd-text-dim);
+  background: var(--obd-surface-3);
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius-pill);
+  cursor: pointer;
+  transition: border-color var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease),
+              background var(--obd-dur-fast) var(--obd-ease),
+              transform var(--obd-dur-fast) var(--obd-ease-spring);
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+
+  &:hover {
+    border-color: rgba(59, 130, 246, 0.4);
+    background: var(--obd-surface-4);
+    color: var(--obd-text);
+  }
+
+  &:active { transform: scale(0.96); }
+
+  &.active {
+    background: var(--obd-blue-dim);
+    border-color: var(--obd-blue);
+    color: var(--obd-blue);
+  }
+}
+
+.price-range {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.price-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 32px;
+  padding: 0 10px;
+  background: var(--obd-surface-3);
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius-sm);
+
+  span {
+    font-size: 0.8rem;
+    color: var(--obd-text-muted);
+  }
+
+  input {
+    width: 56px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--obd-text);
+    font-size: 0.8rem;
+    font-family: inherit;
+
+    // Hide native number spinners
+    -moz-appearance: textfield;
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  }
+}
+
+.price-sep {
+  color: var(--obd-text-muted);
+  font-size: 0.8rem;
+}
+
+.clear-filters-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 10px;
+  margin-left: auto;
+  font-size: 0.8rem;
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--obd-text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s;
+  align-self: flex-end;
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+
+  &:hover { color: var(--obd-red); }
+}
+
+// ── No matches (filters too narrow) ─────────────────────────────────────────────
+.no-matches-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px 20px;
+  color: var(--obd-text-muted);
+  text-align: center;
+
+  mat-icon { font-size: 32px; width: 32px; height: 32px; opacity: 0.4; }
+
+  p { margin: 0; font-size: 0.875rem; }
+
+  .clear-filters-btn { margin: 0; }
+}
+
 .parts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 16px;
 
   @media (max-width: 480px) {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 }
 
 .part-card {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px;
+  flex-direction: column;
   background: var(--obd-surface-2);
   border: 1px solid var(--obd-border);
-  border-radius: var(--obd-radius);
+  border-radius: var(--obd-radius-lg);
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  overflow: hidden;
+  box-shadow: var(--obd-shadow-sm);
+  transition: border-color var(--obd-dur) var(--obd-ease),
+              box-shadow var(--obd-dur) var(--obd-ease),
+              transform var(--obd-dur) var(--obd-ease-spring);
 
   &:hover {
-    border-color: rgba(59, 130, 246, 0.35);
-    background: var(--obd-surface-3);
+    border-color: var(--obd-border-strong);
+    box-shadow: var(--obd-shadow);
+    transform: translateY(-4px);
   }
 
   &.selected {
     border-color: var(--obd-blue);
-    background: var(--obd-blue-dim);
+    box-shadow: 0 0 0 2px var(--obd-blue), var(--obd-shadow);
   }
 }
 
+// ── Image carousel ────────────────────────────────────────────────────────────
+.part-image-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--obd-surface-3);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.part-image-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.part-image {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;
+}
+
+.part-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--obd-text-muted);
+
+  mat-icon { font-size: 32px; width: 32px; height: 32px; opacity: 0.4; }
+}
+
+.image-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(11, 13, 17, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--obd-dur-fast) var(--obd-ease),
+              transform var(--obd-dur-fast) var(--obd-ease-spring);
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+  &:hover {
+    background: rgba(11, 13, 17, 0.85);
+    transform: translateY(-50%) scale(1.12);
+  }
+
+  &--prev { left: 6px; }
+  &--next { right: 6px; }
+}
+
+.image-dots {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.image-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+
+  &:hover { background: rgba(255, 255, 255, 0.8); }
+
+  &.active {
+    background: #fff;
+    transform: scale(1.25);
+  }
+}
+
+.selected-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--obd-blue);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+// ── Card info ─────────────────────────────────────────────────────────────────
 .part-info {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  padding: 12px;
 }
 
 .part-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
 
-.part-name {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--obd-text);
-}
-
 .part-price {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--obd-green);
   white-space: nowrap;
+}
+
+.view-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--obd-blue);
+  opacity: 0.7;
+  transition: opacity 0.15s;
+  text-decoration: none;
+
+  &:hover { opacity: 1; }
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+}
+
+.listing-title {
+  font-size: 0.78rem;
+  color: var(--obd-text-dim);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .part-number {
@@ -170,30 +448,51 @@
   font-family: 'Courier New', monospace;
 }
 
+// ── Card badges ───────────────────────────────────────────────────────────────
+.part-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 2px 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  background: var(--obd-surface-3);
+  color: var(--obd-text-muted);
+
+  mat-icon { font-size: 11px; width: 11px; height: 11px; }
+
+  &.badge-new         { background: rgba(34, 197, 94, 0.15);  color: var(--obd-green); }
+  &.badge-refurbished { background: rgba(59, 130, 246, 0.15); color: var(--obd-blue); }
+  &.badge-used        { background: rgba(234, 179, 8, 0.15);  color: var(--obd-yellow); }
+
+  &.badge-rating   { color: #f5b301; background: rgba(245, 179, 1, 0.12); mat-icon { color: #f5b301; } }
+  &.badge-shipping { color: var(--obd-green); background: rgba(34, 197, 94, 0.12); }
+  &.badge-offer    { color: var(--obd-blue); background: var(--obd-blue-dim); }
+}
+
 .store-info {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 0.8rem;
-  color: var(--obd-text-dim);
+  font-size: 0.78rem;
+  color: var(--obd-text-muted);
 
   mat-icon {
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
     color: var(--obd-blue);
+    opacity: 0.6;
   }
-
-  .store-distance {
-    margin-left: auto;
-    color: var(--obd-text-muted);
-    font-size: 0.75rem;
-  }
-}
-
-.store-address {
-  font-size: 0.73rem;
-  color: var(--obd-text-muted);
 }
 
 .stock-badge {
@@ -214,27 +513,16 @@
   &.out-stock { color: var(--obd-text-muted); }
 }
 
-// ── Action panels grid ────────────────────────────────────────────────────────
-.action-panels {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  align-items: start;
-
-  @media (max-width: 700px) {
-    grid-template-columns: 1fr;
-  }
-}
-
 // ── Notification panel ────────────────────────────────────────────────────────
 .notify-panel {
   background: var(--obd-surface-2);
   border: 1px solid var(--obd-blue-glow);
   border-radius: var(--obd-radius-lg);
-  padding: 20px;
+  padding: 22px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  box-shadow: var(--obd-shadow-sm);
 }
 
 .notify-title {
@@ -251,48 +539,107 @@
 
 .method-group {
   display: flex;
-  gap: 24px;
+  gap: 12px;
   flex-wrap: wrap;
+}
 
-  mat-radio-button {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+// Custom radio pill (native <input> visually hidden, styled mark + label).
+.radio-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 0.875rem;
+  color: var(--obd-text-dim);
+  background: var(--obd-surface-3);
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius-pill);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease),
+              background var(--obd-dur-fast) var(--obd-ease);
 
-    ::ng-deep .mdc-label {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.875rem;
-      color: var(--obd-text);
+  input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .radio-mark {
+    position: relative;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--obd-text-muted);
+    transition: border-color var(--obd-dur-fast) var(--obd-ease);
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: var(--obd-blue);
+      transform: scale(0);
+      transition: transform var(--obd-dur-fast) var(--obd-ease-spring);
     }
+  }
 
-    mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--obd-blue); }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--obd-blue); }
+
+  &:hover { border-color: var(--obd-border-strong); color: var(--obd-text); }
+
+  &.checked {
+    color: var(--obd-text);
+    border-color: var(--obd-blue);
+    background: var(--obd-blue-dim);
+
+    .radio-mark {
+      border-color: var(--obd-blue);
+      &::after { transform: scale(1); }
+    }
+  }
+
+  // Keyboard focus ring on the visually-hidden input.
+  input:focus-visible + .radio-mark {
+    outline: 2px solid var(--obd-blue);
+    outline-offset: 2px;
   }
 }
 
 .notify-row {
   display: flex;
   gap: 10px;
-  align-items: flex-start;
+  align-items: flex-end;
   flex-wrap: wrap;
 
   .recipient-field { flex: 1; min-width: 200px; }
 
   .send-btn {
     height: 52px;
-    margin-top: 4px;
-    background: var(--obd-blue) !important;
-    color: #fff !important;
-    border-radius: var(--obd-radius-sm) !important;
+    gap: 6px;
+    padding: 0 24px;
+    background: var(--obd-blue);
+    color: #fff;
+    border-radius: var(--obd-radius-pill);
+    transition: background var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
+
+    &:hover:not(:disabled) { background: #2f74e0; }
+    &:disabled { opacity: 0.5; }
   }
 
   .copy-btn {
     height: 52px;
-    margin-top: 4px;
-    border-color: var(--obd-border) !important;
-    color: var(--obd-text-dim) !important;
-    border-radius: var(--obd-radius-sm) !important;
+    gap: 6px;
+    padding: 0 20px;
+    border: 1px solid var(--obd-border-strong);
+    color: var(--obd-text-dim);
+    border-radius: var(--obd-radius-pill);
+    transition: border-color var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+
+    &:hover { border-color: var(--obd-blue); color: var(--obd-text); }
   }
 }
 
@@ -308,54 +655,22 @@
   strong { color: var(--obd-text); }
 }
 
-// ── Retailer panel ────────────────────────────────────────────────────────────
-.retailer-note {
-  font-size: 0.8rem;
-  color: var(--obd-text-muted);
-  margin: 0;
-  line-height: 1.5;
-}
-
-.retailer-list {
+// ── Parts groups ──────────────────────────────────────────────────────────────
+.part-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
-.retailer-btn {
-  width: 100%;
-  height: 44px;
-  justify-content: flex-start !important;
-  border-color: var(--obd-border) !important;
-  color: var(--obd-text-dim) !important;
-  border-radius: var(--obd-radius-sm) !important;
-  font-size: 0.875rem !important;
-  transition: border-color 0.15s, color 0.15s, background 0.15s !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  padding: 0 14px !important;
-
-  &:hover {
-    border-color: var(--obd-blue) !important;
-    color: var(--obd-blue) !important;
-    background: var(--obd-blue-dim) !important;
-  }
-
-  .retailer-arrow {
-    margin-left: auto;
-    font-size: 15px !important;
-    width: 15px !important;
-    height: 15px !important;
-    opacity: 0.5;
-  }
-
-  mat-icon:first-of-type {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    color: var(--obd-blue);
-  }
+.group-heading {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--obd-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--obd-border);
 }
 
 // ── Empty state ───────────────────────────────────────────────────────────────

@@ -1,56 +1,75 @@
 <div class="code-entry-wrapper">
-  <mat-form-field appearance="outline" class="code-field">
-    <mat-label>
+  <div class="field code-field">
+    <label class="field-label" for="code-input">
       <mat-icon>search</mat-icon>
       Enter DTC codes (e.g. P0420, P0171)
-    </mat-label>
+    </label>
 
-    <mat-chip-grid #chipGrid aria-label="DTC codes">
+    <div class="chip-input" [class.focused]="focused()">
       @for (code of selectedCodes(); track code) {
-        <mat-chip-row
-          [class]="'chip-' + severityFor(code)"
-          (removed)="removeCode(code)"
-        >
+        <span class="dtc-chip" [class]="'chip-' + severityFor(code)">
           {{ code }}
-          <button matChipRemove [attr.aria-label]="'Remove ' + code">
+          <button
+            type="button"
+            class="chip-remove"
+            (click)="removeCode(code)"
+            [attr.aria-label]="'Remove ' + code"
+          >
             <mat-icon>cancel</mat-icon>
           </button>
-        </mat-chip-row>
+        </span>
       }
-    </mat-chip-grid>
 
-    <input
-      #codeInput
-      class="code-input"
-      placeholder="Type a code and press Enter..."
-      [ngModel]="inputValue"
-      (ngModelChange)="onInputChange($event)"
-      [matChipInputFor]="chipGrid"
-      [matChipInputSeparatorKeyCodes]="separatorKeys"
-      (matChipInputTokenEnd)="addCode($event)"
-      [matAutocomplete]="auto"
-      autocomplete="off"
-      autocapitalize="characters"
-    />
+      <input
+        #codeInput
+        id="code-input"
+        class="chip-input-field"
+        placeholder="Type a code and press Enter..."
+        [ngModel]="inputValue"
+        (ngModelChange)="onInputChange($event)"
+        (keydown)="onKeydown($event)"
+        (focus)="onFocus()"
+        (blur)="onBlur()"
+        autocomplete="off"
+        autocapitalize="characters"
+        role="combobox"
+        aria-controls="dtc-suggestions"
+        aria-autocomplete="list"
+        [attr.aria-expanded]="showSuggestions()"
+      />
 
-    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onAutocompleteSelected($event)">
-      @for (s of suggestions(); track s.code) {
-        <mat-option [value]="s.code" class="suggestion-option">
-          <div class="suggestion-row">
-            <span class="suggestion-code">{{ s.code }}</span>
-            <span class="suggestion-name">{{ s.name }}</span>
-            <span class="severity-badge {{ s.severity }}">{{ s.severity }}</span>
-          </div>
-        </mat-option>
+      @if (hasCode()) {
+        <button
+          type="button"
+          class="btn chip-clear"
+          (click)="clearAll()"
+          matTooltip="Clear all codes"
+          aria-label="Clear all codes"
+        >
+          <mat-icon>clear_all</mat-icon>
+        </button>
       }
-    </mat-autocomplete>
 
-    @if (hasCode()) {
-      <button matSuffix mat-icon-button (click)="clearAll()" matTooltip="Clear all codes">
-        <mat-icon>clear_all</mat-icon>
-      </button>
-    }
-  </mat-form-field>
+      @if (showSuggestions()) {
+        <ul class="suggestion-list" id="dtc-suggestions" role="listbox">
+          @for (s of suggestions(); track s.code; let i = $index) {
+            <li
+              class="suggestion-option"
+              role="option"
+              [class.active]="i === activeIndex()"
+              [attr.aria-selected]="i === activeIndex()"
+              (mousedown)="selectSuggestion(s.code, $event)"
+              (mouseenter)="activeIndex.set(i)"
+            >
+              <span class="suggestion-code">{{ s.code }}</span>
+              <span class="suggestion-name">{{ s.name }}</span>
+              <span class="severity-badge {{ s.severity }}">{{ s.severity }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
 
   @if (!hasCode()) {
     <div class="code-hint">

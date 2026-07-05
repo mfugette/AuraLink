@@ -1,58 +1,10 @@
 <div class="parts-locator">
 
-  <!-- Location / ZIP row -->
-  <div class="location-row">
-    <mat-form-field appearance="outline" class="zip-field">
-      <mat-label>ZIP Code</mat-label>
-      <input
-        matInput
-        [(ngModel)]="zipCode"
-        placeholder="e.g. 48201"
-        maxlength="5"
-        pattern="[0-9]{5}"
-        type="tel"
-      />
-      <mat-icon matPrefix>location_on</mat-icon>
-    </mat-form-field>
-
-    <button
-      mat-stroked-button
-      class="locate-btn"
-      (click)="useMyLocation()"
-      [disabled]="locating()"
-      matTooltip="Use your current location"
-    >
-      @if (locating()) {
-        <mat-spinner diameter="18" />
-      } @else {
-        <mat-icon>my_location</mat-icon>
-      }
-      My Location
-    </button>
-
-    <button
-      mat-flat-button
-      class="search-btn"
-      (click)="searchParts()"
-      [disabled]="!zipCode || partNames.length === 0 || searching()"
-    >
-      @if (searching()) {
-        <ng-container><mat-spinner diameter="18" /> Searching...</ng-container>
-      } @else {
-        <ng-container><mat-icon>search</mat-icon> Find Parts</ng-container>
-      }
-    </button>
-  </div>
-
-  @if (locationError()) {
-    <p class="field-error"><mat-icon>error_outline</mat-icon> {{ locationError() }}</p>
-  }
-
   @if (partNames.length > 0) {
     <div class="parts-needed-chips">
-      <span class="chip-label">Parts to find:</span>
+      <span class="chip-label">Searching for:</span>
       @for (p of partNames; track p) {
-        <mat-chip>{{ p }}</mat-chip>
+        <span class="parts-chip">{{ p }}</span>
       }
     </div>
   }
@@ -61,7 +13,18 @@
   @if (searching()) {
     <div class="loading-state">
       <mat-spinner diameter="32" />
-      <span>Searching nearby auto parts stores...</span>
+      <span>Searching eBay for parts…</span>
+    </div>
+  }
+
+  <!-- Error state -->
+  @if (searchError()) {
+    <div class="error-state">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ searchError() }}</span>
+      <button type="button" class="btn retry-btn" (click)="searchParts()">
+        <mat-icon>refresh</mat-icon> Retry
+      </button>
     </div>
   }
 
@@ -70,7 +33,11 @@
     <div class="results-section">
       <div class="results-header">
         <h4 class="results-title">
-          {{ results().length }} result{{ results().length !== 1 ? 's' : '' }} found
+          @if (hasActiveFilters()) {
+            Showing {{ filteredResults().length }} of {{ results().length }} listings
+          } @else {
+            {{ results().length }} listing{{ results().length !== 1 ? 's' : '' }} found on eBay
+          }
         </h4>
         @if (selectedCount > 0) {
           <span class="selected-summary">
@@ -79,146 +46,297 @@
         }
       </div>
 
-      <div class="parts-grid">
-        @for (item of results(); track item.part.id) {
-          <div class="part-card" [class.selected]="item.selected" (click)="toggleSelection(item)">
-            <mat-checkbox
-              [checked]="item.selected"
-              (change)="toggleSelection(item)"
-              (click)="$event.stopPropagation()"
-              color="primary"
-            />
-            <div class="part-info">
-              <div class="part-header">
-                <span class="part-name">{{ item.part.name }}</span>
-                <span class="part-price">${{ item.part.price.toFixed(2) }}</span>
-              </div>
-              <div class="part-number">Part #{{ item.part.partNumber }}</div>
-              <div class="store-info">
-                <mat-icon>storefront</mat-icon>
-                <span>{{ item.part.store.name }}</span>
-                <span class="store-distance">{{ item.part.store.distance }} mi</span>
-              </div>
-              <div class="store-address">{{ item.part.store.address }}</div>
+      <!-- Filters -->
+      <div class="filters-bar">
+        <div class="filter-group">
+          <span class="filter-label">Condition</span>
+          <div class="filter-chips">
+            @for (c of conditionOptions; track c) {
+              <button
+                type="button"
+                class="filter-chip"
+                [class.active]="filterConditions().has(c)"
+                (click)="toggleCondition(c)"
+              >
+                {{ c }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-label">Seller rating</span>
+          <div class="filter-chips">
+            @for (r of ratingOptions; track r.value) {
+              <button
+                type="button"
+                class="filter-chip"
+                [class.active]="filterMinRating() === r.value"
+                (click)="setMinRating(r.value)"
+              >
+                {{ r.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-label">Price</span>
+          <div class="price-range">
+            <div class="price-input-wrap">
+              <span>$</span>
+              <input
+                type="number"
+                min="0"
+                placeholder="Min"
+                [value]="filterMinPrice()"
+                (input)="onMinPriceInput($any($event.target).value)"
+              />
             </div>
-            <div class="stock-badge" [class.in-stock]="item.part.inStock" [class.out-stock]="!item.part.inStock">
-              @if (item.part.inStock) {
-                <mat-icon>check_circle</mat-icon> In Stock
-              } @else {
-                <mat-icon>cancel</mat-icon> Out of Stock
-              }
+            <span class="price-sep">–</span>
+            <div class="price-input-wrap">
+              <span>$</span>
+              <input
+                type="number"
+                min="0"
+                placeholder="Max"
+                [value]="filterMaxPrice()"
+                (input)="onMaxPriceInput($any($event.target).value)"
+              />
             </div>
           </div>
+        </div>
+
+        <div class="filter-group">
+          <span class="filter-label">More</span>
+          <div class="filter-chips">
+            <button
+              type="button"
+              class="filter-chip"
+              [class.active]="filterFreeShippingOnly()"
+              (click)="toggleFreeShippingOnly()"
+            >
+              <mat-icon>local_shipping</mat-icon> Free shipping
+            </button>
+            <button
+              type="button"
+              class="filter-chip"
+              [class.active]="filterBestOfferOnly()"
+              (click)="toggleBestOfferOnly()"
+            >
+              <mat-icon>handshake</mat-icon> Best offer
+            </button>
+          </div>
+        </div>
+
+        @if (hasActiveFilters()) {
+          <button type="button" class="clear-filters-btn" (click)="clearFilters()">
+            <mat-icon>close</mat-icon> Clear filters
+          </button>
         }
       </div>
 
-      <!-- Action panels (send list + order from retailer) -->
+      @if (hasActiveFilters() && filteredResults().length === 0) {
+        <div class="no-matches-state">
+          <mat-icon>filter_alt_off</mat-icon>
+          <p>No listings match your filters.</p>
+          <button type="button" class="clear-filters-btn" (click)="clearFilters()">
+            <mat-icon>close</mat-icon> Clear filters
+          </button>
+        </div>
+      }
+
+      @for (group of groupedResults; track group.partName) {
+        <div class="part-group">
+          <h5 class="group-heading">{{ group.partName }}</h5>
+          <div class="parts-grid">
+            @for (item of group.items; track item.part.id) {
+              <div class="part-card" [class.selected]="item.selected" (click)="toggleSelection(item)">
+
+                <div class="part-image-wrap">
+                  @if (item.part.images && item.part.images.length > 0) {
+                    <div
+                      class="part-image-track"
+                      [style.transform]="'translateX(-' + ((item.imageIndex ?? 0) * 100) + '%)'"
+                    >
+                      @for (img of item.part.images; track img) {
+                        <img class="part-image" [src]="img" [alt]="item.part.listingTitle || item.part.name" loading="lazy" />
+                      }
+                    </div>
+
+                    @if (item.part.images.length > 1) {
+                      <button
+                        type="button"
+                        class="image-nav image-nav--prev"
+                        (click)="prevImage(item, $event)"
+                        aria-label="Previous image"
+                      >
+                        <mat-icon>chevron_left</mat-icon>
+                      </button>
+                      <button
+                        type="button"
+                        class="image-nav image-nav--next"
+                        (click)="nextImage(item, $event)"
+                        aria-label="Next image"
+                      >
+                        <mat-icon>chevron_right</mat-icon>
+                      </button>
+                      <div class="image-dots">
+                        @for (img of item.part.images; track img; let i = $index) {
+                          <span
+                            class="image-dot"
+                            [class.active]="(item.imageIndex ?? 0) === i"
+                            (click)="setImage(item, i, $event)"
+                          ></span>
+                        }
+                      </div>
+                    }
+                  } @else {
+                    <div class="part-image-placeholder">
+                      <mat-icon>image_not_supported</mat-icon>
+                    </div>
+                  }
+
+                  @if (item.selected) {
+                    <div class="selected-badge">
+                      <mat-icon>check</mat-icon>
+                    </div>
+                  }
+                </div>
+
+                <div class="part-info">
+                  <div class="part-header">
+                    <span class="part-price">${{ item.part.price.toFixed(2) }}</span>
+                    @if (item.part.url) {
+                      <a
+                        class="view-link"
+                        [href]="item.part.url"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        (click)="$event.stopPropagation()"
+                        matTooltip="View on eBay"
+                      >
+                        <mat-icon>open_in_new</mat-icon>
+                      </a>
+                    }
+                  </div>
+                  @if (item.part.listingTitle) {
+                    <div class="listing-title">{{ item.part.listingTitle }}</div>
+                  } @else {
+                    <div class="part-number">Part #{{ item.part.partNumber }}</div>
+                  }
+
+                  <div class="part-badges">
+                    @if (item.part.condition) {
+                      <span class="badge" [class]="'badge-' + item.part.condition.toLowerCase()">
+                        {{ item.part.condition }}
+                      </span>
+                    }
+                    @if (item.part.sellerRating) {
+                      <span class="badge badge-rating">
+                        <mat-icon>star</mat-icon>{{ item.part.sellerRating }}%
+                      </span>
+                    }
+                    @if (item.part.freeShipping) {
+                      <span class="badge badge-shipping">
+                        <mat-icon>local_shipping</mat-icon>Free ship
+                      </span>
+                    }
+                    @if (item.part.bestOffer) {
+                      <span class="badge badge-offer">Best Offer</span>
+                    }
+                  </div>
+
+                  <div class="store-info">
+                    <mat-icon>sell</mat-icon>
+                    <span>{{ item.part.store.name }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Send your parts list -->
       @if (selectedCount > 0) {
-        <div class="action-panels">
+        <div class="notify-panel">
+          <h4 class="notify-title">
+            <mat-icon>send</mat-icon>
+            Send your parts list
+          </h4>
 
-          <!-- Order from selected retailer -->
-          <div class="notify-panel retailer-panel">
-            <h4 class="notify-title">
-              <mat-icon>shopping_cart</mat-icon>
-              Order from selected retailer
-            </h4>
-
-            <p class="retailer-note">
-              Opens the retailer's site with your vehicle and selected parts pre-filled.
-            </p>
-
-            <div class="retailer-list">
-              @for (retailer of selectedRetailers; track retailer.name) {
-                <button
-                  mat-stroked-button
-                  class="retailer-btn"
-                  (click)="openRetailer(retailer)"
-                >
-                  <mat-icon>{{ retailer.icon }}</mat-icon>
-                  {{ retailer.name }}
-                  <mat-icon class="retailer-arrow">open_in_new</mat-icon>
-                </button>
-              }
+          <div class="notify-method">
+            <div class="method-group" role="radiogroup">
+              <label class="radio-option" [class.checked]="notifyMethod === 'sms'">
+                <input type="radio" name="notifyMethod" value="sms" [(ngModel)]="notifyMethod" />
+                <span class="radio-mark"></span>
+                <mat-icon>sms</mat-icon> Text Message
+              </label>
+              <label class="radio-option" [class.checked]="notifyMethod === 'email'">
+                <input type="radio" name="notifyMethod" value="email" [(ngModel)]="notifyMethod" />
+                <span class="radio-mark"></span>
+                <mat-icon>email</mat-icon> Email
+              </label>
             </div>
-
-            <p class="notify-note">
-              <mat-icon>info</mat-icon>
-              Searches for {{ selectedCount }} selected part{{ selectedCount !== 1 ? 's' : '' }}.
-              Vehicle info pre-filled where supported.
-            </p>
           </div>
 
-          <!-- Send your parts list -->
-          <div class="notify-panel">
-            <h4 class="notify-title">
-              <mat-icon>send</mat-icon>
-              Send your parts list
-            </h4>
-
-            <div class="notify-method">
-              <mat-radio-group [(ngModel)]="notifyMethod" class="method-group">
-                <mat-radio-button value="sms">
-                  <mat-icon>sms</mat-icon> Text Message
-                </mat-radio-button>
-                <mat-radio-button value="email">
-                  <mat-icon>email</mat-icon> Email
-                </mat-radio-button>
-              </mat-radio-group>
-            </div>
-
-            <div class="notify-row">
-              <mat-form-field appearance="outline" class="recipient-field">
-                <mat-label>{{ notifyMethod === 'sms' ? 'Phone number' : 'Email address' }}</mat-label>
+          <div class="notify-row">
+            <div class="field recipient-field">
+              <label class="field-label" for="notify-recipient">
+                {{ notifyMethod === 'sms' ? 'Phone number' : 'Email address' }}
+              </label>
+              <div class="field-control">
+                <mat-icon>{{ notifyMethod === 'sms' ? 'phone' : 'alternate_email' }}</mat-icon>
                 <input
-                  matInput
+                  id="notify-recipient"
+                  class="field-input"
                   [(ngModel)]="notifyRecipient"
                   [type]="notifyMethod === 'sms' ? 'tel' : 'email'"
                   [placeholder]="notifyMethod === 'sms' ? '(555) 123-4567' : 'you@example.com'"
                 />
-                <mat-icon matPrefix>{{ notifyMethod === 'sms' ? 'phone' : 'alternate_email' }}</mat-icon>
-              </mat-form-field>
-
-              <button
-                mat-flat-button
-                class="send-btn"
-                (click)="sendList()"
-                [disabled]="sendingNotification()"
-              >
-                @if (sendingNotification()) {
-                  <mat-spinner diameter="18" />
-                } @else {
-                  <mat-icon>send</mat-icon>
-                }
-                Send
-              </button>
-
-              <button
-                mat-stroked-button
-                class="copy-btn"
-                (click)="copyList()"
-                matTooltip="Copy list to clipboard"
-              >
-                <mat-icon>content_copy</mat-icon>
-                Copy
-              </button>
+              </div>
             </div>
 
-            <p class="notify-note">
-              <mat-icon>info</mat-icon>
-              List includes {{ selectedCount }} item{{ selectedCount !== 1 ? 's' : '' }} — estimated total
-              <strong>${{ selectedTotal.toFixed(2) }}</strong>
-            </p>
+            <button
+              type="button"
+              class="btn send-btn"
+              (click)="sendList()"
+              [disabled]="sendingNotification()"
+            >
+              @if (sendingNotification()) {
+                <mat-spinner diameter="18" />
+              } @else {
+                <mat-icon>send</mat-icon>
+              }
+              Send
+            </button>
+
+            <button
+              type="button"
+              class="btn copy-btn"
+              (click)="copyList()"
+              matTooltip="Copy list to clipboard"
+            >
+              <mat-icon>content_copy</mat-icon>
+              Copy
+            </button>
           </div>
 
+          <p class="notify-note">
+            <mat-icon>info</mat-icon>
+            List includes {{ selectedCount }} item{{ selectedCount !== 1 ? 's' : '' }} — estimated total
+            <strong>${{ selectedTotal.toFixed(2) }}</strong>
+          </p>
         </div>
       }
     </div>
   }
 
-  @if (!searching() && results().length === 0 && zipCode) {
+  @if (!searching() && !searchError() && results().length === 0 && partNames.length > 0) {
     <div class="empty-state">
       <mat-icon>search_off</mat-icon>
-      <p>No results yet — click <strong>Find Parts</strong> to search nearby stores.</p>
+      <p>No listings found — try a broader part name or check your server connection.</p>
     </div>
   }
 

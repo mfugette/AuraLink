@@ -1,0 +1,18 @@
+<nav class="sidebar" [class.collapsed]="collapsed" aria-label="Primary">
+  @for (item of items; track item.route) {
+    <a
+      class="nav-item"
+      [routerLink]="item.route"
+      routerLinkActive="active"
+      [matTooltip]="collapsed ? item.label : ''"
+      matTooltipPosition="right"
+      (click)="navigate.emit()"
+    >
+      <mat-icon>{{ item.icon }}</mat-icon>
+      <span class="nav-label">{{ item.label }}</span>
+      @if (locked(item)) {
+        <mat-icon class="nav-lock" [matTooltip]="collapsed ? '' : 'Upgrade to unlock'">lock</mat-icon>
+      }
+    </a>
+  }
+</nav>

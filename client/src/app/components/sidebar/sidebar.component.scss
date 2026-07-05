@@ -1,0 +1,87 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100%;
+  padding: 12px 12px;
+  width: var(--obd-sidebar-width);
+  transition: width var(--obd-dur) var(--obd-ease);
+
+  &.collapsed {
+    width: var(--obd-sidebar-collapsed-width);
+    padding: 12px 8px;
+    align-items: center;
+  }
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: var(--obd-radius);
+  color: var(--obd-text-dim);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: background var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon {
+    flex-shrink: 0;
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+
+  &:hover {
+    background: var(--obd-surface-3);
+    color: var(--obd-text);
+  }
+
+  &.active {
+    background: var(--obd-blue-dim);
+    color: var(--obd-blue);
+    font-weight: 600;
+
+    mat-icon { color: var(--obd-blue); }
+  }
+
+  // Collapsed: icon-only, centered square targets.
+  .collapsed & {
+    width: 48px;
+    justify-content: center;
+    gap: 0;
+    padding: 0;
+  }
+}
+
+.nav-label {
+  transition: opacity var(--obd-dur-fast) var(--obd-ease);
+
+  .collapsed & {
+    display: none;
+  }
+}
+
+// Lock hint on tier-gated nav items — right-aligned, expanded rail only.
+.nav-lock {
+  margin-left: auto;
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
+  color: var(--obd-text-muted);
+  flex-shrink: 0;
+
+  .collapsed & {
+    display: none;
+  }
+}

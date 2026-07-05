@@ -1,0 +1,162 @@
+@use '../panel-shell' as *;
+
+.vehicles-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 20px;
+  color: var(--obd-text-muted);
+  text-align: center;
+
+  mat-icon { font-size: 32px; width: 32px; height: 32px; opacity: 0.4; }
+  p { margin: 0; font-size: 0.875rem; }
+}
+
+.vehicle-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--obd-surface-3);
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius);
+
+  &.primary { border-color: var(--obd-blue-glow); background: var(--obd-blue-dim); }
+}
+
+.vehicle-card-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.vehicle-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--obd-text);
+}
+
+.primary-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--obd-blue-dim);
+  color: var(--obd-blue);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+
+  mat-icon { font-size: 11px; width: 11px; height: 11px; }
+}
+
+.vehicle-card-sub {
+  font-size: 0.78rem;
+  color: var(--obd-text-muted);
+}
+
+.vehicle-card-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.vehicle-action-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: var(--obd-text-muted);
+  transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+  &:hover { background: var(--obd-surface-4); color: var(--obd-blue); }
+
+  &--danger:hover { color: var(--obd-red); }
+}
+
+// ── Add-vehicle inline form ─────────────────────────────────────────────────
+.add-vehicle-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  background: var(--obd-surface-3);
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius);
+}
+
+.add-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  @media (max-width: 420px) { grid-template-columns: 1fr; }
+}
+
+.add-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--obd-red);
+  font-size: 0.8rem;
+  margin: 0;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+.panel-cancel-btn {
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid var(--obd-border-strong);
+  color: var(--obd-text-dim);
+  border-radius: var(--obd-radius-pill);
+  transition: border-color var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { border-color: var(--obd-blue); color: var(--obd-text); }
+}
+
+.panel-save-btn {
+  height: 40px;
+  padding: 0 20px;
+  background: var(--obd-blue);
+  color: #fff;
+  border-radius: var(--obd-radius-pill);
+  font-weight: 600;
+  transition: background var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover:not(:disabled) { background: #2f74e0; }
+  &:disabled { opacity: 0.5; }
+}
+
+.add-vehicle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 20px;
+  margin-left: auto;
+  background: var(--obd-blue);
+  color: #fff;
+  border-radius: var(--obd-radius-pill);
+  font-weight: 600;
+  transition: background var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { background: #2f74e0; }
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}

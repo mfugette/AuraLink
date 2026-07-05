@@ -1,0 +1,139 @@
+.account-menu {
+  position: relative;
+}
+
+.account-trigger {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  transition: box-shadow var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover, &.open {
+    box-shadow: 0 0 0 3px var(--obd-blue-dim);
+  }
+}
+
+.account-signin {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--obd-radius-pill);
+  background: var(--obd-blue);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: background var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+  &:hover { background: #2f74e0; }
+
+  @media (max-width: 520px) {
+    padding: 0;
+    width: 40px;
+    justify-content: center;
+    .account-signin-text { display: none; }
+  }
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--obd-blue), var(--obd-blue-2));
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+
+  &--lg {
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+}
+
+.account-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 120;
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  background: var(--obd-surface-3);
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius);
+  box-shadow: var(--obd-shadow-lg);
+  padding: 14px;
+  gap: 10px;
+}
+
+.account-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 6px 10px;
+}
+
+.summary-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.summary-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--obd-text);
+}
+
+.summary-email {
+  font-size: 0.78rem;
+  color: var(--obd-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.account-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; // override .btn's centering — left-align items
+  gap: 12px;
+  width: 100%;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: var(--obd-radius-sm);
+  color: var(--obd-text-dim);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 19px; width: 19px; height: 19px; color: var(--obd-text-muted); }
+
+  &:hover {
+    background: var(--obd-surface-4);
+    color: var(--obd-text);
+
+    mat-icon { color: var(--obd-blue); }
+  }
+
+  &--danger:hover {
+    color: var(--obd-red);
+    mat-icon { color: var(--obd-red); }
+  }
+}

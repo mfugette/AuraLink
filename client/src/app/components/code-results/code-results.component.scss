@@ -16,63 +16,93 @@
   font-size: 0.875rem;
   line-height: 1.5;
 
-  mat-icon {
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
+  mat-icon { flex-shrink: 0; margin-top: 1px; }
 }
 
-.results-grid {
-  display: grid;
-  // auto-fit + bounded max lets justify-content center partial rows.
-  // minmax(300px, 360px) naturally caps at 3 cols inside the 1100px container.
-  grid-template-columns: repeat(auto-fit, minmax(300px, 360px));
-  gap: 16px;
-  justify-content: center;
-
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.result-card {
-  background: var(--obd-surface-2) !important;
-  border-radius: var(--obd-radius-lg) !important;
-  border: 1px solid var(--obd-border) !important;
-  transition: border-color 0.2s, box-shadow 0.2s;
-
-  &:hover {
-    box-shadow: var(--obd-shadow) !important;
-  }
-
-  &.card-low      { border-left: 3px solid var(--obd-green)  !important; }
-  &.card-moderate { border-left: 3px solid var(--obd-yellow) !important; }
-  &.card-high     { border-left: 3px solid var(--obd-orange) !important; }
-  &.card-critical { border-left: 3px solid var(--obd-red)    !important; }
-}
-
-mat-card-header {
-  padding: 16px 16px 0 !important;
-}
-
-mat-card-content {
-  padding: 12px 16px 16px !important;
-}
-
-.card-header-inner {
+// ── Accordion shell ───────────────────────────────────────────────────────────
+.results-accordion {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
+  flex-direction: column;
+  gap: 10px;
+}
+
+// ── Each panel ────────────────────────────────────────────────────────────────
+.result-panel {
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius);
+  box-shadow: var(--obd-shadow-sm);
+  overflow: hidden;
+  transition: box-shadow var(--obd-dur) var(--obd-ease);
+
+  &:hover,
+  &.expanded { box-shadow: var(--obd-shadow); }
+
+  &.panel-low      { border-left: 4px solid var(--obd-green); }
+  &.panel-moderate { border-left: 4px solid var(--obd-yellow); }
+  &.panel-high     { border-left: 4px solid var(--obd-orange); }
+  &.panel-critical { border-left: 4px solid var(--obd-red); }
+}
+
+// ── Header (native button, full-width click target) ────────────────────────────
+.panel-header {
   width: 100%;
+  min-height: 60px;
+  padding: 16px 22px;
+  gap: 14px;
+  justify-content: space-between;
+  text-align: left;
+  white-space: normal;   // override .btn nowrap so long code names can wrap
+  color: var(--obd-text);
+  background: transparent;
+  transition: background var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { background: rgba(255, 255, 255, 0.03); }
+}
+
+.panel-chevron {
+  flex-shrink: 0;
+  color: var(--obd-text-muted);
+  transition: transform var(--obd-dur) var(--obd-ease-emphasized),
+              color var(--obd-dur-fast) var(--obd-ease);
+
+  .result-panel.expanded & {
+    transform: rotate(180deg);
+    color: var(--obd-blue);
+  }
+}
+
+// ── Body with CSS grid height animation (0fr → 1fr) ─────────────────────────────
+.panel-body-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--obd-dur) var(--obd-ease-emphasized);
+
+  .result-panel.expanded & { grid-template-rows: 1fr; }
+}
+
+.panel-body-clip {
+  overflow: hidden;
+  min-height: 0;
+}
+
+// ── Closed-state summary row ──────────────────────────────────────────────────
+.panel-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
 }
 
 .code-badge {
   font-family: 'Courier New', monospace;
   font-weight: 800;
-  font-size: 1rem;
+  font-size: 0.8rem;
   background: var(--obd-surface-3);
   color: var(--obd-blue);
-  padding: 6px 10px;
+  padding: 3px 9px;
   border-radius: var(--obd-radius-sm);
   letter-spacing: 1px;
   white-space: nowrap;
@@ -80,93 +110,89 @@ mat-card-content {
   border: 1px solid var(--obd-blue-dim);
 }
 
-.header-text {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1;
-  min-width: 0;
-}
-
 .code-name {
-  margin: 0;
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--obd-text);
+  flex: 1;
+  min-width: 0;
   line-height: 1.35;
 }
 
-.code-description {
-  font-size: 0.85rem;
-  color: var(--obd-text-dim);
-  line-height: 1.6;
-  margin: 0 0 12px;
+// ── Expanded body ─────────────────────────────────────────────────────────────
+.panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 22px 20px;
+  border-top: 1px solid var(--obd-border);
 }
 
-// Accordion overrides
-.details-accordion {
-  background: transparent !important;
+.code-description {
+  font-size: 0.875rem;
+  color: var(--obd-text-dim);
+  line-height: 1.65;
+  margin: 0;
+  padding-top: 16px;
+}
 
-  ::ng-deep {
-    .mat-expansion-panel {
-      background: var(--obd-surface-3) !important;
-      border: 1px solid var(--obd-border) !important;
-      border-radius: var(--obd-radius-sm) !important;
-      margin-bottom: 6px !important;
-      box-shadow: none !important;
+.detail-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
 
-      &:last-child { margin-bottom: 0 !important; }
-    }
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
 
-    .mat-expansion-panel-header {
-      padding: 10px 14px !important;
-      height: auto !important;
-      min-height: 40px !important;
-    }
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-    .mat-panel-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--obd-text-dim) !important;
+.detail-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--obd-text-muted);
 
-      mat-icon {
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
-        color: var(--obd-blue);
-      }
-    }
-
-    .mat-expansion-panel-body {
-      padding: 0 14px 12px !important;
-    }
+  mat-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+    color: var(--obd-blue);
+    flex-shrink: 0;
   }
 }
 
 .detail-list {
   margin: 0;
-  padding-left: 18px;
+  padding-left: 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 
   li {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: var(--obd-text-dim);
-    line-height: 1.5;
+    line-height: 1.55;
   }
 }
 
 .parts-hint {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-size: 0.75rem;
   color: var(--obd-text-muted);
-  margin: 0 0 8px;
+  margin: 0;
 
   mat-icon { font-size: 14px; width: 14px; height: 14px; color: var(--obd-blue); opacity: 0.7; }
 }
@@ -175,15 +201,14 @@ mat-card-content {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  padding-top: 4px;
 }
 
 .part-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  border-radius: 999px;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: var(--obd-radius-pill);
   font-size: 0.78rem;
   font-weight: 500;
   font-family: inherit;
@@ -191,14 +216,20 @@ mat-card-content {
   border: 1px solid var(--obd-border);
   background: var(--obd-surface-3);
   color: var(--obd-text-dim);
-  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  transition: border-color var(--obd-dur-fast) var(--obd-ease),
+              background var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease),
+              transform var(--obd-dur-fast) var(--obd-ease-spring);
 
   mat-icon { font-size: 14px; width: 14px; height: 14px; }
 
   &:hover {
     border-color: rgba(59, 130, 246, 0.4);
+    background: var(--obd-surface-4);
     color: var(--obd-text);
   }
+
+  &:active { transform: scale(0.96); }
 
   &.part-chip--selected {
     background: var(--obd-blue-dim);
@@ -207,6 +238,7 @@ mat-card-content {
   }
 }
 
+// ── Parts summary ─────────────────────────────────────────────────────────────
 .parts-summary {
   display: flex;
   align-items: flex-start;
@@ -218,11 +250,7 @@ mat-card-content {
   font-size: 0.85rem;
   color: var(--obd-text);
 
-  mat-icon {
-    color: var(--obd-blue);
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
+  mat-icon { color: var(--obd-blue); flex-shrink: 0; margin-top: 1px; }
 
   .summary-parts {
     color: var(--obd-text-dim);

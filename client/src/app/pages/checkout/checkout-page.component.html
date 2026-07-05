@@ -1,0 +1,242 @@
+<div class="page checkout-page">
+
+  <!-- No order staged (e.g. someone navigated straight here) -->
+  @if (!order()) {
+    <div class="checkout-empty">
+      <mat-icon>shopping_cart_off</mat-icon>
+      <h1>Nothing to check out</h1>
+      <p>Pick a plan or the AuraLink adapter to get started.</p>
+      <a class="btn checkout-primary" routerLink="/plan">
+        <mat-icon>workspace_premium</mat-icon> View plans
+      </a>
+    </div>
+  } @else if (stage() === 'done') {
+    <!-- ── Success ──────────────────────────────────────────────────────────── -->
+    <div class="checkout-success">
+      <div class="success-check"><mat-icon>check</mat-icon></div>
+      <h1>Payment successful</h1>
+      <p class="success-sub">
+        Your {{ order()!.label }} is confirmed. A receipt is on its way to your inbox.
+      </p>
+      <div class="success-actions">
+        <a class="btn checkout-primary" routerLink="/home"><mat-icon>home</mat-icon> Go home</a>
+        <a class="btn checkout-secondary" routerLink="/plan">Back to plans</a>
+      </div>
+      <p class="checkout-note">
+        <mat-icon>info</mat-icon>
+        This was a simulated payment — no card was charged.
+      </p>
+    </div>
+  } @else {
+    <!-- ── Checkout ─────────────────────────────────────────────────────────── -->
+    <a class="checkout-back" (click)="cancel()" role="button" tabindex="0">
+      <mat-icon>arrow_back</mat-icon> Back to plans
+    </a>
+
+    <div class="checkout-grid">
+      <!-- Left: form -->
+      <form class="checkout-form" (ngSubmit)="pay()">
+        <fieldset [disabled]="stage() === 'processing'">
+
+          <!-- Contact -->
+          <section class="form-section">
+            <h2 class="form-section-title">Contact</h2>
+            <label class="field">
+              <span class="field-label">Email</span>
+              <input class="field-input" type="email" autocomplete="email"
+                     [ngModel]="email()" (ngModelChange)="email.set($event)" name="email"
+                     placeholder="you@example.com" />
+              <span class="field-hint">Your receipt and billing updates go here.</span>
+            </label>
+          </section>
+
+          <!-- Payment -->
+          <section class="form-section">
+            <h2 class="form-section-title">Payment</h2>
+            <div class="card-field-wrap">
+              <label class="field">
+                <span class="field-label">Card number</span>
+                <div class="card-input-shell">
+                  <mat-icon class="card-input-icon">credit_card</mat-icon>
+                  <input class="field-input field-input--card" type="text" inputmode="numeric" autocomplete="cc-number"
+                         [ngModel]="card()" (ngModelChange)="onCard($event)" name="ccnumber"
+                         placeholder="1234 5678 9012 3456" />
+                </div>
+              </label>
+              <div class="field-row">
+                <label class="field">
+                  <span class="field-label">Expiry</span>
+                  <input class="field-input" type="text" inputmode="numeric" autocomplete="cc-exp"
+                         [ngModel]="expiry()" (ngModelChange)="onExpiry($event)" name="ccexp"
+                         placeholder="MM / YY" />
+                </label>
+                <label class="field">
+                  <span class="field-label">CVC</span>
+                  <input class="field-input" type="text" inputmode="numeric" autocomplete="cc-csc"
+                         [ngModel]="cvc()" (ngModelChange)="onCvc($event)" name="cccvc"
+                         placeholder="123" />
+                </label>
+              </div>
+              <label class="field">
+                <span class="field-label">Name on card</span>
+                <input class="field-input" type="text" autocomplete="cc-name"
+                       [ngModel]="name()" (ngModelChange)="name.set($event)" name="ccname"
+                       placeholder="Jane Driver" />
+              </label>
+            </div>
+          </section>
+
+          <!-- Billing address -->
+          <section class="form-section">
+            <h2 class="form-section-title">Billing address</h2>
+            <label class="field">
+              <span class="field-label">Country</span>
+              <select class="field-input field-select" [ngModel]="country()"
+                      (ngModelChange)="country.set($event)" name="country">
+                @for (c of countries; track c) { <option [value]="c">{{ c }}</option> }
+              </select>
+            </label>
+            <label class="field">
+              <span class="field-label">Address</span>
+              <input class="field-input" type="text" autocomplete="address-line1"
+                     [ngModel]="address()" (ngModelChange)="address.set($event)" name="address"
+                     placeholder="123 Main St" />
+            </label>
+            <div class="field-row">
+              <label class="field">
+                <span class="field-label">City</span>
+                <input class="field-input" type="text" autocomplete="address-level2"
+                       [ngModel]="city()" (ngModelChange)="city.set($event)" name="city"
+                       placeholder="Los Angeles" />
+              </label>
+              <label class="field">
+                <span class="field-label">State / Region</span>
+                <input class="field-input" type="text" autocomplete="address-level1"
+                       [ngModel]="state()" (ngModelChange)="state.set($event)" name="state"
+                       placeholder="CA" />
+              </label>
+              <label class="field field--zip">
+                <span class="field-label">ZIP</span>
+                <input class="field-input" type="text" inputmode="numeric" autocomplete="postal-code"
+                       [ngModel]="zip()" (ngModelChange)="zip.set($event)" name="zip"
+                       placeholder="90210" />
+              </label>
+            </div>
+          </section>
+
+          @if (error()) {
+            <p class="checkout-error"><mat-icon>error</mat-icon> {{ error() }}</p>
+          }
+
+          <button type="submit" class="btn checkout-primary checkout-pay"
+                  [disabled]="stage() === 'processing'">
+            @if (stage() === 'processing') {
+              <span class="spinner"></span> Processing…
+            } @else {
+              <mat-icon>lock</mat-icon> Pay ${{ dueToday() }}
+            }
+          </button>
+
+          <p class="checkout-secure">
+            <mat-icon>lock</mat-icon>
+            Payments are encrypted and secure. Simulated — no card is charged.
+          </p>
+        </fieldset>
+      </form>
+
+      <!-- Right: order summary -->
+      <aside class="checkout-summary">
+        <div class="summary-card">
+          <h2 class="summary-title">Order summary</h2>
+
+          <div class="summary-item">
+            <div class="summary-item-main">
+              <span class="summary-item-name">{{ order()!.label }}</span>
+              <span class="summary-item-price">
+                @if (order()!.kind === 'adapter') {
+                  ${{ order()!.adapterPrice }}
+                } @else if (order()!.kind === 'bundle') {
+                  ${{ order()!.adapterPrice + order()!.planPrice }}
+                } @else {
+                  ${{ order()!.planPrice }}<span class="per">{{ perLabel() }}</span>
+                }
+              </span>
+            </div>
+          </div>
+
+          <div class="summary-breakdown">
+            @if (order()!.adapterPrice > 0) {
+              <div class="summary-line">
+                <span>AuraLink Adapter (one-time)</span>
+                <span>${{ order()!.adapterPrice }}</span>
+              </div>
+            }
+            @if (order()!.planPrice > 0) {
+              <div class="summary-line">
+                <span>{{ order()!.tier === 'pro' ? 'Pro' : 'Plus' }} plan · {{ firstPeriodLabel() }}</span>
+                <span>${{ order()!.planPrice }}</span>
+              </div>
+            }
+          </div>
+
+          <div class="summary-total">
+            <span>Total due today</span>
+            <span class="summary-total-amount">${{ dueToday() }}</span>
+          </div>
+
+          @if (order()!.planPrice > 0) {
+            <p class="summary-recurring">
+              <mat-icon>autorenew</mat-icon>
+              Renews at ${{ order()!.planPrice }}/{{ renewLabel() }}. Cancel anytime.
+            </p>
+          }
+        </div>
+
+        <!-- Adapter upsell: bundle for Pro, add-on for Plus -->
+        @if (adapterOffer(); as offer) {
+          <div class="adapter-offer" [class.adapter-offer--added]="adapterAdded()">
+            <div class="adapter-offer-head">
+              <mat-icon class="adapter-offer-icon">bluetooth</mat-icon>
+              <div class="adapter-offer-copy">
+                <span class="adapter-offer-title">
+                  {{ offer.isBundle ? 'Add the adapter — bundle deal' : 'Add the AuraLink Adapter' }}
+                </span>
+                <span class="adapter-offer-sub">
+                  @if (offer.isBundle) {
+                    Unlock live streaming telemetry. Save ${{ offer.wasPrice! - offer.price }} with Pro.
+                  } @else {
+                    Scan hands-free and get ready for the live dashboard.
+                  }
+                </span>
+              </div>
+            </div>
+
+            <div class="adapter-offer-foot">
+              <div class="adapter-offer-price">
+                @if (offer.wasPrice) { <span class="offer-was">${{ offer.wasPrice }}</span> }
+                <span class="offer-now">${{ offer.price }}</span>
+                <span class="offer-once">one-time</span>
+              </div>
+              <button type="button" class="btn adapter-offer-btn"
+                      [class.adapter-offer-btn--added]="adapterAdded()"
+                      [disabled]="stage() === 'processing'"
+                      (click)="toggleAdapter()">
+                @if (adapterAdded()) {
+                  <mat-icon>check</mat-icon> Added
+                } @else {
+                  <mat-icon>add</mat-icon> Add
+                }
+              </button>
+            </div>
+          </div>
+        }
+
+        <ul class="summary-trust">
+          <li><mat-icon>verified_user</mat-icon> 30-day money-back guarantee</li>
+          <li><mat-icon>lock</mat-icon> Encrypted &amp; PCI-compliant checkout</li>
+          <li><mat-icon>event_busy</mat-icon> No commitment — cancel whenever</li>
+        </ul>
+      </aside>
+    </div>
+  }
+</div>

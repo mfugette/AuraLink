@@ -1,0 +1,239 @@
+@use '../page-shell' as *;
+
+.page-head.with-action {
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.add-vehicle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 20px;
+  background: var(--obd-blue);
+  color: #fff;
+  border-radius: var(--obd-radius-pill);
+  font-weight: 600;
+  flex-shrink: 0;
+  transition: background var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { background: #2f74e0; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+  // At the tier's vehicle limit: a muted "upgrade" pill instead of the add CTA.
+  &--locked {
+    background: var(--obd-surface-3);
+    border: 1px solid var(--obd-border-strong);
+    color: var(--obd-text-dim);
+    &:hover { background: var(--obd-surface-4); color: var(--obd-text); }
+    mat-icon { color: var(--obd-text-muted); }
+  }
+}
+
+// ── Add / Edit editor ───────────────────────────────────────────────────────
+.vehicle-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px;
+  margin-bottom: 24px;
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-lg);
+}
+
+.editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.editor-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--obd-text);
+
+  mat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--obd-blue); }
+}
+
+.primary-toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.88rem;
+  color: var(--obd-text-dim);
+  cursor: pointer;
+
+  input { width: 16px; height: 16px; accent-color: var(--obd-blue); cursor: pointer; }
+}
+
+.editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--obd-red);
+  font-size: 0.82rem;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+.cancel-btn {
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid var(--obd-border-strong);
+  color: var(--obd-text-dim);
+  border-radius: var(--obd-radius-pill);
+  transition: border-color var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+  &:hover { border-color: var(--obd-blue); color: var(--obd-text); }
+}
+
+.save-btn {
+  height: 40px;
+  padding: 0 20px;
+  background: var(--obd-blue);
+  color: #fff;
+  border-radius: var(--obd-radius-pill);
+  font-weight: 600;
+  transition: background var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
+  &:hover:not(:disabled) { background: #2f74e0; }
+  &:disabled { opacity: 0.5; }
+}
+
+// ── Vehicles grid ───────────────────────────────────────────────────────────
+.vehicles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+}
+
+.vehicle-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius-lg);
+  box-shadow: var(--obd-shadow-sm);
+
+  &.primary { border-color: var(--obd-blue-glow); }
+}
+
+.vehicle-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.vehicle-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--obd-text);
+  min-width: 0;
+
+  mat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--obd-blue); flex-shrink: 0; }
+  span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+
+.primary-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--obd-blue-dim);
+  color: var(--obd-blue);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+
+  mat-icon { font-size: 11px; width: 11px; height: 11px; }
+}
+
+.vehicle-specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+  margin: 0;
+
+  div { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+
+  dt {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--obd-text-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--obd-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.vehicle-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+  border-top: 1px solid var(--obd-border);
+}
+
+.ghost-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: var(--obd-radius-pill);
+  color: var(--obd-text-dim);
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  &:hover { background: var(--obd-surface-4); color: var(--obd-blue); }
+  &--danger:hover { color: var(--obd-red); }
+}
+
+// ── Empty state ─────────────────────────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 56px 20px;
+  color: var(--obd-text-muted);
+  text-align: center;
+
+  mat-icon { font-size: 40px; width: 40px; height: 40px; opacity: 0.4; }
+  p { margin: 0; font-size: 0.9rem; }
+}

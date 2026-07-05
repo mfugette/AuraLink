@@ -1,0 +1,293 @@
+:host {
+  display: block;
+  width: min(560px, 46vw);
+  min-width: 0;
+
+  @media (max-width: 720px) { width: 300px; }
+  @media (max-width: 520px) { width: 42px; }
+}
+
+// ── Compact top-bar trigger ─────────────────────────────────────────────────
+.ai-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 42px;
+  padding: 0 8px 0 16px;
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-pill);
+  color: var(--obd-text-muted);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--obd-dur-fast) var(--obd-ease),
+              background var(--obd-dur-fast) var(--obd-ease),
+              box-shadow var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover {
+    border-color: var(--obd-blue);
+    background: var(--obd-surface-3);
+  }
+
+  > mat-icon {
+    flex-shrink: 0;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--obd-blue);
+  }
+
+  // Icon-only on phones — text/kbd hint would be cramped, and tapping
+  // navigates straight to /assistant instead of opening the hero overlay.
+  @media (max-width: 520px) {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+  }
+}
+
+.ai-trigger-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @media (max-width: 520px) { display: none; }
+}
+
+.ai-trigger-kbd {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-family: inherit;
+  color: var(--obd-text-muted);
+  padding: 3px 8px;
+  border-radius: var(--obd-radius-sm);
+  background: var(--obd-surface-4);
+  border: 1px solid var(--obd-border);
+
+  @media (max-width: 520px) { display: none; }
+}
+
+// ── Activated overlay ───────────────────────────────────────────────────────
+.ai-overlay {
+  // The parent header has a backdrop-filter, which makes it the containing
+  // block for position:fixed descendants. Anchoring with top/left + viewport
+  // units (100vw/100vh) resolves against the viewport regardless, so the
+  // overlay fills the screen instead of being trapped in the 60px bar.
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 300;
+  background: var(--obd-overlay-scrim, rgba(6, 8, 12, 0.82));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 12vh 20px 24px;
+  overflow-y: auto;
+  animation: ai-fade 0.2s var(--obd-ease);
+}
+
+@keyframes ai-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.ai-panel {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  animation: ai-rise 0.32s var(--obd-ease-emphasized);
+}
+
+// In light mode the dark scrim would wash out the (now dark) panel text, so the
+// panel gets a real elevated card surface. That rule lives in global styles.scss
+// because :root is outside this component's encapsulated DOM (see .ai-panel--card).
+:host-context(:root[data-theme='light']) .ai-panel {
+  background: var(--obd-surface);
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius-lg);
+  box-shadow: var(--obd-shadow-lg);
+  padding: 28px 26px;
+
+  // Pull the close button inside the padded card corner.
+  .ai-close { top: 10px; right: 10px; }
+}
+
+@keyframes ai-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ai-close {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--obd-text-dim);
+  background: var(--obd-surface-3);
+  border: 1px solid var(--obd-border);
+  transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { background: var(--obd-surface-4); color: var(--obd-text); }
+
+  @media (max-width: 720px) { top: 0; right: 4px; }
+}
+
+.ai-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--obd-blue-dim);
+  color: var(--obd-blue);
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+.ai-heading {
+  margin: 0;
+  font-size: clamp(1.5rem, 4vw, 2.1rem);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--obd-text);
+}
+
+.ai-sub {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--obd-text-dim);
+}
+
+// ── Suggestion chips ────────────────────────────────────────────────────────
+.ai-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.ai-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 16px;
+  border-radius: var(--obd-radius-pill);
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border-strong);
+  color: var(--obd-text-dim);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: border-color var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease),
+              background var(--obd-dur-fast) var(--obd-ease),
+              transform var(--obd-dur-fast) var(--obd-ease-spring);
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); }
+
+  &:hover {
+    border-color: var(--obd-blue);
+    color: var(--obd-text);
+    background: var(--obd-surface-3);
+    transform: translateY(-1px);
+  }
+}
+
+// ── Input ───────────────────────────────────────────────────────────────────
+.ai-input-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-input-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 56px;
+  padding: 0 8px 0 18px;
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-pill);
+  transition: border-color var(--obd-dur-fast) var(--obd-ease),
+              box-shadow var(--obd-dur-fast) var(--obd-ease);
+
+  &:focus-within {
+    border-color: var(--obd-blue);
+    box-shadow: 0 0 0 3px var(--obd-blue-dim);
+  }
+
+  > mat-icon {
+    flex-shrink: 0;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--obd-blue);
+  }
+}
+
+.ai-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--obd-text);
+  font: inherit;
+  font-size: 1rem;
+
+  &::placeholder { color: var(--obd-text-muted); }
+}
+
+.ai-send {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--obd-blue);
+  color: #fff;
+  transition: background var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 20px; width: 20px; height: 20px; }
+
+  &:hover:not(:disabled) { background: #2f74e0; }
+  &:disabled { opacity: 0.4; }
+}
+
+.ai-disclaimer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--obd-text-muted);
+
+  mat-icon { font-size: 14px; width: 14px; height: 14px; color: var(--obd-blue); opacity: 0.7; }
+}

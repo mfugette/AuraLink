@@ -1,0 +1,172 @@
+<div class="page my-plan-page">
+  <div class="page-head">
+    <h1 class="page-title"><mat-icon>workspace_premium</mat-icon> My Plan</h1>
+    <p class="page-subtitle">Manage your subscription, billing, and orders.</p>
+  </div>
+
+  <!-- ── Current plan ───────────────────────────────────────────────────────── -->
+  <section class="plan-card">
+    <div class="plan-card-head">
+      <div>
+        <span class="plan-eyebrow">Current plan</span>
+        <h2 class="plan-tier">
+          {{ def().name }}
+          @if (sub()?.canceled) { <span class="plan-badge plan-badge--warn">Canceling</span> }
+          @else if (tier.tier() !== 'free') { <span class="plan-badge">Active</span> }
+        </h2>
+      </div>
+      <div class="plan-price">
+        @if (def().priceMonthly === 0) {
+          <span class="plan-price-amount">Free</span>
+        } @else if (sub()) {
+          <span class="plan-price-amount">${{ def().priceMonthly }}</span>
+          <span class="plan-price-per">/mo{{ sub()!.interval === 'annual' ? ' (billed yearly)' : '' }}</span>
+        }
+      </div>
+    </div>
+
+    @if (sub() && tier.tier() !== 'free') {
+      <p class="plan-renewal">
+        <mat-icon>{{ sub()!.canceled ? 'event_busy' : 'autorenew' }}</mat-icon>
+        @if (sub()!.canceled) {
+          Your plan ends on {{ sub()!.renewsAt | date:'longDate' }}. You'll move to Free after that.
+        } @else {
+          Renews {{ sub()!.interval }} on {{ sub()!.renewsAt | date:'longDate' }}.
+        }
+      </p>
+    }
+
+    <!-- Usage snapshot -->
+    <div class="plan-usage">
+      <div class="usage-item">
+        <mat-icon>auto_awesome</mat-icon>
+        <div>
+          <span class="usage-label">Aura messages today</span>
+          <span class="usage-value">
+            @if (aiCap() === Infinity) { Unlimited }
+            @else { {{ aiRemaining() }} of {{ aiCap() }} left }
+          </span>
+        </div>
+      </div>
+      <div class="usage-item">
+        <mat-icon>directions_car</mat-icon>
+        <div>
+          <span class="usage-label">Saved vehicles</span>
+          <span class="usage-value">
+            @if (def().maxVehicles === Infinity) { Unlimited } @else { Up to {{ def().maxVehicles }} }
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="plan-actions">
+      @if (tier.tier() !== 'pro') {
+        <a class="btn plan-btn plan-btn--primary" routerLink="/plan">
+          <mat-icon>upgrade</mat-icon> {{ tier.tier() === 'free' ? 'Choose a plan' : 'Upgrade' }}
+        </a>
+      } @else {
+        <a class="btn plan-btn" routerLink="/plan">
+          <mat-icon>tune</mat-icon> Change plan
+        </a>
+      }
+
+      @if (tier.tier() !== 'free') {
+        @if (sub()?.canceled) {
+          <button type="button" class="btn plan-btn" (click)="resume()">
+            <mat-icon>replay</mat-icon> Resume plan
+          </button>
+        } @else {
+          <button type="button" class="btn plan-btn plan-btn--ghost" (click)="openCancelDialog()">
+            Cancel plan
+          </button>
+        }
+      }
+    </div>
+  </section>
+
+  <!-- ── Cancel dialog (are-you-sure + password re-auth) ────────────────────── -->
+  @if (cancelDialogOpen()) {
+    <div class="dialog-scrim" (click)="closeCancelDialog()">
+      <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="cancel-title"
+           (click)="$event.stopPropagation()">
+        <div class="dialog-icon"><mat-icon>warning</mat-icon></div>
+        <h2 class="dialog-title" id="cancel-title">Cancel your {{ def().name }} plan?</h2>
+        <p class="dialog-body">
+          You'll keep your {{ def().name }} features until
+          <strong>{{ sub()?.renewsAt | date:'longDate' }}</strong>, then move to the Free plan.
+          For your security, enter your password to confirm.
+        </p>
+
+        <form (ngSubmit)="confirmCancel()">
+          <label class="dialog-field">
+            <span class="dialog-label">Password</span>
+            <input class="dialog-input" type="password" autocomplete="current-password"
+                   [ngModel]="cancelPassword()" (ngModelChange)="cancelPassword.set($event)"
+                   name="cancelPassword" placeholder="Enter your password"
+                   [disabled]="cancelling()" />
+          </label>
+
+          @if (cancelError()) {
+            <p class="dialog-error"><mat-icon>error</mat-icon> {{ cancelError() }}</p>
+          }
+
+          <div class="dialog-actions">
+            <button type="button" class="btn plan-btn" (click)="closeCancelDialog()"
+                    [disabled]="cancelling()">
+              Keep my plan
+            </button>
+            <button type="submit" class="btn plan-btn plan-btn--danger" [disabled]="cancelling()">
+              @if (cancelling()) {
+                <span class="dialog-spinner"></span> Canceling…
+              } @else {
+                Cancel plan
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- ── Billing history / orders ───────────────────────────────────────────── -->
+  <section class="history-section">
+    <h2 class="section-title">Billing &amp; orders</h2>
+
+    @if (history().length === 0) {
+      <div class="history-empty">
+        <mat-icon>receipt_long</mat-icon>
+        <p>No purchases yet. Your receipts and orders will show up here.</p>
+      </div>
+    } @else {
+      <div class="history-table">
+        @for (r of history(); track r.id) {
+          <div class="history-row">
+            <div class="history-main">
+              <mat-icon class="history-icon">{{ r.kind === 'plan' ? 'subscriptions' : 'memory' }}</mat-icon>
+              <div class="history-copy">
+                <span class="history-label">{{ r.label }}</span>
+                <span class="history-meta">
+                  {{ r.date | date:'mediumDate' }} · card ····{{ r.cardLast4 }}
+                </span>
+              </div>
+            </div>
+            <div class="history-right">
+              <span class="history-status" [attr.data-status]="r.status">
+                <mat-icon>{{
+                  r.status === 'delivered' ? 'check_circle'
+                  : r.status === 'shipped' ? 'local_shipping'
+                  : r.status === 'processing' ? 'schedule'
+                  : r.status === 'refunded' ? 'undo'
+                  : 'check_circle'
+                }}</mat-icon>
+                {{ r.status }}
+              </span>
+              <span class="history-amount">${{ r.amount }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </section>
+</div>

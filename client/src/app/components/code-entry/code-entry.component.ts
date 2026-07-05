@@ -1,16 +1,10 @@
 import {
-  Component, EventEmitter, Input, OnInit, Output, signal, computed,
+  Component, ElementRef, EventEmitter, Input, Output, ViewChild, signal, computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatChipsModule, MatChipInputEvent } from '@angular/material/chips';
-import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { DtcService } from '../../services/dtc.service';
 import { DtcCode } from '../../models/dtc-code.model';
 
@@ -19,14 +13,14 @@ import { DtcCode } from '../../models/dtc-code.model';
   standalone: true,
   imports: [
     CommonModule, FormsModule,
-    MatChipsModule, MatAutocompleteModule, MatFormFieldModule,
-    MatInputModule, MatIconModule, MatButtonModule, MatTooltipModule,
+    MatIconModule, MatTooltipModule,
   ],
   templateUrl: './code-entry.component.html',
   styleUrl: './code-entry.component.scss',
 })
-export class CodeEntryComponent implements OnInit {
+export class CodeEntryComponent {
   @Output() codesChanged = new EventEmitter<string[]>();
+  @ViewChild('codeInput') codeInput?: ElementRef<HTMLInputElement>;
 
   // Allows external flows (e.g. live DTC scan) to seed the chip list.
   @Input() set initialCodes(codes: string[] | null) {
@@ -35,41 +29,102 @@ export class CodeEntryComponent implements OnInit {
     }
   }
 
-  readonly separatorKeys = [ENTER, COMMA];
   inputValue = '';
   selectedCodes = signal<string[]>([]);
   suggestions = signal<DtcCode[]>([]);
+  focused = signal(false);
+  showSuggestions = signal(false);
+  activeIndex = signal(-1);
 
   readonly hasCode = computed(() => this.selectedCodes().length > 0);
 
   constructor(private dtcService: DtcService) {}
 
-  ngOnInit(): void {}
+  onFocus(): void {
+    this.focused.set(true);
+    if (this.inputValue) this.refreshSuggestions();
+  }
+
+  onBlur(): void {
+    this.focused.set(false);
+    this.showSuggestions.set(false);
+    this.activeIndex.set(-1);
+  }
 
   onInputChange(value: string): void {
     this.inputValue = value;
-    this.suggestions.set(this.dtcService.search(value));
+    this.refreshSuggestions();
   }
 
-  addCode(event: MatChipInputEvent): void {
-    const value = (event.value ?? '').trim().toUpperCase();
+  private refreshSuggestions(): void {
+    const results = this.dtcService.search(this.inputValue);
+    this.suggestions.set(results);
+    this.showSuggestions.set(this.inputValue.trim().length > 0 && results.length > 0);
+    this.activeIndex.set(-1);
+  }
+
+  onKeydown(event: KeyboardEvent): void {
+    const list = this.suggestions();
+
+    switch (event.key) {
+      case 'ArrowDown':
+        if (this.showSuggestions()) {
+          event.preventDefault();
+          this.activeIndex.set(Math.min(this.activeIndex() + 1, list.length - 1));
+        }
+        break;
+      case 'ArrowUp':
+        if (this.showSuggestions()) {
+          event.preventDefault();
+          this.activeIndex.set(Math.max(this.activeIndex() - 1, 0));
+        }
+        break;
+      case 'Enter':
+      case ',':
+        event.preventDefault();
+        if (this.showSuggestions() && this.activeIndex() >= 0) {
+          this.selectSuggestion(list[this.activeIndex()].code);
+        } else {
+          this.commitInput();
+        }
+        break;
+      case 'Escape':
+        this.showSuggestions.set(false);
+        this.activeIndex.set(-1);
+        break;
+      case 'Backspace':
+        if (!this.inputValue && this.selectedCodes().length > 0) {
+          this.removeCode(this.selectedCodes()[this.selectedCodes().length - 1]);
+        }
+        break;
+    }
+  }
+
+  private commitInput(): void {
+    const value = this.inputValue.trim().toUpperCase();
     if (value && this.isValidCode(value) && !this.selectedCodes().includes(value)) {
       this.selectedCodes.update(codes => [...codes, value]);
       this.codesChanged.emit(this.selectedCodes());
     }
-    event.chipInput?.clear();
-    this.inputValue = '';
-    this.suggestions.set([]);
+    this.resetInput();
   }
 
-  onAutocompleteSelected(event: MatAutocompleteSelectedEvent): void {
-    const code = event.option.value as string;
+  selectSuggestion(code: string, event?: Event): void {
+    // On mousedown we must keep focus on the input, so cancel the default blur.
+    event?.preventDefault();
     if (!this.selectedCodes().includes(code)) {
       this.selectedCodes.update(codes => [...codes, code]);
       this.codesChanged.emit(this.selectedCodes());
     }
+    this.resetInput();
+    this.codeInput?.nativeElement.focus();
+  }
+
+  private resetInput(): void {
     this.inputValue = '';
     this.suggestions.set([]);
+    this.showSuggestions.set(false);
+    this.activeIndex.set(-1);
   }
 
   removeCode(code: string): void {

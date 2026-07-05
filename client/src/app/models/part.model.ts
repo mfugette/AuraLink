@@ -1,3 +1,5 @@
+export type PartCondition = 'New' | 'Refurbished' | 'Used';
+
 export interface Part {
   id: string;
   name: string;
@@ -6,6 +8,13 @@ export interface Part {
   inStock: boolean;
   store: PartStore;
   url?: string;
+  images?: string[];
+  source?: 'ebay' | 'amazon' | 'mock';
+  listingTitle?: string;
+  condition?: PartCondition;
+  sellerRating?: number | null;
+  freeShipping?: boolean;
+  bestOffer?: boolean;
 }
 
 export interface PartStore {
@@ -21,4 +30,5 @@ export interface PartStore {
 export interface PartSearchResult {
   part: Part;
   selected: boolean;
+  imageIndex?: number;
 }

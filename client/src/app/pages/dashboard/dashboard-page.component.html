@@ -1,0 +1,95 @@
+<div class="page">
+  <div class="page-head">
+    <h1 class="page-title"><mat-icon>monitoring</mat-icon> Live Dashboard</h1>
+    <p class="page-subtitle">Real-time and historical readings streamed from your vehicle.</p>
+  </div>
+
+  <!-- Premium / adapter status banner -->
+  <div class="adapter-banner">
+    <div class="adapter-status">
+      <span class="status-dot" [class.status-dot--live]="connected()"></span>
+      <span class="status-text">
+        {{ connected() ? 'AuraLink Adapter — Connected' : 'No adapter connected' }}
+      </span>
+      <span class="badge-premium"><mat-icon>workspace_premium</mat-icon> Premium</span>
+    </div>
+    <p class="adapter-note">
+      <mat-icon>info</mat-icon>
+      Demo data. Live telemetry requires the AuraLink Bluetooth adapter and a premium plan.
+    </p>
+  </div>
+
+  <!-- ── Live gauges ─────────────────────────────────────────────────────────── -->
+  <section class="gauges">
+    @for (c of charts(); track trackByKey($index, c)) {
+      <div class="gauge-card" [class.gauge-card--warn]="c.isWarn"
+           [style.--metric-color]="'var(' + c.def.colorVar + ')'">
+        <div class="gauge-svg-wrap">
+          <svg viewBox="0 0 100 100" class="gauge-svg" aria-hidden="true">
+            <!-- Track -->
+            <path [attr.d]="gaugeTrackPath" class="gauge-track" fill="none" />
+            <!-- Value arc -->
+            <path [attr.d]="gaugeArc(c.gaugeFrac)" class="gauge-value" fill="none"
+                  [style.stroke]="c.isWarn ? 'var(--obd-red)' : 'var(--metric-color)'" />
+          </svg>
+          <div class="gauge-center">
+            <span class="gauge-value-num" [class.gauge-value-num--warn]="c.isWarn">
+              {{ format(c.current, c.def) }}
+            </span>
+            <span class="gauge-unit">{{ c.def.unit }}</span>
+          </div>
+        </div>
+        <div class="gauge-label">
+          <mat-icon [style.color]="'var(' + c.def.colorVar + ')'">{{ c.def.icon }}</mat-icon>
+          {{ c.def.label }}
+          @if (c.isWarn) {
+            <mat-icon class="warn-icon" matTooltip="Reading outside the healthy range">warning</mat-icon>
+          }
+        </div>
+      </div>
+    }
+  </section>
+
+  <!-- ── Historical charts ───────────────────────────────────────────────────── -->
+  <h2 class="section-heading">History <span class="section-sub">· last 5 minutes</span></h2>
+  <section class="charts">
+    @for (c of charts(); track trackByKey($index, c)) {
+      <div class="chart-card" [style.--metric-color]="'var(' + c.def.colorVar + ')'">
+        <div class="chart-head">
+          <div class="chart-title">
+            <mat-icon [style.color]="'var(' + c.def.colorVar + ')'">{{ c.def.icon }}</mat-icon>
+            {{ c.def.label }}
+          </div>
+          <div class="chart-current" [class.chart-current--warn]="c.isWarn">
+            {{ format(c.current, c.def) }} <span class="chart-current-unit">{{ c.def.unit }}</span>
+          </div>
+        </div>
+
+        <div class="chart-plot">
+          <svg [attr.viewBox]="'0 0 320 120'" preserveAspectRatio="none" class="chart-svg" aria-hidden="true">
+            <defs>
+              <linearGradient [attr.id]="'grad-' + c.def.key" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" [style.stop-color]="'var(' + c.def.colorVar + ')'" stop-opacity="0.28" />
+                <stop offset="100%" [style.stop-color]="'var(' + c.def.colorVar + ')'" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            <!-- Recessive gridlines (thirds) -->
+            <line x1="6" y1="40" x2="314" y2="40" class="grid-line" />
+            <line x1="6" y1="80" x2="314" y2="80" class="grid-line" />
+            <!-- Area fill -->
+            <path [attr.d]="c.areaPath" [attr.fill]="'url(#grad-' + c.def.key + ')'" />
+            <!-- Line -->
+            <path [attr.d]="c.linePath" fill="none" class="chart-line"
+                  [style.stroke]="'var(' + c.def.colorVar + ')'" />
+            <!-- Last-point marker -->
+            <circle [attr.cx]="c.lastX" [attr.cy]="c.lastY" r="3" class="chart-dot"
+                    [style.fill]="'var(' + c.def.colorVar + ')'" />
+          </svg>
+          <!-- Y-axis min/max labels -->
+          <span class="axis-label axis-label--max">{{ format(c.yMax, c.def) }}</span>
+          <span class="axis-label axis-label--min">{{ format(c.yMin, c.def) }}</span>
+        </div>
+      </div>
+    }
+  </section>
+</div>

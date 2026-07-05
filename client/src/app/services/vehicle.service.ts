@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map, of, catchError } from 'rxjs';
 import { Vehicle } from '../models/vehicle.model';
+import { environment } from '../../environments/environment';
 
 interface NhtsaMakesResponse {
   Results: Array<{ MakeId: number; MakeName: string }>;
@@ -15,11 +16,35 @@ interface NhtsaVinResponse {
   Results: Array<{ Variable: string; Value: string }>;
 }
 
+export interface VehicleTrim {
+  subModel: string;
+  engine: string | null;
+  label: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class VehicleService {
   private readonly nhtsaBase = 'https://vpic.nhtsa.dot.gov/api/vehicles';
+  private readonly apiBase = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
+
+  // CarAPI-backed trim/engine lookup (currently covers all makes, 2015+).
+  // Returns an empty array for uncovered vehicles or on any failure —
+  // callers should fall back to free-text entry when this comes back empty.
+  getTrims(year: number, make: string, model: string): Observable<VehicleTrim[]> {
+    const params = new HttpParams()
+      .set('year', String(year))
+      .set('make', make)
+      .set('model', model);
+
+    return this.http
+      .get<{ trims: VehicleTrim[] }>(`${this.apiBase}/api/vehicle/trims`, { params })
+      .pipe(
+        map(r => r.trims ?? []),
+        catchError(() => of([]))
+      );
+  }
 
   getYears(): number[] {
     const currentYear = new Date().getFullYear() + 1;
@@ -41,7 +66,9 @@ export class VehicleService {
         `${this.nhtsaBase}/GetModelsForMakeYear/make/${encodeURIComponent(make)}/modelyear/${year}?format=json`
       )
       .pipe(
-        map(r => r.Results.map(m => m.Model_Name).sort()),
+        // NHTSA returns duplicate Model_Name entries under different Model_IDs
+        // (the API doesn't expose what distinguishes them) — dedupe by name.
+        map(r => [...new Set(r.Results.map(m => m.Model_Name))].sort()),
         catchError(() => of([]))
       );
   }

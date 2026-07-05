@@ -1,0 +1,358 @@
+@use '../page-shell' as *;
+
+// ── Locked-feature banner ─────────────────────────────────────────────────────
+.locked-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 22px;
+  padding: 12px 16px;
+  border-radius: var(--obd-radius-sm);
+  background: var(--obd-blue-dim);
+  border: 1px solid var(--obd-blue);
+  color: var(--obd-text);
+  font-size: 0.92rem;
+
+  mat-icon { color: var(--obd-blue); flex-shrink: 0; }
+  strong { font-weight: 650; }
+}
+
+// ── Billing interval toggle ───────────────────────────────────────────────────
+.interval-toggle {
+  display: flex;
+  width: fit-content;
+  margin: 0 auto 24px; // center above the grid
+  padding: 4px;
+  border-radius: var(--obd-radius-pill);
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border-strong);
+}
+
+.interval-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: var(--obd-radius-pill);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--obd-text-dim);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { color: var(--obd-text); }
+
+  &.active {
+    background: var(--obd-blue);
+    color: #fff;
+  }
+}
+
+.interval-save {
+  padding: 2px 8px;
+  border-radius: var(--obd-radius-pill);
+  background: var(--obd-green);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
+
+  // On the inactive button, tone it down so it doesn't shout.
+  .interval-btn:not(.active) & {
+    background: rgba(34, 197, 94, 0.16);
+    color: var(--obd-green);
+  }
+}
+
+.price-annual-note {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: var(--obd-text-dim);
+
+  &--ghost { visibility: hidden; } // reserve the line so cards stay aligned
+}
+
+// ── Tier grid ─────────────────────────────────────────────────────────────────
+.tier-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+  margin-bottom: 34px;
+}
+
+.tier-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 22px;
+  border-radius: var(--obd-radius);
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border);
+  box-shadow: var(--obd-shadow-sm);
+  transition: transform var(--obd-dur-fast) var(--obd-ease),
+              border-color var(--obd-dur-fast) var(--obd-ease);
+
+  &--highlight {
+    border-color: var(--obd-blue);
+    box-shadow: var(--obd-shadow), 0 0 0 1px var(--obd-blue);
+  }
+
+  &--current {
+    border-color: var(--obd-green);
+  }
+}
+
+.tier-flag {
+  position: absolute;
+  top: -11px;
+  left: 22px;
+  padding: 3px 12px;
+  border-radius: var(--obd-radius-pill);
+  background: var(--obd-blue);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+
+.tier-head { margin-bottom: 16px; }
+
+.tier-name {
+  margin: 0 0 6px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--obd-text);
+}
+
+.tier-price {
+  margin: 0 0 8px;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.price-amount {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--obd-text);
+}
+.price-per { font-size: 0.95rem; color: var(--obd-text-dim); }
+
+.tier-tagline {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--obd-text-dim);
+  line-height: 1.45;
+  min-height: 2.5em;
+}
+
+.tier-features {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--obd-border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: 0.88rem;
+    color: var(--obd-text);
+    line-height: 1.4;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      color: var(--obd-green);
+    }
+  }
+
+  .feature--off {
+    color: var(--obd-text-muted);
+    mat-icon { color: var(--obd-text-muted); }
+  }
+
+  .feature-note {
+    color: var(--obd-text-muted);
+    font-style: italic;
+    font-size: 0.82em;
+  }
+}
+
+.tier-cta {
+  width: 100%;
+  justify-content: center;
+  padding: 11px 16px;
+  border-radius: var(--obd-radius-sm);
+  background: var(--obd-surface-3);
+  border: 1px solid var(--obd-border-strong);
+  color: var(--obd-text);
+  font-weight: 600;
+  font-size: 0.92rem;
+
+  &:hover:not(:disabled) { background: var(--obd-surface-4); }
+
+  &--primary {
+    background: var(--obd-blue);
+    border-color: var(--obd-blue);
+    color: #fff;
+    &:hover:not(:disabled) { filter: brightness(1.08); }
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: default;
+    color: var(--obd-green);
+    mat-icon { color: var(--obd-green); }
+  }
+}
+
+// ── Adapter section ───────────────────────────────────────────────────────────
+.adapter-section { margin-bottom: 26px; }
+
+.adapter-card {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 26px;
+  padding: 26px;
+  border-radius: var(--obd-radius);
+  background: linear-gradient(135deg, var(--obd-blue-dim), transparent 70%), var(--obd-surface-2);
+  border: 1px solid var(--obd-border);
+  box-shadow: var(--obd-shadow-sm);
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.adapter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  margin-bottom: 12px;
+  border-radius: var(--obd-radius-pill);
+  background: var(--obd-blue-dim);
+  color: var(--obd-blue);
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+}
+
+.adapter-name {
+  margin: 0 0 10px;
+  font-size: 1.5rem;
+  font-weight: 750;
+  color: var(--obd-text);
+}
+
+.adapter-blurb {
+  margin: 0 0 12px;
+  color: var(--obd-text-dim);
+  line-height: 1.5;
+  font-size: 0.92rem;
+}
+
+.adapter-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--obd-text-muted);
+  line-height: 1.45;
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; margin-top: 1px; flex-shrink: 0; }
+}
+
+.adapter-buy {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  justify-content: center;
+}
+
+.adapter-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.adapter-price { display: flex; align-items: baseline; gap: 6px; }
+.adapter-amount { font-size: 1.7rem; font-weight: 800; color: var(--obd-text); }
+.adapter-once { font-size: 0.8rem; color: var(--obd-text-muted); }
+
+.adapter-bundle {
+  padding: 15px;
+  border-radius: var(--obd-radius-sm);
+  background: var(--obd-surface-3);
+  border: 1px dashed var(--obd-blue);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.bundle-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--obd-text);
+  mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); }
+}
+
+.bundle-price { display: flex; align-items: baseline; gap: 8px; }
+.bundle-was {
+  font-size: 1rem;
+  color: var(--obd-text-muted);
+  text-decoration: line-through;
+}
+.bundle-now { font-size: 1.5rem; font-weight: 800; color: var(--obd-blue); }
+
+.adapter-cta {
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: var(--obd-radius-sm);
+  background: var(--obd-surface-3);
+  border: 1px solid var(--obd-border-strong);
+  color: var(--obd-text);
+  font-weight: 600;
+  font-size: 0.9rem;
+
+  &:hover { background: var(--obd-surface-4); }
+
+  &--primary {
+    background: var(--obd-blue);
+    border-color: var(--obd-blue);
+    color: #fff;
+    &:hover { filter: brightness(1.08); }
+  }
+}
+
+// ── Disclaimer ────────────────────────────────────────────────────────────────
+.plan-disclaimer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--obd-text-muted);
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); opacity: 0.8; }
+}

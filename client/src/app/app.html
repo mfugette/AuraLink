@@ -1,176 +1,81 @@
 <div class="app-shell">
 
-  <!-- ── Header ────────────────────────────────────────────────────────────── -->
+  <!-- ── Top bar ──────────────────────────────────────────────────────────── -->
   <header class="app-header">
-    <div class="container">
-      <div class="logo">
-        <div class="logo-icon">
-          <mat-icon>sensors</mat-icon>
-        </div>
-        <div class="logo-text">
-          <span class="logo-name">OpenOBD</span>
-          <span class="logo-tagline">Free OBD2 Code Lookup</span>
-        </div>
-      </div>
-      <nav class="header-nav">
-        <a href="https://en.wikipedia.org/wiki/On-board_diagnostics" target="_blank" rel="noopener">
-          <mat-icon>help_outline</mat-icon> OBD2 Guide
-        </a>
-      </nav>
+    <div class="header-left" [class.sidebar-collapsed]="sidebarCollapsed()">
+      <!-- Sidebar (and thus its toggle) is a signed-in-only feature. -->
+      @if (auth.isSignedIn()) {
+        <button type="button" class="btn hamburger" (click)="toggleSidebar()" aria-label="Toggle menu">
+          <mat-icon>menu</mat-icon>
+        </button>
+      }
+      <a class="logo" routerLink="/home">
+        <mat-icon class="logo-icon">bluetooth_drive</mat-icon>
+        <span class="logo-text">Aura<span class="logo-text-accent">Link.vin</span></span>
+      </a>
+    </div>
+
+    <div class="header-right">
+      @if (showAiSearch()) {
+        <app-ai-search class="header-ai-search" />
+      }
+      <button type="button" class="btn header-link theme-toggle" (click)="theme.toggle()"
+              [matTooltip]="theme.isLight() ? 'Switch to dark' : 'Switch to light'"
+              [attr.aria-label]="theme.isLight() ? 'Switch to dark theme' : 'Switch to light theme'">
+        <mat-icon>{{ theme.isLight() ? 'dark_mode' : 'light_mode' }}</mat-icon>
+      </button>
+      <a class="header-link" routerLink="/faq" matTooltip="Help & FAQ" aria-label="Help & FAQ">
+        <mat-icon>help_outline</mat-icon>
+      </a>
+
+      <app-account-menu />
     </div>
   </header>
 
-  <!-- ── Hero stage (horizontal slider: hero ⇄ live DTC) ──────────────────── -->
-  <section class="hero-stage" [class.hero--gone]="heroHidden()">
-    <div class="stage-track" [class.stage-track--live]="liveMode()">
-
-      <!-- Panel A: Hero -->
-      <div class="stage-panel hero">
-        <div class="container hero-inner">
-          <h1 class="hero-title">
-            Diagnose your car.<br>
-            <span class="hero-accent">For free.</span>
-          </h1>
-          <p class="hero-sub">
-            Enter your OBD2 fault codes to get detailed explanations, likely causes, and find the
-            parts you need at nearby stores — all in one place.
-          </p>
-          <div class="hero-badges">
-            <span class="badge"><mat-icon>check</mat-icon> No account needed</span>
-            <span class="badge"><mat-icon>check</mat-icon> Works on any device</span>
-            <span class="badge"><mat-icon>check</mat-icon> 100% free</span>
-          </div>
-          <div class="hero-cta">
-            <button mat-flat-button class="get-started-btn" (click)="scrollToForm()">
-              Get Started
-              <mat-icon iconPositionEnd>arrow_downward</mat-icon>
-            </button>
-            <span class="cta-or">or</span>
-            <button mat-stroked-button class="detect-live-btn" (click)="enterLiveMode()">
-              Detect Live DTCs
-              <mat-icon iconPositionEnd>arrow_forward</mat-icon>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Panel B: Live DTC flow -->
-      <div class="stage-panel stage-panel--live">
-        <div class="container live-host">
-          <app-live-dtc
-            (back)="exitLiveMode()"
-            (useCodes)="onUseDetectedCodes($event)"
-          />
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ── Main content ───────────────────────────────────────────────────────── -->
-  <main id="main-form" class="container main-content">
-
-    <!-- Step 1: Enter codes -->
-    <section class="card-section">
-      <div class="section-label">
-        <span class="step-num">1</span>
-        <div>
-          <div class="obd-section-title"><mat-icon>qr_code_scanner</mat-icon> Enter Your Fault Codes</div>
-          <p class="obd-section-subtitle">Type each code from your OBD2 scanner and press Enter or comma to add it.</p>
-        </div>
-      </div>
-      <app-code-entry [initialCodes]="codes()" (codesChanged)="onCodesChanged($event)" />
-    </section>
-
-    <mat-divider class="section-divider" />
-
-    <!-- Step 2: Vehicle info -->
-    <section class="card-section">
-      <div class="section-label">
-        <span class="step-num">2</span>
-        <div>
-          <div class="obd-section-title"><mat-icon>directions_car</mat-icon> Your Vehicle</div>
-          <p class="obd-section-subtitle">Used to find the right parts for your year, make, and model.</p>
-        </div>
-      </div>
-      <app-vehicle-selector (vehicleChanged)="onVehicleChanged($event)" />
-    </section>
-
-    <!-- Lookup button -->
-    <div class="lookup-bar">
-      <button
-        mat-flat-button
-        class="lookup-btn"
-        [disabled]="!canLookup()"
-        (click)="lookup()"
-      >
-        <mat-icon>search</mat-icon>
-        Look Up {{ codes().length > 0 ? codes().length : '' }} Code{{ codes().length !== 1 ? 's' : '' }}
-      </button>
-
-      @if (showResults()) {
-        <button mat-stroked-button class="reset-btn" (click)="reset()">
-          <mat-icon>refresh</mat-icon>
-          Start Over
-        </button>
+  <!-- ── Body: sidebar + routed page ─────────────────────────────────────── -->
+  <div class="app-body">
+    <!-- Sidebar is signed-in only; guests get just the routed /home page. -->
+    @if (auth.isSignedIn()) {
+      <!-- Scrim behind the mobile drawer; tap to dismiss. -->
+      @if (mobileDrawerOpen()) {
+        <div class="drawer-scrim" (click)="closeMobileDrawer()"></div>
       }
-    </div>
 
-    <!-- ── Results ─────────────────────────────────────────────────────────── -->
-    @if (showResults()) {
-      <div id="results-section" class="results-region">
-        <mat-divider class="section-divider" />
-
-        <!-- Step 3: Code results -->
-        <section class="card-section">
-          <div class="section-label">
-            <span class="step-num">3</span>
-            <div>
-              <div class="obd-section-title"><mat-icon>article</mat-icon> Code Explanations</div>
-              <p class="obd-section-subtitle">Detailed breakdown of each fault code.</p>
-            </div>
-          </div>
-          <app-code-results
-            [codes]="codes()"
-            (selectedPartsChanged)="onSelectedPartsChanged($event)"
-          />
-        </section>
-
-        <!-- Step 4: Parts locator (only when user has selected parts in Step 3) -->
-        @if (selectedParts().length > 0) {
-          <mat-divider class="section-divider" />
-          <section class="card-section">
-            <div class="section-label">
-              <span class="step-num">4</span>
-              <div>
-                <div class="obd-section-title"><mat-icon>store</mat-icon> Find Parts Near You</div>
-                <p class="obd-section-subtitle">
-                  Locate the parts you selected at nearby auto stores and send your shopping list.
-                </p>
-              </div>
-            </div>
-            <app-parts-locator
-              [partNames]="selectedParts()"
-              [vehicle]="vehicle()"
-            />
-          </section>
-        }
-      </div>
+      <aside
+        class="app-sidebar"
+        [class.collapsed]="sidebarCollapsed()"
+        [class.drawer-open]="mobileDrawerOpen()"
+      >
+        <!-- On the mobile drawer the sidebar is always expanded (icons + labels);
+             tapping a nav item closes the drawer. -->
+        <app-sidebar
+          [collapsed]="sidebarCollapsed() && !mobileDrawerOpen()"
+          (navigate)="closeMobileDrawer()"
+        />
+      </aside>
     }
 
-  </main>
+    <main class="app-main">
+      <router-outlet />
+    </main>
+  </div>
 
-  <!-- ── Footer ────────────────────────────────────────────────────────────── -->
-  <footer class="app-footer">
-    <div class="container footer-inner">
-      <span class="footer-logo">
-        <mat-icon>sensors</mat-icon> OpenOBD
-      </span>
-      <span class="footer-note">
-        Diagnostic information is for reference only. Always consult a qualified mechanic for safety-critical repairs.
-      </span>
-      <span class="footer-copy">© {{ currentYear }} OpenOBD</span>
+  <!-- TEMPORARY floating tier switcher — for testing tier-gated features before
+       real billing exists. Signed-in only. Remove once subscriptions are wired. -->
+  @if (auth.isSignedIn()) {
+    <div class="tier-switch" role="group" aria-label="Switch plan (testing)">
+      <span class="tier-switch-tag">Test tier</span>
+      @for (t of tiers; track t) {
+        <button type="button" class="tier-switch-btn"
+                [class.active]="tierService.tier() === t"
+                (click)="tierService.set(t)">
+          {{ t }}
+        </button>
+      }
+      <a class="tier-switch-plans" routerLink="/plan" matTooltip="Plans & pricing" aria-label="Plans">
+        <mat-icon>workspace_premium</mat-icon>
+      </a>
     </div>
-  </footer>
+  }
 
 </div>

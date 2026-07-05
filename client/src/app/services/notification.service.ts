@@ -31,7 +31,7 @@ export class NotificationService {
         `• ${i.part.name} (${i.part.partNumber}) - $${i.part.price.toFixed(2)}\n  @ ${i.part.store.name} - ${i.part.store.address}`
     );
     const total = selected.reduce((sum, i) => sum + i.part.price, 0);
-    return `OpenOBD Parts List\n${'─'.repeat(30)}\n${lines.join('\n')}\n${'─'.repeat(30)}\nEstimated Total: $${total.toFixed(2)}`;
+    return `AuraLink Parts List\n${'─'.repeat(30)}\n${lines.join('\n')}\n${'─'.repeat(30)}\nEstimated Total: $${total.toFixed(2)}`;
   }
 
   copyToClipboard(text: string): Promise<void> {

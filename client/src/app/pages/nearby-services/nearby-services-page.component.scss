@@ -1,0 +1,406 @@
+@use '../page-shell' as *;
+
+// This page manages its own scrolling (only .services-list scrolls, not the
+// page), so it needs the viewport-height math to be simple: no bottom padding
+// eating into the "1 viewport" budget the way the shared .page shell has.
+// It still keeps the shared shell's centering + horizontal padding (the
+// override only drops the *bottom* padding and adds the flex/height column),
+// otherwise the content sits flush against the viewport edge on mobile.
+.page {
+  padding: 28px 32px 0;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--obd-header-height));
+  min-height: 0;
+
+  @media (max-width: 900px) { padding: 24px 20px 0; }
+  @media (max-width: 600px) { padding: 20px 16px 0; }
+}
+
+.page-head {
+  flex-shrink: 0;
+}
+
+// ── Location input ────────────────────────────────────────────────────────────
+.locate-block {
+  flex-shrink: 0;
+}
+
+.locate-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.locate-gps {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 46px;
+  padding: 0 20px;
+  background: var(--obd-blue);
+  color: #fff;
+  border-radius: var(--obd-radius-pill);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 19px; width: 19px; height: 19px; }
+  &:hover:not(:disabled) { background: #2f74e0; }
+  &:disabled { opacity: 0.6; }
+}
+
+.locate-or {
+  color: var(--obd-text-muted);
+  font-size: 0.85rem;
+}
+
+.locate-zip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 240px;
+  height: 46px;
+  padding: 0 6px 0 16px;
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-pill);
+  transition: border-color var(--obd-dur-fast) var(--obd-ease);
+
+  &:focus-within { border-color: var(--obd-blue); }
+
+  .field-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    height: 100%;
+    color: var(--obd-text);
+    font: inherit;
+    outline: none;
+    &::placeholder { color: var(--obd-text-muted); }
+  }
+}
+
+.locate-search {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--obd-blue);
+  color: #fff;
+  mat-icon { font-size: 19px; width: 19px; height: 19px; }
+  &:hover:not(:disabled) { background: #2f74e0; }
+  &:disabled { opacity: 0.5; }
+}
+
+.locate-resolved,
+.locate-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px;
+  font-size: 0.85rem;
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+.locate-resolved { color: var(--obd-text-dim); }
+.locate-error { color: var(--obd-red); }
+
+// ── Category tabs ─────────────────────────────────────────────────────────────
+// nowrap + shrinkable tabs so all 4 stay on one row even in the narrower list
+// column (a plain wrap would drop "Auto parts" to its own line there).
+.category-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+  margin-bottom: 20px;
+  min-width: 0;
+
+  // On phones the four tabs can't all fit their labels across a narrow
+  // full-width row, so instead of squashing/clipping them make the row
+  // horizontally scrollable (each tab keeps its natural size).
+  @media (max-width: 600px) {
+    // Pin to the column width so overflow-x scrolls the strip internally
+    // instead of the tab content widening the whole page.
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    &::-webkit-scrollbar { display: none; }
+  }
+}
+
+.category-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: var(--obd-radius-pill);
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border-strong);
+  color: var(--obd-text-dim);
+  font-size: 0.82rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { flex-shrink: 0; font-size: 17px; width: 17px; height: 17px; }
+
+  // In the horizontally-scrolling mobile row, tabs keep their natural width
+  // instead of sharing/shrinking (which caused label clipping).
+  @media (max-width: 600px) {
+    flex: 0 0 auto;
+    padding: 0 16px;
+  }
+
+  &:hover { border-color: var(--obd-blue); color: var(--obd-text); }
+  &.active {
+    background: var(--obd-blue-dim);
+    border-color: var(--obd-blue);
+    color: var(--obd-blue);
+  }
+}
+
+// ── Layout: list + map ────────────────────────────────────────────────────────
+// .page is a fixed-height flex column (100vh - header). Everything above this
+// (.page-head, .locate-block) is flex-shrink: 0, so .services-layout naturally
+// fills whatever's left — no magic-number height guessing. min-height: 0 is
+// required on every link of this flex chain, or children refuse to shrink
+// below their content size and the browser falls back to page-level scroll.
+.services-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  flex: 1;
+  min-height: 0;
+  padding-bottom: 24px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    flex: none;
+    overflow: visible;
+    min-width: 0;
+  }
+}
+
+.services-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 0;
+  min-width: 0;
+  // .services-layout is itself height-bounded (flex: 1 inside the fixed-height
+  // .page column). Take up that full grid-row height so .services-list has a
+  // real box to scroll within, instead of growing to fit its content.
+  height: 100%;
+
+  @media (max-width: 900px) {
+    height: auto;
+    // Explicitly cap to the layout width so a long unbreakable string in a
+    // card can't push the column (and the page) past the viewport.
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+.services-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  // Without min-width:0 the flex item takes its min-content width — the widest
+  // unbreakable string in a card (a long address/name) — and pushes the whole
+  // column past the viewport on narrow screens. Pin it to the parent width.
+  min-width: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+
+  @media (max-width: 900px) { overflow-y: visible; }
+}
+
+// Fixed square map, sticky so it stays in view while the list scrolls — back
+// to the original square treatment (not stretched to the column's height).
+.services-map-wrap {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--obd-radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--obd-border);
+  background: var(--obd-surface-2);
+  // The Google Maps SDK renders into .services-map with its own internal
+  // stacking context, which can escape a plain ancestor overflow:hidden clip
+  // (visible as square tile corners poking past the rounded border). Forcing
+  // this wrapper onto its own compositor layer makes the clip authoritative.
+  isolation: isolate;
+  transform: translateZ(0);
+
+  @media (max-width: 900px) {
+    position: static;
+    aspect-ratio: auto;
+    height: 360px;
+    order: -1;
+  }
+
+  // No embedded map on phones at all — see isMobile() in the component
+  // (skips the Maps script/API entirely, not just visually hidden here).
+  // Each result card's "Open in Maps" button covers the same need.
+  @media (max-width: 520px) {
+    display: none;
+  }
+}
+
+.services-map {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--obd-radius-lg);
+  overflow: hidden;
+}
+
+.map-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+  text-align: center;
+  color: var(--obd-text-muted);
+  background: var(--obd-surface-2);
+  pointer-events: none;
+
+  mat-icon { font-size: 38px; width: 38px; height: 38px; opacity: 0.45; }
+  p { margin: 0; font-size: 0.88rem; max-width: 240px; }
+}
+
+// ── Result cards ──────────────────────────────────────────────────────────────
+.service-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius);
+  box-shadow: var(--obd-shadow-sm);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.service-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.service-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--obd-text);
+}
+
+.open-badge {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--obd-green);
+
+  &.closed { background: rgba(239, 68, 68, 0.15); color: var(--obd-red); }
+}
+
+.service-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.82rem;
+  color: var(--obd-text-dim);
+}
+
+.service-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  .stars { color: var(--obd-yellow); letter-spacing: 1px; }
+}
+
+.service-distance {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+}
+
+.service-address {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--obd-text-dim);
+  line-height: 1.4;
+}
+
+.service-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+.service-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: var(--obd-radius-pill);
+  border: 1px solid var(--obd-border-strong);
+  color: var(--obd-text-dim);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  &:hover { border-color: var(--obd-blue); color: var(--obd-blue); }
+}
+
+// ── States ────────────────────────────────────────────────────────────────────
+.services-loading,
+.services-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 20px;
+  color: var(--obd-text-muted);
+  text-align: center;
+
+  mat-icon { font-size: 36px; width: 36px; height: 36px; opacity: 0.5; }
+  p { margin: 0; font-size: 0.9rem; }
+}
+
+.services-loading { flex-direction: row; }
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
