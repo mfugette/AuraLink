@@ -38,6 +38,16 @@
   font-weight: 800;
   letter-spacing: -0.5px;
   color: var(--obd-text);
+
+  // Match the Home hero: the personalized name is injected via [innerHTML] as a
+  // .hero-accent span, so it needs the same gradient here. ::ng-deep because the
+  // injected markup isn't tagged with this component's view-encapsulation attr.
+  ::ng-deep .hero-accent {
+    background: linear-gradient(90deg, var(--obd-blue), #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 }
 
 .assistant-sub {

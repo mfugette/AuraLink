@@ -34,3 +34,26 @@ export async function getUserIdFromToken(token: string): Promise<string | null> 
   if (error || !data.user) return null;
   return data.user.id;
 }
+
+/**
+ * Re-verify a user's password server-side (for destructive actions like account
+ * deletion). Uses a SEPARATE short-lived client (its own auth storage) so the
+ * sign-in attempt never mutates the shared admin client's state. signInWithPassword
+ * is a public auth endpoint, so the service-role key is fine here — we're only
+ * checking the credential, not using elevated access. Returns true only if the
+ * email + password authenticate.
+ *
+ * We re-check on the server (not just the client) so a valid-but-stolen session
+ * token can't by itself delete an account — the caller must prove the password.
+ */
+export async function verifyPassword(email: string, password: string): Promise<boolean> {
+  if (!email || !password) return false;
+
+  const client = createClient(url as string, serviceRoleKey as string, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+  const { data, error } = await client.auth.signInWithPassword({ email, password });
+  // Clean up the throwaway session created by a successful sign-in.
+  if (data.session) await client.auth.signOut();
+  return !error && !!data.user;
+}

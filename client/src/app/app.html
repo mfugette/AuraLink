@@ -57,6 +57,16 @@
 
     <main class="app-main">
       <router-outlet />
+
+      <!-- Global footer: legal + help links reachable from every page. -->
+      <footer class="app-footer">
+        <span class="app-footer-brand">© {{ currentYear }} AuraLink</span>
+        <nav class="app-footer-links" aria-label="Footer">
+          <a routerLink="/terms">Terms</a>
+          <a routerLink="/privacy">Privacy</a>
+          <a routerLink="/faq">Help &amp; FAQ</a>
+        </nav>
+      </footer>
     </main>
   </div>
 
@@ -77,5 +87,8 @@
       </a>
     </div>
   }
+
+  <!-- App-wide toasts + offline banner (fixed-position, renders above content). -->
+  <app-toast-host />
 
 </div>

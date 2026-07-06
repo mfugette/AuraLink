@@ -1,0 +1,142 @@
+@use '../page-shell' as *;
+
+// Shared styling for the Terms and Privacy pages. Long-form legal reading:
+// narrower column than the app pages, generous line height, clear section
+// hierarchy, and a prominent "template — not legal advice" banner.
+
+.legal {
+  max-width: 820px;
+}
+
+// ── Template / disclaimer banner ──────────────────────────────────────────────
+.legal-banner {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: color-mix(in srgb, #e0a100 14%, var(--obd-surface));
+  border: 1px solid color-mix(in srgb, #e0a100 45%, transparent);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 20px 0 32px;
+
+  mat-icon {
+    color: #b47700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--obd-text-dim);
+  }
+  strong { color: var(--obd-text); }
+}
+
+// ── Meta line (effective date) ────────────────────────────────────────────────
+.legal-meta {
+  font-size: 0.85rem;
+  color: var(--obd-text-dim);
+  margin: 0 0 8px;
+}
+
+// ── Table of contents ─────────────────────────────────────────────────────────
+.legal-toc {
+  background: var(--obd-surface);
+  border: 1px solid var(--obd-border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 36px;
+
+  h2 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--obd-text-dim);
+    margin: 0 0 10px;
+  }
+  ol {
+    margin: 0;
+    padding-left: 20px;
+    columns: 2;
+    column-gap: 32px;
+    font-size: 0.9rem;
+
+    @media (max-width: 600px) { columns: 1; }
+  }
+  li { margin-bottom: 6px; break-inside: avoid; }
+  a {
+    color: var(--obd-blue);
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
+  }
+}
+
+// ── Sections ──────────────────────────────────────────────────────────────────
+.legal-section {
+  margin-bottom: 32px;
+  scroll-margin-top: 80px;
+
+  h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--obd-text);
+    margin: 0 0 12px;
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+  }
+  .legal-num {
+    color: var(--obd-blue);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  p, li {
+    color: var(--obd-text);
+    line-height: 1.65;
+    font-size: 0.95rem;
+  }
+  p { margin: 0 0 12px; }
+  ul { margin: 0 0 12px; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+
+  a { color: var(--obd-blue); }
+}
+
+// ── Inline lawyer-review flag ─────────────────────────────────────────────────
+.legal-flag {
+  display: block;
+  background: color-mix(in srgb, var(--obd-blue) 8%, var(--obd-surface));
+  border-left: 3px solid var(--obd-blue);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  margin: 12px 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--obd-text-dim);
+
+  .legal-flag-tag {
+    display: inline-block;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--obd-blue);
+    margin-right: 8px;
+  }
+}
+
+// ── Footer contact / cross-link ───────────────────────────────────────────────
+.legal-foot {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--obd-border);
+  font-size: 0.9rem;
+  color: var(--obd-text-dim);
+
+  a { color: var(--obd-blue); }
+}

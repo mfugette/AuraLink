@@ -1,0 +1,243 @@
+<div class="page legal">
+  <div class="page-head">
+    <h1 class="page-title"><mat-icon>shield</mat-icon> Privacy Policy</h1>
+    <p class="page-subtitle">What AuraLink collects, why, who we share it with, and your rights.</p>
+  </div>
+
+  <div class="legal-banner">
+    <mat-icon>info</mat-icon>
+    <p>
+      <strong>This is a working template, not legal advice.</strong> It names AuraLink's real data
+      flows, but it has <strong>not been reviewed by a privacy lawyer</strong>. Before you open to
+      the public, have counsel confirm your legal basis, sub-processor list, retention periods, and
+      international-transfer safeguards under GDPR, CCPA/CPRA, and any other law that applies to your
+      users.
+    </p>
+  </div>
+
+  <p class="legal-meta">Effective date: {{ effectiveDate }}</p>
+
+  <nav class="legal-toc" aria-label="Table of contents">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#who">Who we are</a></li>
+      <li><a href="#collect">What we collect</a></li>
+      <li><a href="#use">How we use it</a></li>
+      <li><a href="#legal-basis">Legal basis (GDPR)</a></li>
+      <li><a href="#share">Who we share it with</a></li>
+      <li><a href="#ai-data">Your AI conversations</a></li>
+      <li><a href="#location">Location data</a></li>
+      <li><a href="#retention">How long we keep it</a></li>
+      <li><a href="#rights">Your rights</a></li>
+      <li><a href="#security">How we protect it</a></li>
+      <li><a href="#cookies">Cookies &amp; local storage</a></li>
+      <li><a href="#children">Children</a></li>
+      <li><a href="#transfers">International transfers</a></li>
+      <li><a href="#changes">Changes</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ol>
+  </nav>
+
+  <section class="legal-section" id="who">
+    <h2><span class="legal-num">1.</span> Who we are</h2>
+    <p>
+      AuraLink ("we", "us") provides the AuraLink vehicle-management app at auralink.vin. This policy
+      explains how we handle your personal information when you use it.
+    </p>
+    <span class="legal-flag">
+      <span class="legal-flag-tag">Lawyer: fill in</span>
+      Insert your legal entity name, registered address, and — if you serve EU users — your data
+      controller identity and any required EU/UK representative or Data Protection Officer.
+    </span>
+  </section>
+
+  <section class="legal-section" id="collect">
+    <h2><span class="legal-num">2.</span> What we collect</h2>
+    <ul>
+      <li><strong>Account data:</strong> your email address and display name.</li>
+      <li><strong>Vehicle data:</strong> vehicles you save (year, make, model, VIN, mileage, and similar details) and your diagnostic/issue history.</li>
+      <li><strong>Diagnostic activity:</strong> fault codes you look up and parts you search for.</li>
+      <li><strong>AI conversations:</strong> the messages you send to Aura and the context we attach (such as your primary vehicle and its issue history).</li>
+      <li><strong>Location:</strong> when you use Find Help Nearby, your device location or a ZIP code you enter — used only for that search.</li>
+      <li><strong>Payment data:</strong> if you subscribe, our payment processor collects your payment details. We do not store your full card number.</li>
+      <li><strong>Technical data:</strong> basic logs needed to run and secure the Service (such as IP address and request metadata for rate limiting and abuse prevention).</li>
+    </ul>
+  </section>
+
+  <section class="legal-section" id="use">
+    <h2><span class="legal-num">3.</span> How we use it</h2>
+    <ul>
+      <li>To provide the Service — saving your vehicles, answering diagnostic questions, powering Aura, and finding nearby help;</li>
+      <li>To manage your account, plan, and payments;</li>
+      <li>To secure the Service and prevent abuse (rate limiting, fraud/abuse detection);</li>
+      <li>To communicate with you about your account (e.g. email verification, password reset, service notices);</li>
+      <li>To improve the Service.</li>
+    </ul>
+    <p>We do <strong>not</strong> sell your personal information.</p>
+    <span class="legal-flag">
+      <span class="legal-flag-tag">Lawyer: review</span>
+      "We don't sell" has a specific legal meaning under CCPA/CPRA (which also covers "sharing" for
+      cross-context advertising). Confirm this statement is accurate for every third party you use,
+      and add a "Do Not Sell or Share" mechanism if any arrangement qualifies.
+    </span>
+  </section>
+
+  <section class="legal-section" id="legal-basis">
+    <h2><span class="legal-num">4.</span> Legal basis (GDPR)</h2>
+    <p>
+      If you are in the EU/UK, we process your data to perform our contract with you (providing the
+      Service), to comply with legal obligations, and for our legitimate interests in securing and
+      improving the Service. Where required, we rely on your consent (for example, location).
+    </p>
+    <span class="legal-flag">
+      <span class="legal-flag-tag">Lawyer: review</span>
+      Map each processing purpose in Section 3 to a specific GDPR Article 6 basis. This is required
+      and should not be left generic if you serve EU users.
+    </span>
+  </section>
+
+  <section class="legal-section" id="share">
+    <h2><span class="legal-num">5.</span> Who we share it with</h2>
+    <p>
+      We share data with the service providers ("sub-processors") that make AuraLink work. Each
+      processes data only to provide its service to us:
+    </p>
+    <ul>
+      <li><strong>Supabase</strong> — cloud database and authentication (stores your account, vehicles, and settings).</li>
+      <li><strong>Google (Gemini AI)</strong> — processes your Aura conversation text to generate responses.</li>
+      <li><strong>Google Maps Platform</strong> — geocoding and nearby-place search for Find Help Nearby.</li>
+      <li><strong>Cloudflare</strong> — network, security, and access control for the site.</li>
+      <li><strong>Payment processor</strong> — processes subscription payments (to be added when paid plans launch).</li>
+    </ul>
+    <p>We may also disclose data if required by law or to protect the rights and safety of our users.</p>
+    <span class="legal-flag">
+      <span class="legal-flag-tag">Lawyer: review</span>
+      This sub-processor list must stay accurate and current. Confirm you have a Data Processing
+      Agreement (DPA) in place with each, and check each provider's data-use terms — particularly
+      whether the AI provider may use inputs for model training (choose a no-training tier if so).
+    </span>
+  </section>
+
+  <section class="legal-section" id="ai-data">
+    <h2><span class="legal-num">6.</span> Your AI conversations</h2>
+    <p>
+      When you chat with Aura, your messages and the vehicle context we attach are sent to our AI
+      provider to generate a response. We do not persist your conversations on our servers after the
+      response is produced. Do not share sensitive personal information in chat that isn't needed for
+      a vehicle question.
+    </p>
+    <span class="legal-flag">
+      <span class="legal-flag-tag">Lawyer: confirm</span>
+      Verify the AI provider's retention and training terms for the specific API tier you use, and
+      describe them accurately here. This is a common area of privacy-policy inaccuracy.
+    </span>
+  </section>
+
+  <section class="legal-section" id="location">
+    <h2><span class="legal-num">7.</span> Location data</h2>
+    <p>
+      Find Help Nearby uses your device's location (with your permission) or a ZIP code you type. We
+      use it only to run that search and show nearby results. We don't track your location in the
+      background or build a location history.
+    </p>
+  </section>
+
+  <section class="legal-section" id="retention">
+    <h2><span class="legal-num">8.</span> How long we keep it</h2>
+    <p>
+      We keep your account and vehicle data for as long as your account is active. When you delete
+      your account, we delete your associated data from our database. Some records may be retained
+      where required by law (for example, payment and tax records).
+    </p>
+    <span class="legal-flag">
+      <span class="legal-flag-tag">Lawyer: fill in</span>
+      Specify concrete retention periods per data type (especially billing/tax records and backup
+      deletion timelines). "As long as needed" alone is not sufficient under GDPR.
+    </span>
+  </section>
+
+  <section class="legal-section" id="rights">
+    <h2><span class="legal-num">9.</span> Your rights</h2>
+    <p>Depending on where you live, you may have the right to:</p>
+    <ul>
+      <li><strong>Access</strong> the data we hold about you — you can export it anytime from your <a routerLink="/account">Account</a> page;</li>
+      <li><strong>Delete</strong> your account and data — also from your <a routerLink="/account">Account</a> page;</li>
+      <li><strong>Correct</strong> inaccurate data;</li>
+      <li><strong>Object to or restrict</strong> certain processing, and withdraw consent;</li>
+      <li><strong>Not be discriminated against</strong> for exercising these rights.</li>
+    </ul>
+    <p>To exercise a right we don't yet offer in-app, contact us (Section 15).</p>
+  </section>
+
+  <section class="legal-section" id="security">
+    <h2><span class="legal-num">10.</span> How we protect it</h2>
+    <p>
+      We protect your data with encrypted connections, authentication on every request that touches
+      your data, strict per-user access scoping, rate limiting, and access controls on our
+      infrastructure. No system is perfectly secure, but we work to keep your data safe and to fix
+      issues promptly.
+    </p>
+  </section>
+
+  <section class="legal-section" id="cookies">
+    <h2><span class="legal-num">11.</span> Cookies &amp; local storage</h2>
+    <p>
+      AuraLink uses your browser's local storage to keep you signed in and to remember preferences
+      (such as your theme and plan). We use only what's needed to run the Service; we don't use
+      third-party advertising trackers.
+    </p>
+    <span class="legal-flag">
+      <span class="legal-flag-tag">Lawyer: review</span>
+      If EU users can reach the app, you likely need a consent notice for non-essential storage.
+      Decide whether to geo-restrict the EU initially or add a consent banner before public launch.
+    </span>
+  </section>
+
+  <section class="legal-section" id="children">
+    <h2><span class="legal-num">12.</span> Children</h2>
+    <p>
+      AuraLink is not intended for children under 16, and we don't knowingly collect their data. If
+      you believe a child has given us personal information, contact us and we'll delete it.
+    </p>
+  </section>
+
+  <section class="legal-section" id="transfers">
+    <h2><span class="legal-num">13.</span> International transfers</h2>
+    <p>
+      Our providers may process data in countries other than yours. Where required, we rely on
+      appropriate safeguards for international transfers.
+    </p>
+    <span class="legal-flag">
+      <span class="legal-flag-tag">Lawyer: fill in</span>
+      Name the transfer mechanism (e.g. EU Standard Contractual Clauses) for each provider that
+      processes EU data outside the EEA. Required under GDPR.
+    </span>
+  </section>
+
+  <section class="legal-section" id="changes">
+    <h2><span class="legal-num">14.</span> Changes</h2>
+    <p>
+      We may update this policy. If we make material changes, we'll update the effective date and,
+      where appropriate, notify you. Continuing to use AuraLink after changes take effect means you
+      accept the updated policy.
+    </p>
+  </section>
+
+  <section class="legal-section" id="contact">
+    <h2><span class="legal-num">15.</span> Contact</h2>
+    <p>
+      Questions or privacy requests? Contact us at
+      <a href="mailto:privacy@auralink.vin">privacy&#64;auralink.vin</a>.
+    </p>
+    <span class="legal-flag">
+      <span class="legal-flag-tag">To do</span>
+      Stand up this privacy contact inbox before launch. EU/UK users must have a way to reach you
+      about their data rights.
+    </span>
+  </section>
+
+  <div class="legal-foot">
+    See also our <a routerLink="/terms">Terms of Service</a> &middot;
+    <a routerLink="/faq">Help &amp; FAQ</a>
+  </div>
+</div>

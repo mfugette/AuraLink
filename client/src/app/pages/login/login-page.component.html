@@ -2,15 +2,19 @@
   <div class="login-card">
     <div class="login-head">
       <div class="ai-badge"><mat-icon>lock</mat-icon> AuraLink Account</div>
-      <h1 class="login-title">{{ mode() === 'signin' ? 'Welcome back' : 'Create your account' }}</h1>
+      <h1 class="login-title">
+        {{ mode() === 'signin' ? 'Welcome back'
+          : mode() === 'signup' ? 'Create your account'
+          : 'Reset your password' }}
+      </h1>
       <p class="login-sub">
-        {{ mode() === 'signin'
-          ? 'Sign in to access your vehicles and issue history.'
-          : 'Save your vehicles and track diagnostic history across sessions.' }}
+        {{ mode() === 'signin' ? 'Sign in to access your vehicles and issue history.'
+          : mode() === 'signup' ? 'Save your vehicles and track diagnostic history across sessions.'
+          : "Enter your email and we'll send you a reset link." }}
       </p>
     </div>
 
-    <form class="login-form" (ngSubmit)="submit()">
+    <form class="login-form" (ngSubmit)="mode() === 'reset-request' ? sendReset() : submit()">
       @if (mode() === 'signup') {
         <label class="field">
           <span class="field-label">Display name</span>
@@ -42,20 +46,28 @@
         </span>
       </label>
 
-      <label class="field">
-        <span class="field-label">Password</span>
-        <span class="field-control">
-          <input
-            class="field-input"
-            type="password"
-            [ngModel]="password()"
-            (ngModelChange)="password.set($event)"
-            name="password"
-            placeholder="••••••••"
-            [autocomplete]="mode() === 'signin' ? 'current-password' : 'new-password'"
-          />
-        </span>
-      </label>
+      @if (mode() !== 'reset-request') {
+        <label class="field">
+          <span class="field-label">Password</span>
+          <span class="field-control">
+            <input
+              class="field-input"
+              type="password"
+              [ngModel]="password()"
+              (ngModelChange)="password.set($event)"
+              name="password"
+              placeholder="••••••••"
+              [autocomplete]="mode() === 'signin' ? 'current-password' : 'new-password'"
+            />
+          </span>
+        </label>
+
+        @if (mode() === 'signin') {
+          <button type="button" class="btn login-forgot" (click)="showResetRequest()">
+            Forgot password?
+          </button>
+        }
+      }
 
       @if (error()) {
         <p class="login-error"><mat-icon>error_outline</mat-icon> {{ error() }}</p>
@@ -65,15 +77,34 @@
       }
 
       <button type="submit" class="btn login-submit" [disabled]="loading()">
-        {{ loading() ? 'Please wait…' : (mode() === 'signin' ? 'Sign in' : 'Create account') }}
+        {{ loading() ? 'Please wait…'
+          : mode() === 'signin' ? 'Sign in'
+          : mode() === 'signup' ? 'Create account'
+          : 'Send reset link' }}
       </button>
+
+      @if (mode() === 'signup') {
+        <p class="login-consent">
+          By creating an account you agree to our
+          <a routerLink="/terms">Terms</a> and <a routerLink="/privacy">Privacy Policy</a>.
+        </p>
+      }
     </form>
 
-    <p class="login-toggle">
-      {{ mode() === 'signin' ? "Don't have an account?" : 'Already have an account?' }}
-      <button type="button" class="btn login-toggle-btn" (click)="toggleMode()">
-        {{ mode() === 'signin' ? 'Sign up' : 'Sign in' }}
-      </button>
-    </p>
+    @if (mode() === 'reset-request') {
+      <p class="login-toggle">
+        Remembered it?
+        <button type="button" class="btn login-toggle-btn" (click)="backToSignIn()">
+          Back to sign in
+        </button>
+      </p>
+    } @else {
+      <p class="login-toggle">
+        {{ mode() === 'signin' ? "Don't have an account?" : 'Already have an account?' }}
+        <button type="button" class="btn login-toggle-btn" (click)="toggleMode()">
+          {{ mode() === 'signin' ? 'Sign up' : 'Sign in' }}
+        </button>
+      </p>
+    }
   </div>
 </div>

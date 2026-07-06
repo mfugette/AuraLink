@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../services/auth.service';
 
@@ -10,7 +10,7 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-login-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, RouterLink, MatIconModule],
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.scss',
 })
@@ -21,8 +21,8 @@ export class LoginPageComponent {
 
   // Defaults to sign-in, but /login?mode=signup (e.g. the Home page's guest
   // CTA) opens straight into account creation instead of making the user
-  // toggle manually.
-  mode = signal<'signin' | 'signup'>(
+  // toggle manually. 'reset-request' is the "forgot password" email form.
+  mode = signal<'signin' | 'signup' | 'reset-request'>(
     this.route.snapshot.queryParamMap.get('mode') === 'signup' ? 'signup' : 'signin',
   );
   email = signal('');
@@ -37,6 +37,36 @@ export class LoginPageComponent {
     this.mode.update(m => (m === 'signin' ? 'signup' : 'signin'));
     this.error.set(null);
     this.notice.set(null);
+  }
+
+  // Enter / leave the "forgot password" email form.
+  showResetRequest(): void {
+    this.mode.set('reset-request');
+    this.error.set(null);
+    this.notice.set(null);
+  }
+  backToSignIn(): void {
+    this.mode.set('signin');
+    this.error.set(null);
+    this.notice.set(null);
+  }
+
+  async sendReset(): Promise<void> {
+    const email = this.email().trim();
+    if (!email) {
+      this.error.set('Enter your email to reset your password.');
+      return;
+    }
+    this.loading.set(true);
+    this.error.set(null);
+    this.notice.set(null);
+    try {
+      // Don't reveal whether the address exists — always show the same message.
+      await this.auth.sendPasswordReset(email);
+      this.notice.set('If an account exists for that email, a reset link is on its way.');
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   async submit(): Promise<void> {

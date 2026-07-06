@@ -116,3 +116,27 @@
 
   &:hover { text-decoration: underline; }
 }
+
+.login-forgot {
+  align-self: flex-end;
+  margin-top: -4px;
+  font-size: 0.82rem;
+  color: var(--obd-blue);
+  padding: 0;
+
+  &:hover { text-decoration: underline; }
+}
+
+.login-consent {
+  margin: 2px 0 0;
+  text-align: center;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--obd-text-dim);
+
+  a {
+    color: var(--obd-blue);
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
+  }
+}
