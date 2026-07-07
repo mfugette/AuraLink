@@ -1,0 +1,36 @@
+@use '../history-table' as ht;
+
+@include ht.history-table;
+
+:host { display: block; margin-top: 34px; }
+
+// Vehicle dropdown sizing to match the search field height/row.
+.ht-vehicle-select { min-width: 190px; display: inline-block; }
+
+// ── Drive-specific: metric traces inside the drill-in dialog ──────────────────
+.sh-traces-head {
+  display: flex; align-items: baseline; gap: 10px; margin: 22px 0 12px;
+  h4 { margin: 0; font-size: 0.95rem; color: var(--obd-text); }
+  span { font-size: 0.78rem; color: var(--obd-text-muted); }
+}
+.sh-traces { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 560px) { .sh-traces { grid-template-columns: 1fr; } }
+
+.sh-trace { background: var(--obd-surface); border: 1px solid var(--obd-border); border-radius: var(--obd-radius); padding: 12px 14px; }
+.sh-trace-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.sh-trace-title {
+  display: flex; align-items: center; gap: 7px; font-size: 0.86rem; font-weight: 600; color: var(--obd-text);
+  mat-icon { font-size: 17px; width: 17px; height: 17px; }
+}
+.sh-trace-peak {
+  font-size: 0.84rem; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--obd-text);
+  small { color: var(--obd-text-muted); font-size: 0.72rem; margin-left: 1px; }
+}
+.sh-trace-plot { position: relative; height: 72px; }
+.sh-trace-plot svg { width: 100%; height: 100%; display: block; }
+.sh-grid { stroke: var(--obd-border); stroke-width: 1; opacity: 0.55; }
+.sh-line { stroke-width: 2; }
+.sh-axis {
+  position: absolute; right: 3px; font-size: 0.6rem; color: var(--obd-text-muted); font-variant-numeric: tabular-nums;
+  &.max { top: 2px; } &.min { bottom: 2px; }
+}

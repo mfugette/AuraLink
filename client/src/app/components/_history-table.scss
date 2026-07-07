@@ -1,0 +1,202 @@
+// Shared history-table styling used by the History hub tabs (Drives, Issues,
+// Repairs) so they all look identical: a sortable table with a filters row, a
+// mobile card fallback, and a centered drill-in dialog. Each component @use's
+// this partial; Angular view encapsulation scopes the resulting rules per host.
+// Class prefix: ht-*.
+
+@mixin history-table {
+  :host { display: block; }
+
+  // ── Header ──────────────────────────────────────────────────────────────────
+  .ht-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .ht-head-left { display: flex; align-items: baseline; gap: 10px; }
+  .ht-title { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.01em; margin: 0; color: var(--obd-text); }
+  .ht-sub { font-size: 0.82rem; color: var(--obd-text-muted); }
+
+  // ── Filters row ─────────────────────────────────────────────────────────────
+  .ht-filters { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+
+  .ht-search {
+    position: relative; flex: 1; min-width: 180px; display: flex; align-items: center;
+    mat-icon { position: absolute; left: 10px; font-size: 18px; width: 18px; height: 18px; color: var(--obd-text-muted); pointer-events: none; }
+    input {
+      width: 100%; height: 38px; padding: 0 12px 0 34px; border-radius: var(--obd-radius-sm);
+      background: var(--obd-surface); border: 1px solid var(--obd-border); color: var(--obd-text); font-size: 0.88rem;
+      &:focus { outline: none; border-color: var(--obd-blue); box-shadow: 0 0 0 3px var(--obd-blue-dim); }
+      &::placeholder { color: var(--obd-text-muted); }
+    }
+  }
+
+  .ht-select {
+    height: 38px; padding: 0 10px; border-radius: var(--obd-radius-sm);
+    background: var(--obd-surface); border: 1px solid var(--obd-border); color: var(--obd-text); font-size: 0.85rem; cursor: pointer;
+    &:focus { outline: none; border-color: var(--obd-blue); }
+  }
+
+  .ht-toggle {
+    height: 38px; padding: 0 14px; border-radius: var(--obd-radius-sm); gap: 6px;
+    background: var(--obd-surface); border: 1px solid var(--obd-border); color: var(--obd-text-dim);
+    font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center;
+    mat-icon { font-size: 17px; width: 17px; height: 17px; }
+    &:hover { border-color: var(--obd-border-strong); }
+    &.on {
+      background: color-mix(in srgb, var(--obd-red) 14%, var(--obd-surface));
+      border-color: color-mix(in srgb, var(--obd-red) 45%, transparent);
+      color: var(--obd-red);
+    }
+  }
+
+  .ht-add {
+    height: 38px; padding: 0 16px; border-radius: var(--obd-radius-sm); gap: 6px;
+    background: var(--obd-blue); color: #fff; font-weight: 650; font-size: 0.88rem; display: inline-flex; align-items: center;
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
+    &:hover { filter: brightness(1.06); }
+  }
+
+  .ht-summary {
+    display: flex; gap: 8px; align-items: baseline; font-size: 0.85rem; color: var(--obd-text-dim); margin-bottom: 14px;
+    b { color: var(--obd-text); font-weight: 700; font-variant-numeric: tabular-nums; }
+  }
+
+  // ── Table (desktop) ─────────────────────────────────────────────────────────
+  .ht-wrap { border: 1px solid var(--obd-border); border-radius: var(--obd-radius); overflow: hidden; background: var(--obd-surface); }
+
+  .ht-table {
+    width: 100%; border-collapse: collapse; font-size: 0.88rem;
+
+    thead th {
+      text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--obd-text-muted); font-weight: 600; padding: 11px 14px; white-space: nowrap;
+      background: var(--obd-surface-2); border-bottom: 1px solid var(--obd-border);
+    }
+    th.num { text-align: right; }
+    th.sortable { cursor: pointer; user-select: none; }
+    th.sortable:hover { color: var(--obd-text-dim); }
+    .ht-arr { font-size: 14px; width: 14px; height: 14px; vertical-align: middle; color: var(--obd-blue); }
+
+    tbody tr {
+      cursor: pointer; border-bottom: 1px solid var(--obd-border); transition: background var(--obd-dur-fast) var(--obd-ease);
+      &:last-child { border-bottom: 0; }
+      &:hover { background: var(--obd-surface-2); }
+      &:focus-visible { outline: 2px solid var(--obd-blue); outline-offset: -2px; }
+      &.warn { box-shadow: inset 3px 0 0 var(--obd-red); }
+    }
+    td { padding: 12px 14px; vertical-align: middle; color: var(--obd-text); }
+    td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .td-primary { font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums;
+      small { display: block; color: var(--obd-text-muted); font-weight: 400; font-size: 0.72rem; } }
+    .td-title { font-weight: 600;
+      small { display: block; color: var(--obd-text-muted); font-weight: 400; font-size: 0.76rem; } }
+    .cell-warn { color: var(--obd-red); }
+    .cell-with-ic { display: inline-flex; align-items: center; gap: 7px;
+      mat-icon { font-size: 17px; width: 17px; height: 17px; } }
+  }
+
+  // ── Status / category chip ────────────────────────────────────────────────────
+  .ht-chip {
+    display: inline-flex; align-items: center; gap: 4px; font-size: 0.66rem; letter-spacing: 0.03em;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 5px; font-weight: 600; white-space: nowrap;
+    mat-icon { font-size: 13px; width: 13px; height: 13px; }
+    &.ok       { background: color-mix(in srgb, var(--obd-green) 16%, transparent);  color: var(--obd-green); }
+    &.warn     { background: color-mix(in srgb, var(--obd-red) 16%, transparent);    color: var(--obd-red); }
+    &.info     { background: color-mix(in srgb, var(--obd-blue) 16%, transparent);   color: var(--obd-blue); }
+    &.progress { background: color-mix(in srgb, var(--obd-orange) 16%, transparent); color: var(--obd-orange); }
+    &.neutral  { background: var(--obd-surface-3); color: var(--obd-text-dim); }
+  }
+
+  .ht-empty {
+    padding: 40px 24px; text-align: center; color: var(--obd-text-muted); font-size: 0.9rem;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    mat-icon { font-size: 32px; width: 32px; height: 32px; opacity: 0.6; }
+    p { margin: 0; max-width: 340px; }
+  }
+
+  .ht-retention {
+    text-align: center; font-size: 0.8rem; color: var(--obd-text-muted); padding: 12px; margin-top: 12px;
+    border: 1px dashed var(--obd-border); border-radius: var(--obd-radius-sm);
+  }
+
+  // ── Card fallback (mobile) ────────────────────────────────────────────────────
+  .ht-cards { display: none; }
+
+  @media (max-width: 720px) {
+    .ht-table { display: none; }
+    .ht-wrap { border: 0; background: transparent; overflow: visible; }
+    .ht-cards { display: flex; flex-direction: column; gap: 10px; }
+
+    .ht-card {
+      background: var(--obd-surface); border: 1px solid var(--obd-border); border-radius: var(--obd-radius);
+      padding: 14px 16px; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; text-align: left; width: 100%;
+      &.warn { border-left: 3px solid var(--obd-red); }
+      &:focus-visible { outline: 2px solid var(--obd-blue); outline-offset: 2px; }
+    }
+    .ht-card-badge {
+      grid-row: span 2; width: 46px; height: 46px; border-radius: 10px; background: var(--obd-surface-3);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--obd-text-dim);
+      .d { font-size: 1.15rem; font-weight: 700; line-height: 1; color: var(--obd-text); }
+      .m { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--obd-text-muted); }
+      mat-icon { font-size: 22px; width: 22px; height: 22px; }
+    }
+    .ht-card-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .ht-card-title { font-weight: 650; font-size: 0.95rem; color: var(--obd-text); }
+    .ht-card-meta { font-size: 0.78rem; color: var(--obd-text-muted); font-variant-numeric: tabular-nums; }
+    .ht-card-stats {
+      grid-column: 1 / -1; display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.78rem; color: var(--obd-text-dim); margin-top: 2px;
+      b { color: var(--obd-text); font-weight: 600; font-variant-numeric: tabular-nums; }
+      .cell-warn { color: var(--obd-red); }
+    }
+  }
+
+  // ── Drill-in dialog ───────────────────────────────────────────────────────────
+  .ht-scrim {
+    position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; padding: 20px;
+    background: var(--obd-overlay-scrim, rgba(0, 0, 0, 0.55)); backdrop-filter: blur(2px);
+    animation: ht-fade 0.18s var(--obd-ease) both;
+  }
+  .ht-dialog {
+    width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto; padding: 22px 24px 26px;
+    border-radius: var(--obd-radius); background: var(--obd-bg, var(--obd-surface));
+    border: 1px solid var(--obd-border-strong); box-shadow: var(--obd-shadow-lg);
+    animation: ht-pop 0.22s var(--obd-ease-spring) both;
+  }
+  .ht-dialog--wide { max-width: 760px; }
+  .ht-dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 4px; }
+  .ht-dialog-title {
+    margin: 0; font-size: 1.2rem; font-weight: 750; letter-spacing: -0.02em; color: var(--obd-text);
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .ht-dialog-when { margin: 3px 0 0; font-size: 0.82rem; color: var(--obd-text-muted); font-variant-numeric: tabular-nums; }
+  .ht-x {
+    flex-shrink: 0; width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--obd-border);
+    background: var(--obd-surface); color: var(--obd-text-dim); cursor: pointer; display: grid; place-items: center;
+    mat-icon { font-size: 20px; width: 20px; height: 20px; }
+    &:hover { background: var(--obd-surface-2); color: var(--obd-text); }
+  }
+
+  .ht-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin: 16px 0 4px; }
+  .ht-tile {
+    background: var(--obd-surface); border: 1px solid var(--obd-border); border-radius: var(--obd-radius-sm); padding: 11px 12px;
+    &.warn { border-color: color-mix(in srgb, var(--obd-red) 45%, transparent); }
+  }
+  .ht-tile-l { display: block; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--obd-text-muted); }
+  .ht-tile-v {
+    display: block; font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em; margin-top: 2px;
+    font-variant-numeric: tabular-nums; color: var(--obd-text);
+    &.warn { color: var(--obd-red); }
+  }
+
+  // Body text block inside a dialog (notes, parts, etc.)
+  .ht-dialog-section { margin-top: 20px;
+    h4 { margin: 0 0 8px; font-size: 0.95rem; color: var(--obd-text); }
+    p { margin: 0; font-size: 0.9rem; line-height: 1.6; color: var(--obd-text-dim); }
+  }
+  .ht-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ht-pill {
+    font-size: 0.78rem; padding: 4px 10px; border-radius: var(--obd-radius-pill);
+    background: var(--obd-surface-3); color: var(--obd-text-dim);
+  }
+
+  @keyframes ht-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes ht-pop { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  @media (prefers-reduced-motion: reduce) { .ht-scrim, .ht-dialog { animation: none; } }
+}

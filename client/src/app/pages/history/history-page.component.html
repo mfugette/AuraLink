@@ -1,0 +1,42 @@
+<div class="page">
+  <div class="page-head">
+    <h1 class="page-title"><mat-icon>history</mat-icon> History</h1>
+    <p class="page-subtitle">Everything about your vehicles in one place — drives, issues, repairs, and more.</p>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="hist-tabs" role="tablist" aria-label="History type">
+    @for (t of tabs; track t.key) {
+      <button type="button" class="hist-tab" role="tab"
+              [class.active]="active() === t.key" [attr.aria-selected]="active() === t.key"
+              (click)="setTab(t.key)">
+        <mat-icon>{{ t.icon }}</mat-icon>
+        <span class="hist-tab-label">{{ t.label }}</span>
+        @if (t.soon) { <span class="hist-tab-soon">Soon</span> }
+      </button>
+    }
+  </div>
+
+  <!-- Panels -->
+  <div class="hist-panel">
+    @switch (active()) {
+      @case ('drives') {
+        <app-session-history />
+      }
+      @case ('issues') {
+        <app-issue-history-page [embedded]="true" />
+      }
+      @case ('repairs') {
+        <app-repair-log />
+      }
+      @default {
+        <div class="hist-soon">
+          <mat-icon>{{ active() === 'chats' ? 'auto_awesome' : 'fact_check' }}</mat-icon>
+          <h2>{{ soonMessage(active()).title }}</h2>
+          <p>{{ soonMessage(active()).body }}</p>
+          <span class="hist-soon-badge">Coming soon</span>
+        </div>
+      }
+    }
+  </div>
+</div>

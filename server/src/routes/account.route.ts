@@ -1,6 +1,19 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import rateLimit from 'express-rate-limit';
 import { accountStore } from '../data/account.store';
 import { requireAuth } from '../middleware/auth';
+import { verifyPassword } from '../data/supabase';
+
+// Tight limiter for the account-deletion endpoint specifically: it re-checks a
+// password, so it's a credential-guessing vector. The rest of the account router
+// stays on the global limit (it's called several times on normal page loads).
+const deleteLimiter = rateLimit({
+  windowMs: 60_000,
+  limit: 5,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'Too many attempts. Please wait a moment.' },
+});
 
 export const accountRouter = Router();
 
@@ -34,6 +47,41 @@ accountRouter.patch('/me', asyncHandler(async (req, res) => {
     return;
   }
   res.json({ account });
+}));
+
+// ── Data export / account deletion (GDPR/CCPA) ───────────────────────────────
+// Right of access: stream the user's full data as a JSON download.
+accountRouter.get('/export', asyncHandler(async (req, res) => {
+  const data = await accountStore.exportData(req.userId!);
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', 'attachment; filename="auralink-data-export.json"');
+  res.send(JSON.stringify(data, null, 2));
+}));
+
+// Right to erasure: permanently delete the account and all associated data
+// (cascade). Destructive + irreversible, so we require the password again here
+// and re-verify it server-side — a valid session token alone is not enough.
+accountRouter.delete('/', deleteLimiter, asyncHandler(async (req, res) => {
+  const { password } = req.body as { password?: unknown };
+  if (typeof password !== 'string' || !password) {
+    res.status(400).json({ error: 'Password is required to delete your account.' });
+    return;
+  }
+
+  const account = await accountStore.getAccount(req.userId!);
+  if (!account) {
+    res.status(404).json({ error: 'Account not found.' });
+    return;
+  }
+
+  const ok = await verifyPassword(account.email, password);
+  if (!ok) {
+    res.status(403).json({ error: 'Incorrect password.' });
+    return;
+  }
+
+  await accountStore.deleteAccount(req.userId!);
+  res.status(204).send();
 }));
 
 // ── My Vehicles ──────────────────────────────────────────────────────────────

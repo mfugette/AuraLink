@@ -1,0 +1,107 @@
+// ── Offline banner ────────────────────────────────────────────────────────────
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100vw - 24px);
+  padding: 8px 16px;
+  border-radius: 0 0 12px 12px;
+  background: var(--obd-red);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: var(--obd-shadow-2);
+  animation: offline-drop 0.25s var(--obd-ease-spring, ease) both;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+
+@keyframes offline-drop {
+  from { transform: translate(-50%, -100%); }
+  to   { transform: translate(-50%, 0); }
+}
+
+// ── Toast stack ───────────────────────────────────────────────────────────────
+.toast-stack {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: min(380px, calc(100vw - 32px));
+
+  // Below the floating tier switcher (z 250) but the stack sits bottom-right,
+  // while the switcher is bottom-center, so they don't collide horizontally.
+  @media (max-width: 520px) {
+    left: 16px;
+    right: 16px;
+    bottom: 84px; // clear the bottom-center tier switcher on phones
+    max-width: none;
+  }
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--obd-radius);
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border-strong);
+  border-left-width: 3px;
+  box-shadow: var(--obd-shadow-lg);
+  color: var(--obd-text);
+  animation: toast-in 0.22s var(--obd-ease-spring, ease) both;
+}
+
+.toast--success { border-left-color: var(--obd-green, #2e9e6b); }
+.toast--error   { border-left-color: var(--obd-red); }
+.toast--info    { border-left-color: var(--obd-blue); }
+
+.toast-icon {
+  flex-shrink: 0;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+}
+.toast--success .toast-icon { color: var(--obd-green, #2e9e6b); }
+.toast--error   .toast-icon { color: var(--obd-red); }
+.toast--info    .toast-icon { color: var(--obd-blue); }
+
+.toast-text {
+  flex: 1;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  min-width: 0;
+}
+
+.toast-close {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin: -2px -4px 0 0;
+  border-radius: 6px;
+  color: var(--obd-text-muted);
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  &:hover { color: var(--obd-text); background: var(--obd-surface-3); }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .offline-banner, .toast { animation: none; }
+}

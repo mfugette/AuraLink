@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DtcService } from '../../services/dtc.service';
 import { DtcCode, SEVERITY_RANK } from '../../models/dtc-code.model';
+import { Vehicle } from '../../models/vehicle.model';
 
 @Component({
   selector: 'app-live-dtc',
@@ -17,7 +18,7 @@ import { DtcCode, SEVERITY_RANK } from '../../models/dtc-code.model';
 })
 export class LiveDtcComponent implements OnDestroy {
   @Output() back = new EventEmitter<void>();
-  @Output() useCodes = new EventEmitter<string[]>();
+  @Output() useCodes = new EventEmitter<{ codes: string[]; vehicle: Vehicle }>();
   @Output() stepChanged = new EventEmitter<number>();
 
   // 0 = instructions, 1 = connecting/scanning, 2 = detected codes
@@ -25,6 +26,15 @@ export class LiveDtcComponent implements OnDestroy {
 
   // DEMO: fake codes a dongle would "detect". Resolved against the real DTC DB.
   private readonly fakeDetected = ['P0420', 'P0171', 'P0301'];
+
+  // DEMO: a real OBD2 dongle reads the VIN (Mode 09 PID 02) and can report the
+  // decoded vehicle alongside the trouble codes — so the vehicle-info form
+  // shouldn't sit empty after a scan. Fake but plausible for the demo flow.
+  private readonly fakeVehicle: Vehicle = {
+    year: 2019, make: 'Honda', model: 'Civic', subModel: 'EX', engine: '1.5L Turbo I4',
+    driveType: 'FWD', transmission: 'CVT', fuelType: 'Gasoline', bodyStyle: 'Sedan',
+    mileage: null, vin: '2HGFC2F59KH123456',
+  };
 
   readonly detected = computed<DtcCode[]>(() =>
     this.fakeDetected
@@ -128,6 +138,6 @@ export class LiveDtcComponent implements OnDestroy {
   }
 
   lookupDetected(): void {
-    this.useCodes.emit(this.detected().map(d => d.code));
+    this.useCodes.emit({ codes: this.detected().map(d => d.code), vehicle: this.fakeVehicle });
   }
 }

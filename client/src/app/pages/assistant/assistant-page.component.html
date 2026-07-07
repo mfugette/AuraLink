@@ -4,7 +4,7 @@
   @if (messages().length === 0) {
     <div class="assistant-hero">
       <div class="ai-badge"><mat-icon>auto_awesome</mat-icon> Aura</div>
-      <h1 class="assistant-heading">Need a hand?</h1>
+      <h1 class="assistant-heading" [innerHTML]="greeting"></h1>
       <p class="assistant-sub">Describe a symptom, ask about a code, or pick a common question below.</p>
 
       <div class="ai-chips">

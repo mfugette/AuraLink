@@ -268,4 +268,41 @@ export const accountStore = {
     if (error) throw error;
     return data ? toSettings(data as SettingsRow) : null;
   },
+
+  // ── Data export / account deletion (GDPR/CCPA) ───────────────────────────────
+  /**
+   * Assemble everything we hold about a user into one plain object for download
+   * (right of access / data portability). Every query is scoped to userId. Rows
+   * are returned as stored (snake_case) so the export reflects the actual data.
+   */
+  async exportData(userId: string): Promise<Record<string, unknown>> {
+    const [account, vehicles, settings, issues] = await Promise.all([
+      this.getAccount(userId),
+      supabaseAdmin.from('vehicles').select('*').eq('user_id', userId).order('created_at', { ascending: true }),
+      supabaseAdmin.from('user_settings').select('*').eq('user_id', userId).maybeSingle(),
+      supabaseAdmin.from('issues').select('*').eq('user_id', userId).order('created_at', { ascending: true }),
+    ]);
+
+    if (vehicles.error) throw vehicles.error;
+    if (settings.error) throw settings.error;
+    if (issues.error) throw issues.error;
+
+    return {
+      exportedAt: new Date().toISOString(),
+      account,
+      vehicles: vehicles.data ?? [],
+      settings: settings.data ?? null,
+      issues: issues.data ?? [],
+    };
+  },
+
+  /**
+   * Permanently delete a user's auth identity. Every app table references
+   * auth.users(id) with ON DELETE CASCADE (see 0001_init.sql), so removing the
+   * auth user wipes their profile, settings, vehicles, and issues in one step.
+   */
+  async deleteAccount(userId: string): Promise<void> {
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+    if (error) throw error;
+  },
 };

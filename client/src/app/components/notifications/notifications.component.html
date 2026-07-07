@@ -1,0 +1,104 @@
+<!-- Bell trigger (lives in the header) -->
+<button type="button" class="btn notif-bell" [class.active]="open()" (click)="toggle()"
+        aria-label="Notifications" [attr.aria-expanded]="open()">
+  <mat-icon>notifications</mat-icon>
+  @if (unreadCount() > 0) {
+    <span class="notif-badge">{{ unreadCount() > 9 ? '9+' : unreadCount() }}</span>
+  }
+</button>
+
+<!-- Right-side pane. Moved to <body> on open so the header's backdrop-filter
+     doesn't trap this position:fixed overlay in the header's containing block. -->
+@if (open()) {
+  <div class="notif-scrim" #paneEl (click)="close()">
+    <aside class="notif-pane" role="dialog" aria-modal="true" aria-label="Notifications"
+           (click)="$event.stopPropagation()">
+      <div class="notif-head">
+        <h2>Notifications</h2>
+        <div class="notif-head-actions">
+          @if (tab() !== 'settings' && unreadCount() > 0) {
+            <button type="button" class="notif-txtbtn" (click)="markAllRead()">Mark all read</button>
+          }
+          <button type="button" class="notif-icon-btn" (click)="setTab('settings')"
+                  aria-label="Notification settings" matTooltip="Settings">
+            <mat-icon>settings</mat-icon>
+          </button>
+          <button type="button" class="notif-x" (click)="close()" aria-label="Close">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      @if (tab() === 'settings') {
+        <!-- Settings: per-category SMS opt-in -->
+        <div class="notif-tabs">
+          <button type="button" class="notif-tab" (click)="setTab('all')">
+            <mat-icon>chevron_left</mat-icon> Back
+          </button>
+        </div>
+
+        <div class="notif-settings">
+          <h3>Also text me <span class="notif-pro">Pro</span></h3>
+          <p class="notif-settings-desc">
+            Choose which notifications AuraLink texts to your phone. Everything still shows here in-app.
+          </p>
+
+          @for (cat of categories; track cat) {
+            <div class="notif-setrow">
+              <span class="notif-setic" [attr.data-cat]="cat"><mat-icon>{{ meta[cat].icon }}</mat-icon></span>
+              <span class="notif-setl">{{ meta[cat].label }}</span>
+              <label class="notif-switch">
+                <input type="checkbox" [checked]="smsPrefs()[cat]" [disabled]="!isPro()"
+                       (change)="setSms(cat, $event)" />
+                <span class="notif-track"><span class="notif-knob"></span></span>
+              </label>
+              <span class="notif-setd">{{ meta[cat].hint }}</span>
+            </div>
+          }
+
+          @if (!isPro()) {
+            <p class="notif-locked">
+              <mat-icon>lock</mat-icon>
+              SMS alerts are a Pro feature. <a routerLink="/plan" (click)="close()">Upgrade</a>
+            </p>
+          }
+        </div>
+      } @else {
+        <!-- List: All / Unread -->
+        <div class="notif-tabs">
+          <button type="button" class="notif-tab" [class.on]="tab() === 'all'" (click)="setTab('all')">All</button>
+          <button type="button" class="notif-tab" [class.on]="tab() === 'unread'" (click)="setTab('unread')">
+            Unread <span class="notif-tab-count">{{ unreadCount() }}</span>
+          </button>
+        </div>
+
+        <div class="notif-body">
+          @if (items().length === 0) {
+            <div class="notif-empty">
+              <mat-icon>done_all</mat-icon>
+              You're all caught up.
+            </div>
+          } @else {
+            @for (n of items(); track trackId($index, n)) {
+              <div class="notif-item" [class.unread]="!n.read" (click)="markRead(n)">
+                <span class="notif-item-ic" [attr.data-cat]="n.category"><mat-icon>{{ n.icon }}</mat-icon></span>
+                <div class="notif-item-top">
+                  <span class="notif-item-title">{{ n.title }}</span>
+                  @if (!n.read) { <span class="notif-dot"></span> }
+                  @if (n.smsOn) { <span class="notif-sms"><mat-icon>sms</mat-icon> texted</span> }
+                </div>
+                <span class="notif-item-time">{{ n.timeAgo }}</span>
+                <div class="notif-item-body">{{ n.body }}</div>
+                @if (n.ctaRoute) {
+                  <div class="notif-item-cta">
+                    <a [routerLink]="n.ctaRoute" (click)="close()">{{ n.ctaLabel }} →</a>
+                  </div>
+                }
+              </div>
+            }
+          }
+        </div>
+      }
+    </aside>
+  </div>
+}

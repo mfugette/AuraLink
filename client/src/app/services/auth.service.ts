@@ -67,6 +67,38 @@ export class AuthService {
   }
 
   /**
+   * Send a password-reset email. Supabase emails a recovery link that lands on
+   * `${origin}/reset-password`; clicking it opens a PASSWORD_RECOVERY session so
+   * the reset page can set a new password. Always resolves without revealing
+   * whether the email exists (the caller shows a generic "check your email").
+   */
+  async sendPasswordReset(email: string): Promise<{ error: string | null }> {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    return { error: error?.message ?? null };
+  }
+
+  /**
+   * Set a new password for the current user. Used on the reset page (where the
+   * recovery link has established a session) and anywhere else re-auth'd.
+   */
+  async updatePassword(newPassword: string): Promise<{ error: string | null }> {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    return { error: error?.message ?? null };
+  }
+
+  /** Resend the signup confirmation email for an address awaiting verification. */
+  async resendConfirmation(email: string): Promise<{ error: string | null }> {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    });
+    return { error: error?.message ?? null };
+  }
+
+  /**
    * Re-verify the current user's password (for sensitive actions like canceling
    * a plan). Validates by re-authenticating with the signed-in email; on success
    * Supabase refreshes the existing session (same user), so this is safe to call

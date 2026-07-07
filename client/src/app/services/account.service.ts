@@ -1,8 +1,10 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, tap } from 'rxjs';
+import { HttpContext } from '@angular/common/http';
+import { Observable, firstValueFrom, map, tap } from 'rxjs';
 import { Account, AccountSettings, NewSavedVehicle, SavedVehicle } from '../models/account.model';
 import { environment } from '../../environments/environment';
+import { SKIP_ERROR_TOAST } from '../interceptors/error.interceptor';
 
 // TODO(auth): this service assumes a single logged-in account and carries no
 // token/session handling. Once real auth exists, HttpClient calls here should
@@ -98,5 +100,34 @@ export class AccountService {
         map(r => r.settings),
         tap(settings => this.settings.set(settings))
       );
+  }
+
+  // ── Data export / account deletion (GDPR/CCPA) ───────────────────────────────
+  /** Download the user's full data export as a JSON file. Resolves when saved. */
+  async exportData(): Promise<void> {
+    const blob = await firstValueFrom(
+      this.http.get(`${this.base}/api/account/export`, { responseType: 'blob' })
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'auralink-data-export.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  /**
+   * Permanently delete the account. The server re-verifies the password before
+   * deleting, so we pass it through. On success the caller should sign out.
+   */
+  deleteAccount(password: string): Observable<void> {
+    // Skip the global error toast — the delete dialog shows errors inline
+    // (e.g. "Incorrect password").
+    return this.http.request<void>('delete', `${this.base}/api/account`, {
+      body: { password },
+      context: new HttpContext().set(SKIP_ERROR_TOAST, true),
+    });
   }
 }

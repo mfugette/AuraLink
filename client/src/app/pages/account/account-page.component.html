@@ -1,0 +1,122 @@
+<div class="page account">
+  <div class="page-head">
+    <h1 class="page-title"><mat-icon>person</mat-icon> Account</h1>
+    <p class="page-subtitle">Manage your profile, your data, and your account.</p>
+  </div>
+
+  @if (account(); as acct) {
+    <!-- ── Profile ───────────────────────────────────────────────────────────── -->
+    <section class="acct-card">
+      <div class="acct-identity">
+        <div class="acct-avatar" aria-hidden="true">{{ initial() }}</div>
+        <div class="acct-identity-text">
+          <span class="acct-name">{{ acct.displayName || 'Your account' }}</span>
+          <span class="acct-email">{{ acct.email }}</span>
+        </div>
+      </div>
+
+      <form class="acct-field-row" (ngSubmit)="saveName()">
+        <label class="acct-field">
+          <span class="acct-label">Display name</span>
+          <input
+            class="acct-input"
+            [ngModel]="displayName()"
+            (ngModelChange)="displayName.set($event)"
+            name="displayName"
+            placeholder="How should we address you?"
+            autocomplete="name"
+            [disabled]="savingName()"
+          />
+        </label>
+        <button type="submit" class="btn acct-btn"
+                [disabled]="savingName() || !displayName().trim() || displayName().trim() === acct.displayName">
+          {{ savingName() ? 'Saving…' : 'Save' }}
+        </button>
+      </form>
+
+      @if (nameSaved()) {
+        <p class="acct-hint acct-hint--ok"><mat-icon>check_circle</mat-icon> Name updated.</p>
+      }
+      @if (nameError()) {
+        <p class="acct-hint acct-hint--err"><mat-icon>error</mat-icon> {{ nameError() }}</p>
+      }
+
+      <p class="acct-note">
+        Your email is used to sign in.
+        Manage your plan and billing on the <a routerLink="/my-plan">My Plan</a> page.
+      </p>
+    </section>
+
+    <!-- ── Your data ─────────────────────────────────────────────────────────── -->
+    <section class="acct-card">
+      <h2 class="acct-card-title">Your data</h2>
+      <p class="acct-card-sub">
+        Download a copy of everything AuraLink stores about you — your profile,
+        saved vehicles, settings, and issue history — as a JSON file.
+      </p>
+      <button type="button" class="btn acct-btn acct-btn--ghost" (click)="exportData()" [disabled]="exporting()">
+        <mat-icon>download</mat-icon> {{ exporting() ? 'Preparing…' : 'Export my data' }}
+      </button>
+    </section>
+
+    <!-- ── Danger zone ───────────────────────────────────────────────────────── -->
+    <section class="acct-card acct-card--danger">
+      <h2 class="acct-card-title acct-card-title--danger">
+        <mat-icon>warning</mat-icon> Danger zone
+      </h2>
+      <p class="acct-card-sub">
+        Deleting your account is permanent. Your profile, saved vehicles, settings,
+        and history will be erased and cannot be recovered.
+      </p>
+      <button type="button" class="btn acct-btn acct-btn--danger" (click)="openDeleteDialog()">
+        <mat-icon>delete_forever</mat-icon> Delete my account
+      </button>
+    </section>
+  } @else {
+    <div class="acct-loading">Loading your account…</div>
+  }
+
+  <!-- ── Delete dialog (are-you-sure + password re-auth) ───────────────────────── -->
+  @if (deleteDialogOpen()) {
+    <div class="dialog-scrim" (click)="closeDeleteDialog()">
+      <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="delete-title"
+           (click)="$event.stopPropagation()">
+        <div class="dialog-icon dialog-icon--danger"><mat-icon>delete_forever</mat-icon></div>
+        <h2 class="dialog-title" id="delete-title">Delete your account?</h2>
+        <p class="dialog-body">
+          This <strong>permanently erases</strong> your profile, vehicles, settings,
+          and history. This can't be undone. For your security, enter your password
+          to confirm.
+        </p>
+
+        <form (ngSubmit)="confirmDelete()">
+          <label class="dialog-field">
+            <span class="dialog-label">Password</span>
+            <input class="dialog-input" type="password" autocomplete="current-password"
+                   [ngModel]="deletePassword()" (ngModelChange)="deletePassword.set($event)"
+                   name="deletePassword" placeholder="Enter your password"
+                   [disabled]="deleting()" />
+          </label>
+
+          @if (deleteError()) {
+            <p class="dialog-error"><mat-icon>error</mat-icon> {{ deleteError() }}</p>
+          }
+
+          <div class="dialog-actions">
+            <button type="button" class="btn acct-btn acct-btn--ghost" (click)="closeDeleteDialog()"
+                    [disabled]="deleting()">
+              Keep my account
+            </button>
+            <button type="submit" class="btn acct-btn acct-btn--danger" [disabled]="deleting()">
+              @if (deleting()) {
+                <span class="dialog-spinner"></span> Deleting…
+              } @else {
+                Delete forever
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>
