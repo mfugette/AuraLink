@@ -72,6 +72,10 @@ export class AccountMenuComponent implements OnDestroy {
     return name.trim().charAt(0).toUpperCase() || '?';
   }
 
+  retryLoad(): void {
+    this.accountService.loadAll();
+  }
+
   toggleMenu(): void {
     // Signed out: the trigger is a direct route to the login page.
     if (!this.auth.isSignedIn()) {

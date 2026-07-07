@@ -40,6 +40,13 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
     callback(new Error(`Origin ${origin} not allowed by CORS`));
   },
+  // The app (auralink.vin) and API (api.auralink.vin) are different origins,
+  // both gated by the same Cloudflare Access app. Access's session cookie is
+  // per-subdomain and won't be sent cross-origin unless the browser is told
+  // this is an intentional credentialed request — which requires the server
+  // to explicitly opt in too (a wildcard/reflected origin without this is
+  // rejected by browsers for credentialed requests regardless).
+  credentials: true,
 }));
 
 // Cap request bodies — no endpoint needs a large payload, and an explicit limit

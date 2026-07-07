@@ -7,6 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, takeUntil } from 'rxjs';
+import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
+import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 import { VehicleService, VehicleTrim } from '../../services/vehicle.service';
 import { Vehicle } from '../../models/vehicle.model';
 import { CustomSelectComponent, SelectOption } from '../shared/custom-select/custom-select.component';
@@ -70,6 +72,7 @@ export class VehicleSelectorComponent implements OnInit, OnDestroy {
   @ViewChild('videoPreview') private videoRef?: ElementRef<HTMLVideoElement>;
   private videoEl: HTMLVideoElement | null = null;
   private stream: MediaStream | null = null;
+  private zxingControls: IScannerControls | null = null;
   private destroy$ = new Subject<void>();
 
   private static toOptions(values: string[]): SelectOption[] {
@@ -440,6 +443,8 @@ export class VehicleSelectorComponent implements OnInit, OnDestroy {
   }
 
   stopScanner(): void {
+    this.zxingControls?.stop();
+    this.zxingControls = null;
     this.stream?.getTracks().forEach(t => t.stop());
     this.stream = null;
     this.videoEl = null;
@@ -448,11 +453,17 @@ export class VehicleSelectorComponent implements OnInit, OnDestroy {
 
   private async runBarcodeDetection(video: HTMLVideoElement): Promise<void> {
     const BarcodeDetector = (window as any)['BarcodeDetector'];
-    if (!BarcodeDetector) {
-      this.scanError.set('Barcode scanning not supported on this device. Enter VIN manually.');
-      this.stopScanner();
-      return;
+    if (BarcodeDetector) {
+      this.runNativeBarcodeDetection(video, BarcodeDetector);
+    } else {
+      // Safari/iOS has no BarcodeDetector implementation — fall back to a
+      // pure-JS decoder (zxing) reading the same camera stream so VIN
+      // scanning still works there instead of forcing manual entry.
+      await this.runZxingBarcodeDetection(video);
     }
+  }
+
+  private runNativeBarcodeDetection(video: HTMLVideoElement, BarcodeDetector: any): void {
     const detector = new BarcodeDetector({ formats: ['code_39', 'code_128', 'data_matrix'] });
     const scan = async () => {
       if (!this.scannerActive()) return;
@@ -471,5 +482,27 @@ export class VehicleSelectorComponent implements OnInit, OnDestroy {
       requestAnimationFrame(scan);
     };
     requestAnimationFrame(scan);
+  }
+
+  private async runZxingBarcodeDetection(video: HTMLVideoElement): Promise<void> {
+    const hints = new Map();
+    hints.set(DecodeHintType.POSSIBLE_FORMATS, [
+      BarcodeFormat.CODE_39, BarcodeFormat.CODE_128, BarcodeFormat.DATA_MATRIX,
+    ]);
+    const reader = new BrowserMultiFormatReader(hints);
+    try {
+      this.zxingControls = await reader.decodeFromStream(video.srcObject as MediaStream, video, (result) => {
+        if (!result || !this.scannerActive()) return;
+        const val = result.getText()?.replace(/[^A-HJ-NPR-Z0-9]/gi, '').toUpperCase();
+        if (val && val.length === 17) {
+          this.form.get('vin')!.setValue(val);
+          this.stopScanner();
+          this.decodeVin();
+        }
+      });
+    } catch {
+      this.scanError.set('Barcode scanning not supported on this device. Enter VIN manually.');
+      this.stopScanner();
+    }
   }
 }

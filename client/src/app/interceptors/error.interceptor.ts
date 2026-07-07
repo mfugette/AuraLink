@@ -2,6 +2,7 @@ import { HttpContextToken, HttpErrorResponse, HttpInterceptorFn } from '@angular
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { ToastService } from '../services/toast.service';
+import { AuthService } from '../services/auth.service';
 import { environment } from '../../environments/environment';
 
 // Opt out of the global error toast for a specific request when the caller
@@ -16,6 +17,7 @@ export const SKIP_ERROR_TOAST = new HttpContextToken<boolean>(() => false);
 // handlers can react too.
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const toast = inject(ToastService);
+  const auth = inject(AuthService);
   const isOurApi = req.url.startsWith(environment.apiUrl);
   const skip = req.context.get(SKIP_ERROR_TOAST);
 
@@ -23,6 +25,14 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((err: HttpErrorResponse) => {
       if (isOurApi && !skip) {
         toast.error(messageFor(err));
+      }
+      // A 401 from our own API means the Supabase session Angular still thinks
+      // is valid isn't accepted server-side anymore (expired, revoked, or a
+      // refresh that silently failed). Force a real sign-out so the app falls
+      // back to the actual signed-out UI instead of a half-authenticated state
+      // (account menu stuck, header showing user chrome with no data behind it).
+      if (isOurApi && err.status === 401 && auth.isSignedIn()) {
+        auth.signOut();
       }
       return throwError(() => err);
     }),

@@ -76,6 +76,20 @@
     align-items: flex-start;
     justify-content: center;
     padding-top: max(32px, calc((100vh - var(--obd-header-height)) / 3 - 150px));
+
+    // On short/narrow phones the padding-top formula above leaves too little
+    // room for the authenticated hero's title + wrapping quick-action row —
+    // the page is intentionally not scrollable at the outer level (nav is via
+    // the buttons), so the hero itself gets a scroll escape hatch instead:
+    // invisible once the compressed layout fits, a safety net when it still
+    // doesn't (e.g. very short viewports).
+    @media (max-width: 600px) {
+      padding-top: 72px;
+      padding-bottom: 24px;
+      align-items: flex-start;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
   }
 
   &.stage-panel--live {
@@ -97,6 +111,8 @@
   align-items: flex-start;
   text-align: left;
   gap: 20px;
+
+  @media (max-width: 600px) { gap: 14px; }
 }
 
 .hero-title {
@@ -106,6 +122,8 @@
   letter-spacing: -1px;
   margin: 0;
   color: var(--obd-text);
+
+  @media (max-width: 600px) { font-size: 1.6rem; }
 }
 
 .hero-accent {
@@ -121,6 +139,8 @@
   line-height: 1.65;
   margin: 0;
   max-width: 560px;
+
+  @media (max-width: 600px) { font-size: 0.9rem; line-height: 1.5; }
 }
 
 .hero-badges {
@@ -267,6 +287,8 @@
   opacity: 0;
   animation: fadeInUp 0.6s ease forwards;
   animation-delay: 0.85s;
+
+  @media (max-width: 600px) { margin-top: 12px; gap: 8px; }
 }
 
 .hero-action {
@@ -298,10 +320,13 @@
 
   &:active { transform: translateY(0) scale(0.98); }
 
-  @media (max-width: 480px) {
-    height: 40px;
-    padding: 0 16px;
-    font-size: 0.85rem;
+  @media (max-width: 600px) {
+    height: 36px;
+    padding: 0 14px;
+    font-size: 0.8rem;
+    gap: 6px;
+
+    mat-icon { font-size: 16px; width: 16px; height: 16px; }
   }
 }
 

@@ -23,8 +23,15 @@
       <div class="account-summary">
         <span class="avatar avatar--lg">{{ initial }}</span>
         <div class="summary-text">
-          <span class="summary-name">{{ accountService.account()?.displayName ?? 'Loading…' }}</span>
-          <span class="summary-email">{{ accountService.account()?.email }}</span>
+          @if (accountService.account()) {
+            <span class="summary-name">{{ accountService.account()!.displayName }}</span>
+            <span class="summary-email">{{ accountService.account()!.email }}</span>
+          } @else if (accountService.accountLoadError()) {
+            <span class="summary-name summary-name--error">Couldn't load profile</span>
+            <button type="button" class="btn summary-retry" (click)="retryLoad()">Retry</button>
+          } @else {
+            <span class="summary-name">Loading…</span>
+          }
         </div>
       </div>
 

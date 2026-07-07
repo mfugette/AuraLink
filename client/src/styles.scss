@@ -5,6 +5,17 @@
   box-sizing: border-box;
 }
 
+// iOS Safari auto-zooms the page when focusing any text input/textarea/select
+// whose computed font-size is under 16px. Rather than hunt down every field's
+// font-size across the app, force the floor globally on small viewports —
+// this only affects layout on phones (16px was already ~the common size on
+// desktop) and stops the focus-zoom without changing how anything looks.
+@media (max-width: 600px) {
+  input, textarea, select {
+    font-size: 16px;
+  }
+}
+
 // AuraLink dark automotive theme
 html {
   @include mat.theme((

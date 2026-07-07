@@ -18,12 +18,27 @@ export class AccountService {
   readonly vehicles = signal<SavedVehicle[]>([]);
   readonly settings = signal<AccountSettings | null>(null);
 
+  // Tracks whether the initial fetchMe() is in flight vs. has failed, so the
+  // UI can tell "still loading" apart from "the request died" instead of
+  // showing a permanent fake "Loading…" when the network/API call fails
+  // silently (subscribe() with no error handler used to just swallow it).
+  readonly accountLoading = signal(false);
+  readonly accountLoadError = signal(false);
+
   constructor(private http: HttpClient) {}
 
   loadAll(): void {
-    this.fetchMe().subscribe();
-    this.fetchVehicles().subscribe();
-    this.fetchSettings().subscribe();
+    this.accountLoading.set(true);
+    this.accountLoadError.set(false);
+    this.fetchMe().subscribe({
+      next: () => this.accountLoading.set(false),
+      error: () => {
+        this.accountLoading.set(false);
+        this.accountLoadError.set(true);
+      },
+    });
+    this.fetchVehicles().subscribe({ error: () => {} });
+    this.fetchSettings().subscribe({ error: () => {} });
   }
 
   // Reset all account state — called on sign-out.
@@ -31,6 +46,8 @@ export class AccountService {
     this.account.set(null);
     this.vehicles.set([]);
     this.settings.set(null);
+    this.accountLoading.set(false);
+    this.accountLoadError.set(false);
   }
 
   fetchMe(): Observable<Account> {

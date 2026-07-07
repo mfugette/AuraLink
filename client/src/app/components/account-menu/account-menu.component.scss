@@ -102,6 +102,21 @@
   white-space: nowrap;
 }
 
+.summary-name--error {
+  color: var(--obd-red);
+}
+
+.summary-retry {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--obd-blue);
+
+  &:hover { text-decoration: underline; }
+}
+
 .account-items {
   display: flex;
   flex-direction: column;
