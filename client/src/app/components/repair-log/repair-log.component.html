@@ -1,0 +1,193 @@
+<section>
+  <!-- Filters -->
+  <div class="ht-filters">
+    <div class="ht-search">
+      <mat-icon>search</mat-icon>
+      <input type="search" placeholder="Search records…"
+             [ngModel]="query()" (ngModelChange)="query.set($event)" autocomplete="off" />
+    </div>
+    <app-custom-select class="ht-vehicle-select"
+      [options]="vehicleOptions()" [value]="vehicleFilter()"
+      (valueChange)="vehicleFilter.set($any($event))" icon="directions_car" />
+    <button type="button" class="btn ht-add" (click)="openDialog()">
+      <mat-icon>add</mat-icon> Add record
+    </button>
+  </div>
+
+  @if (records().length > 0) {
+    <div class="ht-summary">
+      <span>{{ records().length }} record{{ records().length === 1 ? '' : 's' }}</span>
+      @if (totalSpent() > 0) {
+        <span>·</span><span>Total spent <b>${{ totalSpent().toFixed(2) }}</b></span>
+      }
+    </div>
+  }
+
+  <!-- Table + cards -->
+  <div class="ht-wrap">
+    <table class="ht-table">
+      <thead>
+        <tr>
+          <th class="sortable" (click)="sortBy('date')">Date
+            @if (arrow('date')) { <mat-icon class="ht-arr">{{ arrow('date') }}</mat-icon> }</th>
+          <th>Service</th>
+          <th>Vehicle</th>
+          <th class="num sortable" (click)="sortBy('mileage')">Mileage
+            @if (arrow('mileage')) { <mat-icon class="ht-arr">{{ arrow('mileage') }}</mat-icon> }</th>
+          <th>Shop</th>
+          <th class="num sortable" (click)="sortBy('cost')">Cost
+            @if (arrow('cost')) { <mat-icon class="ht-arr">{{ arrow('cost') }}</mat-icon> }</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of records(); track trackId($index, r)) {
+          <tr tabindex="0" (click)="openDetail(r)" (keydown.enter)="openDetail(r)">
+            <td class="td-primary">{{ dateLabel(r.date) }}</td>
+            <td class="td-title">
+              <span class="cell-with-ic">
+                <mat-icon [style.color]="'var(--obd-blue)'">{{ meta[r.category].icon }}</mat-icon>
+                {{ r.title }}
+              </span>
+              <small>{{ meta[r.category].label }}</small>
+            </td>
+            <td>{{ r.vehicleLabel }}</td>
+            <td class="num">{{ r.mileage !== null ? r.mileage.toLocaleString() + ' mi' : '—' }}</td>
+            <td>{{ r.shop || '—' }}</td>
+            <td class="num">{{ r.cost !== null ? '$' + r.cost.toFixed(2) : '—' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="ht-cards">
+      @for (r of records(); track trackId($index, r)) {
+        <button type="button" class="ht-card" (click)="openDetail(r)">
+          <span class="ht-card-badge"><mat-icon>{{ meta[r.category].icon }}</mat-icon></span>
+          <div class="ht-card-top">
+            <span class="ht-card-title">{{ r.title }}</span>
+            <span class="ht-chip neutral">{{ meta[r.category].label }}</span>
+            <span class="ht-card-meta">{{ dateLabel(r.date) }}</span>
+          </div>
+          <div class="ht-card-stats">
+            @if (r.mileage !== null) { <span>Mileage <b>{{ r.mileage.toLocaleString() }}</b></span> }
+            @if (r.cost !== null) { <span>Cost <b>${{ r.cost.toFixed(2) }}</b></span> }
+            @if (r.shop) { <span>{{ r.shop }}</span> }
+          </div>
+        </button>
+      }
+    </div>
+
+    @if (records().length === 0) {
+      <div class="ht-empty">
+        <mat-icon>build</mat-icon>
+        <p>No service records yet. Add your first one to start your maintenance log.</p>
+        <button type="button" class="btn ht-add" (click)="openDialog()"><mat-icon>add</mat-icon> Add record</button>
+      </div>
+    }
+  </div>
+</section>
+
+<!-- ── Detail dialog ─────────────────────────────────────────────────────────── -->
+@if (detail(); as r) {
+  <div class="ht-scrim" (click)="closeDetail()">
+    <div class="ht-dialog" role="dialog" aria-modal="true" aria-labelledby="rl-detail-title"
+         (click)="$event.stopPropagation()">
+      <div class="ht-dialog-head">
+        <div>
+          <h3 class="ht-dialog-title" id="rl-detail-title">
+            <mat-icon [style.color]="'var(--obd-blue)'">{{ meta[r.category].icon }}</mat-icon>
+            {{ r.title }}
+          </h3>
+          <p class="ht-dialog-when">{{ dateLabel(r.date) }} · {{ r.vehicleLabel }}</p>
+        </div>
+        <button type="button" class="ht-x" (click)="closeDetail()" aria-label="Close"><mat-icon>close</mat-icon></button>
+      </div>
+
+      <div class="ht-tiles">
+        <div class="ht-tile"><span class="ht-tile-l">Category</span><span class="ht-tile-v" style="font-size:1rem">{{ meta[r.category].label }}</span></div>
+        @if (r.mileage !== null) { <div class="ht-tile"><span class="ht-tile-l">Mileage</span><span class="ht-tile-v">{{ r.mileage.toLocaleString() }}</span></div> }
+        @if (r.cost !== null) { <div class="ht-tile"><span class="ht-tile-l">Cost</span><span class="ht-tile-v">${{ r.cost.toFixed(2) }}</span></div> }
+        @if (r.shop) { <div class="ht-tile"><span class="ht-tile-l">Shop</span><span class="ht-tile-v" style="font-size:1rem">{{ r.shop }}</span></div> }
+      </div>
+
+      @if (r.notes) {
+        <div class="ht-dialog-section"><h4>Notes</h4><p>{{ r.notes }}</p></div>
+      }
+
+      @if (!isSeed(r)) {
+        <div class="ht-dialog-section">
+          <button type="button" class="btn rl-btn rl-btn--danger" (click)="remove(r)">
+            <mat-icon>delete_outline</mat-icon> Delete this record
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+<!-- ── Add-record dialog ─────────────────────────────────────────────────────── -->
+@if (dialogOpen()) {
+  <div class="ht-scrim" (click)="closeDialog()">
+    <div class="ht-dialog" role="dialog" aria-modal="true" aria-labelledby="rl-add-title"
+         (click)="$event.stopPropagation()">
+      <div class="ht-dialog-head">
+        <h3 class="ht-dialog-title" id="rl-add-title">Add service record</h3>
+        <button type="button" class="ht-x" (click)="closeDialog()" aria-label="Close"><mat-icon>close</mat-icon></button>
+      </div>
+
+      <form class="rl-form" (ngSubmit)="save()">
+        <label class="rl-field rl-field--full">
+          <span class="rl-label">What was done?</span>
+          <input class="rl-input" [ngModel]="form().title" (ngModelChange)="patch('title', $event)"
+                 name="title" placeholder="e.g. Oil & filter change" />
+        </label>
+
+        <div class="rl-field">
+          <span class="rl-label">Vehicle</span>
+          <app-custom-select [options]="vehicleOptions().slice(1)" [value]="form().vehicleId"
+                             (valueChange)="patch('vehicleId', $any($event))" icon="directions_car" />
+        </div>
+
+        <div class="rl-field">
+          <span class="rl-label">Category</span>
+          <app-custom-select [options]="categoryOptions" [value]="form().category"
+                             (valueChange)="patch('category', $any($event))" />
+        </div>
+
+        <label class="rl-field">
+          <span class="rl-label">Date</span>
+          <input class="rl-input" type="date" [ngModel]="form().date" (ngModelChange)="patch('date', $event)" name="date" />
+        </label>
+
+        <label class="rl-field">
+          <span class="rl-label">Mileage <span class="rl-opt">(optional)</span></span>
+          <input class="rl-input" type="number" inputmode="numeric" [ngModel]="form().mileage"
+                 (ngModelChange)="patch('mileage', $event)" name="mileage" placeholder="48200" />
+        </label>
+
+        <label class="rl-field">
+          <span class="rl-label">Cost <span class="rl-opt">(optional)</span></span>
+          <input class="rl-input" type="number" inputmode="decimal" step="0.01" [ngModel]="form().cost"
+                 (ngModelChange)="patch('cost', $event)" name="cost" placeholder="62.50" />
+        </label>
+
+        <label class="rl-field">
+          <span class="rl-label">Shop <span class="rl-opt">(optional)</span></span>
+          <input class="rl-input" [ngModel]="form().shop" (ngModelChange)="patch('shop', $event)"
+                 name="shop" placeholder="e.g. Jiffy Lube, or DIY" />
+        </label>
+
+        <label class="rl-field rl-field--full">
+          <span class="rl-label">Notes <span class="rl-opt">(optional)</span></span>
+          <textarea class="rl-input rl-textarea" [ngModel]="form().notes" (ngModelChange)="patch('notes', $event)"
+                    name="notes" rows="2" placeholder="Anything worth remembering…"></textarea>
+        </label>
+
+        <div class="rl-dialog-actions">
+          <button type="button" class="btn rl-btn rl-btn--ghost" (click)="closeDialog()">Cancel</button>
+          <button type="submit" class="btn rl-btn" [disabled]="!canSave()">Save record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

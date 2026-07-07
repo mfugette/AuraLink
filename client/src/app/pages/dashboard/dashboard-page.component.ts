@@ -1,9 +1,10 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TelemetryService } from '../../services/telemetry.service';
 import { MetricDef, MetricKey, Sample } from '../../models/telemetry.model';
+type DashView = 'gauges' | 'charts';
 
 // Shape the SVG line chart needs: a precomputed path + fill area + axis labels.
 interface ChartVm {
@@ -42,6 +43,11 @@ export class DashboardPageComponent {
   private readonly PAD = 6;
 
   readonly connected = this.telemetry.connected;
+
+  // Which live view is shown: circular gauges (default) or line charts. The
+  // "History" section (past sessions) is separate and always shown below.
+  readonly view = signal<DashView>('gauges');
+  setView(v: DashView): void { this.view.set(v); }
 
   // One view-model per metric, recomputed whenever the telemetry signal ticks.
   readonly charts = computed<ChartVm[]>(() => {

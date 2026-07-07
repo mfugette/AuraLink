@@ -8,8 +8,7 @@
 .chip-input {
   position: relative;
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 8px;
   min-height: 56px;
   padding: 10px 12px;
@@ -25,6 +24,20 @@
     border-color: var(--obd-blue);
     box-shadow: 0 0 0 3px var(--obd-blue-dim);
   }
+}
+
+// Row of entered chips, stacked above the input row.
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+// Row holding the text input + clear-all button.
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .chip-input-field {

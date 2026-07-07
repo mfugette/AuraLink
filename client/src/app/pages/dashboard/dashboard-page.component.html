@@ -19,7 +19,25 @@
     </p>
   </div>
 
+  <!-- ── Live view toggle ────────────────────────────────────────────────────── -->
+  <div class="dash-toolbar">
+    <div class="view-seg" role="tablist" aria-label="Live view">
+      <button type="button" class="view-seg-btn" role="tab"
+              [class.active]="view() === 'gauges'" [attr.aria-selected]="view() === 'gauges'"
+              (click)="setView('gauges')">
+        <mat-icon>speed</mat-icon> Gauges
+      </button>
+      <button type="button" class="view-seg-btn" role="tab"
+              [class.active]="view() === 'charts'" [attr.aria-selected]="view() === 'charts'"
+              (click)="setView('charts')">
+        <mat-icon>show_chart</mat-icon> Line graphs
+      </button>
+    </div>
+    <span class="dash-toolbar-hint">Live · last 5 minutes</span>
+  </div>
+
   <!-- ── Live gauges ─────────────────────────────────────────────────────────── -->
+  @if (view() === 'gauges') {
   <section class="gauges">
     @for (c of charts(); track trackByKey($index, c)) {
       <div class="gauge-card" [class.gauge-card--warn]="c.isWarn"
@@ -49,9 +67,10 @@
       </div>
     }
   </section>
+  }
 
-  <!-- ── Historical charts ───────────────────────────────────────────────────── -->
-  <h2 class="section-heading">History <span class="section-sub">· last 5 minutes</span></h2>
+  <!-- ── Live line charts (toggled view of the same live data) ────────────────── -->
+  @if (view() === 'charts') {
   <section class="charts">
     @for (c of charts(); track trackByKey($index, c)) {
       <div class="chart-card" [style.--metric-color]="'var(' + c.def.colorVar + ')'">
@@ -92,4 +111,5 @@
       </div>
     }
   </section>
+  }
 </div>

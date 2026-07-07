@@ -119,7 +119,7 @@
             <p class="obd-section-subtitle">Used to find the right parts for your year, make, and model.</p>
           </div>
         </div>
-        <app-vehicle-selector (vehicleChanged)="onVehicleChanged($event)" />
+        <app-vehicle-selector [initialVehicle]="vehicle()" (vehicleChanged)="onVehicleChanged($event)" />
       </section>
 
       <!-- Lookup button -->

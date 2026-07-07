@@ -134,8 +134,12 @@ export class HomePageComponent implements OnInit, OnDestroy {
     }
   }
 
-  onUseDetectedCodes(codes: string[]): void {
-    this.codes.set(codes);
+  onUseDetectedCodes(result: { codes: string[]; vehicle: Vehicle }): void {
+    this.codes.set(result.codes);
+    // The dongle "read" the vehicle along with the codes — auto-fill the vehicle
+    // form instead of leaving it blank (see VehicleSelectorComponent's
+    // initialVehicle input, the same mechanism edit-mode/VIN-scan use).
+    this.vehicle.set(result.vehicle);
     this.liveMode.set(false);
     this.heroHidden.set(true);
     this.showResults.set(true);

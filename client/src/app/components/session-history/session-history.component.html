@@ -1,0 +1,157 @@
+<section>
+  <div class="ht-head">
+    <div class="ht-head-left">
+      <h2 class="ht-title">Past sessions</h2>
+      <span class="ht-sub">your recent AuraLink drives</span>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="ht-filters">
+    <div class="ht-search">
+      <mat-icon>search</mat-icon>
+      <input type="search" placeholder="Search sessions…"
+             [ngModel]="query()" (ngModelChange)="query.set($event)" autocomplete="off" />
+    </div>
+    <app-custom-select class="ht-vehicle-select"
+      [options]="vehicleOptions()" [value]="vehicleFilter()"
+      (valueChange)="vehicleFilter.set($any($event))" icon="directions_car" />
+    <button type="button" class="btn ht-toggle" [class.on]="warnOnly()" (click)="toggleWarn()">
+      <mat-icon>warning</mat-icon> Warnings only
+    </button>
+  </div>
+
+  <!-- Table + cards -->
+  <div class="ht-wrap">
+    <table class="ht-table">
+      <thead>
+        <tr>
+          <th class="sortable" (click)="sortBy('date')">Date
+            @if (arrow('date')) { <mat-icon class="ht-arr">{{ arrow('date') }}</mat-icon> }</th>
+          <th>Session</th>
+          <th class="num sortable" (click)="sortBy('duration')">Duration
+            @if (arrow('duration')) { <mat-icon class="ht-arr">{{ arrow('duration') }}</mat-icon> }</th>
+          <th class="num sortable" (click)="sortBy('distance')">Distance
+            @if (arrow('distance')) { <mat-icon class="ht-arr">{{ arrow('distance') }}</mat-icon> }</th>
+          <th class="num sortable" (click)="sortBy('rpm')">Max RPM
+            @if (arrow('rpm')) { <mat-icon class="ht-arr">{{ arrow('rpm') }}</mat-icon> }</th>
+          <th class="num sortable" (click)="sortBy('coolant')">Peak coolant
+            @if (arrow('coolant')) { <mat-icon class="ht-arr">{{ arrow('coolant') }}</mat-icon> }</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (s of visible(); track trackById($index, s)) {
+          <tr [class.warn]="s.warnLabel" tabindex="0" (click)="open(s)" (keydown.enter)="open(s)">
+            <td class="td-primary">{{ dateLabel(s) }}<small>{{ timeLabel(s) }}</small></td>
+            <td class="td-title">{{ title(s) }}<small>{{ s.vehicleLabel }}</small></td>
+            <td class="num">{{ s.durationMin }} min</td>
+            <td class="num">{{ s.distanceMi.toFixed(1) }} mi</td>
+            <td class="num">{{ maxRpm(s).toLocaleString() }}</td>
+            <td class="num" [class.cell-warn]="coolantWarn(s)">{{ peakCoolant(s) }}°F</td>
+            <td>
+              @if (s.warnLabel) {
+                <span class="ht-chip warn"><mat-icon>warning</mat-icon> {{ s.warnLabel }}</span>
+              } @else {
+                <span class="ht-chip ok"><mat-icon>check</mat-icon> Nominal</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="ht-cards">
+      @for (s of visible(); track trackById($index, s)) {
+        <button type="button" class="ht-card" [class.warn]="s.warnLabel" (click)="open(s)">
+          <span class="ht-card-badge"><span class="d">{{ dateLabel(s).split(' ')[1] }}</span><span class="m">{{ dateLabel(s).split(' ')[0] }}</span></span>
+          <div class="ht-card-top">
+            <span class="ht-card-title">{{ title(s) }}</span>
+            @if (s.warnLabel) {
+              <span class="ht-chip warn"><mat-icon>warning</mat-icon> {{ s.warnLabel }}</span>
+            } @else {
+              <span class="ht-chip ok"><mat-icon>check</mat-icon> Nominal</span>
+            }
+            <span class="ht-card-meta">{{ timeLabel(s) }} · {{ s.durationMin }} min · {{ s.distanceMi.toFixed(1) }} mi</span>
+          </div>
+          <div class="ht-card-stats">
+            <span>Max RPM <b>{{ maxRpm(s).toLocaleString() }}</b></span>
+            <span>Peak coolant <b [class.cell-warn]="coolantWarn(s)">{{ peakCoolant(s) }}°F</b></span>
+          </div>
+        </button>
+      }
+    </div>
+
+    @if (visible().length === 0) {
+      <div class="ht-empty"><p>No sessions match your filters.</p></div>
+    }
+  </div>
+
+  <div class="ht-retention">
+    Showing your last {{ count }} sessions. Pro keeps your full history.
+  </div>
+</section>
+
+<!-- ── Drill-in dialog (centered) ────────────────────────────────────────────── -->
+@if (openSession(); as s) {
+  <div class="ht-scrim" (click)="close()">
+    <div class="ht-dialog ht-dialog--wide" role="dialog" aria-modal="true" aria-labelledby="sh-dialog-title"
+         (click)="$event.stopPropagation()">
+      <div class="ht-dialog-head">
+        <div>
+          <h3 class="ht-dialog-title" id="sh-dialog-title">
+            {{ title(s) }}
+            @if (s.warnLabel) {
+              <span class="ht-chip warn"><mat-icon>warning</mat-icon> {{ s.warnLabel }}</span>
+            }
+          </h3>
+          <p class="ht-dialog-when">{{ dateLabel(s) }} · {{ timeLabel(s) }} · {{ s.vehicleLabel }}</p>
+        </div>
+        <button type="button" class="ht-x" (click)="close()" aria-label="Close"><mat-icon>close</mat-icon></button>
+      </div>
+
+      <div class="ht-tiles">
+        @for (t of tiles(); track t.label) {
+          <div class="ht-tile" [class.warn]="t.warn">
+            <span class="ht-tile-l">{{ t.label }}</span>
+            <span class="ht-tile-v" [class.warn]="t.warn">{{ t.value }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="sh-traces-head">
+        <h4>Metric traces</h4>
+        <span>downsampled · this drive</span>
+      </div>
+      <div class="sh-traces">
+        @for (c of drillCharts(); track trackDrill($index, c)) {
+          <div class="sh-trace" [style.--metric-color]="'var(' + c.def.colorVar + ')'">
+            <div class="sh-trace-head">
+              <span class="sh-trace-title">
+                <mat-icon [style.color]="'var(' + c.def.colorVar + ')'">{{ c.def.icon }}</mat-icon>
+                {{ c.def.label }}
+              </span>
+              <span class="sh-trace-peak">{{ format(c.peak, c.def) }}<small>{{ c.def.unit }}</small></span>
+            </div>
+            <div class="sh-trace-plot">
+              <svg viewBox="0 0 320 96" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <linearGradient [attr.id]="'sh-grad-' + c.def.key" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" [style.stop-color]="'var(' + c.def.colorVar + ')'" stop-opacity="0.26" />
+                    <stop offset="100%" [style.stop-color]="'var(' + c.def.colorVar + ')'" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+                <line x1="6" y1="32" x2="314" y2="32" class="sh-grid" />
+                <line x1="6" y1="64" x2="314" y2="64" class="sh-grid" />
+                <path [attr.d]="c.areaPath" [attr.fill]="'url(#sh-grad-' + c.def.key + ')'" />
+                <path [attr.d]="c.linePath" fill="none" class="sh-line" [style.stroke]="'var(' + c.def.colorVar + ')'" />
+              </svg>
+              <span class="sh-axis max">{{ format(c.max, c.def) }}</span>
+              <span class="sh-axis min">{{ format(c.min, c.def) }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

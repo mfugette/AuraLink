@@ -8,6 +8,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { AiSearchComponent } from './components/ai-search/ai-search.component';
 import { AccountMenuComponent } from './components/account-menu/account-menu.component';
+import { NotificationsComponent } from './components/notifications/notifications.component';
 import { ToastHostComponent } from './components/toast-host/toast-host.component';
 import { ThemeService } from './services/theme.service';
 import { AuthService } from './services/auth.service';
@@ -27,6 +28,7 @@ import { Tier } from './models/tier.model';
     SidebarComponent,
     AiSearchComponent,
     AccountMenuComponent,
+    NotificationsComponent,
     ToastHostComponent,
   ],
   templateUrl: './app.html',

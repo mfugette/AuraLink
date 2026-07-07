@@ -1,0 +1,86 @@
+@use '../page-shell' as *;
+
+// ── Tab bar ───────────────────────────────────────────────────────────────────
+.hist-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--obd-border);
+  margin-bottom: 22px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.hist-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--obd-text-dim);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 19px; width: 19px; height: 19px; }
+
+  &:hover { color: var(--obd-text); }
+  &.active { color: var(--obd-blue); border-bottom-color: var(--obd-blue); }
+}
+
+.hist-tab-soon {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--obd-text-muted);
+  background: var(--obd-surface-3);
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+
+@media (max-width: 560px) {
+  .hist-tab-label { display: none; }
+  .hist-tab { padding: 11px 14px; }
+  .hist-tab.active .hist-tab-label,
+  .hist-tab .hist-tab-soon { display: inline; }
+  // Keep the active tab's label visible even on mobile for orientation.
+  .hist-tab.active .hist-tab-label { display: inline; }
+}
+
+// ── Panel ─────────────────────────────────────────────────────────────────────
+.hist-panel { min-height: 200px; }
+
+// ── "Coming soon" placeholder ─────────────────────────────────────────────────
+.hist-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 56px 24px;
+  border: 1px dashed var(--obd-border);
+  border-radius: var(--obd-radius);
+  color: var(--obd-text-dim);
+
+  mat-icon { font-size: 40px; width: 40px; height: 40px; color: var(--obd-blue); opacity: 0.8; }
+  h2 { margin: 6px 0 0; font-size: 1.1rem; color: var(--obd-text); }
+  p { margin: 0; max-width: 400px; font-size: 0.9rem; line-height: 1.55; }
+}
+
+.hist-soon-badge {
+  margin-top: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--obd-blue);
+  background: var(--obd-blue-dim);
+  padding: 4px 10px;
+  border-radius: var(--obd-radius-pill);
+}

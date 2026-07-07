@@ -1,5 +1,50 @@
 @use '../page-shell' as *;
 
+// ── Live view toggle ──────────────────────────────────────────────────────────
+.dash-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.view-seg {
+  display: inline-flex;
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius-pill);
+  padding: 3px;
+  gap: 2px;
+}
+
+.view-seg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: var(--obd-radius-pill);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--obd-text-dim);
+  background: transparent;
+  transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+  &.active {
+    background: var(--obd-surface);
+    color: var(--obd-text);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  }
+}
+
+.dash-toolbar-hint {
+  font-size: 0.8rem;
+  color: var(--obd-text-muted);
+}
+
 // ── Adapter / premium banner ──────────────────────────────────────────────────
 .adapter-banner {
   display: flex;

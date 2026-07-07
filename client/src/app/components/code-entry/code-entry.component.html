@@ -6,49 +6,55 @@
     </label>
 
     <div class="chip-input" [class.focused]="focused()">
-      @for (code of selectedCodes(); track code) {
-        <span class="dtc-chip" [class]="'chip-' + severityFor(code)">
-          {{ code }}
+      @if (hasCode()) {
+        <div class="chip-row">
+          @for (code of selectedCodes(); track code) {
+            <span class="dtc-chip" [class]="'chip-' + severityFor(code)">
+              {{ code }}
+              <button
+                type="button"
+                class="chip-remove"
+                (click)="removeCode(code)"
+                [attr.aria-label]="'Remove ' + code"
+              >
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </span>
+          }
+        </div>
+      }
+
+      <div class="input-row">
+        <input
+          #codeInput
+          id="code-input"
+          class="chip-input-field"
+          placeholder="Type a code and press Enter..."
+          [ngModel]="inputValue"
+          (ngModelChange)="onInputChange($event)"
+          (keydown)="onKeydown($event)"
+          (focus)="onFocus()"
+          (blur)="onBlur()"
+          autocomplete="off"
+          autocapitalize="characters"
+          role="combobox"
+          aria-controls="dtc-suggestions"
+          aria-autocomplete="list"
+          [attr.aria-expanded]="showSuggestions()"
+        />
+
+        @if (hasCode()) {
           <button
             type="button"
-            class="chip-remove"
-            (click)="removeCode(code)"
-            [attr.aria-label]="'Remove ' + code"
+            class="btn chip-clear"
+            (click)="clearAll()"
+            matTooltip="Clear all codes"
+            aria-label="Clear all codes"
           >
-            <mat-icon>cancel</mat-icon>
+            <mat-icon>clear_all</mat-icon>
           </button>
-        </span>
-      }
-
-      <input
-        #codeInput
-        id="code-input"
-        class="chip-input-field"
-        placeholder="Type a code and press Enter..."
-        [ngModel]="inputValue"
-        (ngModelChange)="onInputChange($event)"
-        (keydown)="onKeydown($event)"
-        (focus)="onFocus()"
-        (blur)="onBlur()"
-        autocomplete="off"
-        autocapitalize="characters"
-        role="combobox"
-        aria-controls="dtc-suggestions"
-        aria-autocomplete="list"
-        [attr.aria-expanded]="showSuggestions()"
-      />
-
-      @if (hasCode()) {
-        <button
-          type="button"
-          class="btn chip-clear"
-          (click)="clearAll()"
-          matTooltip="Clear all codes"
-          aria-label="Clear all codes"
-        >
-          <mat-icon>clear_all</mat-icon>
-        </button>
-      }
+        }
+      </div>
 
       @if (showSuggestions()) {
         <ul class="suggestion-list" id="dtc-suggestions" role="listbox">

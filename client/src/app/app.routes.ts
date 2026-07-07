@@ -11,6 +11,7 @@ import { PlanPageComponent } from './pages/plan/plan-page.component';
 import { CheckoutPageComponent } from './pages/checkout/checkout-page.component';
 import { MyPlanPageComponent } from './pages/my-plan/my-plan-page.component';
 import { AccountPageComponent } from './pages/account/account-page.component';
+import { HistoryPageComponent } from './pages/history/history-page.component';
 import { FaqPageComponent } from './pages/faq/faq-page.component';
 import { TermsPageComponent } from './pages/legal/terms-page.component';
 import { PrivacyPageComponent } from './pages/legal/privacy-page.component';
@@ -67,6 +68,12 @@ export const routes: Routes = [
     component: IssueHistoryPageComponent,
     title: 'Issue History — AuraLink',
     canActivate: [authGuard, requireTier('issue-history')],
+  },
+  {
+    path: 'history',
+    component: HistoryPageComponent,
+    title: 'History — AuraLink',
+    canActivate: [authGuard],
   },
   {
     path: 'plan',

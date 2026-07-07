@@ -40,7 +40,7 @@ export class SidebarComponent {
     { label: 'Part Lookup',   icon: 'search',         route: '/part-lookup' },
     { label: 'Find Help',     icon: 'near_me',        route: '/nearby',        feature: 'nearby' },
     { label: 'My Vehicles',   icon: 'directions_car', route: '/my-vehicles' },
-    { label: 'Issue History', icon: 'history',        route: '/issue-history', feature: 'issue-history' },
+    { label: 'History',       icon: 'history',        route: '/history' },
   ];
 
   // A gated item the current tier hasn't unlocked — render a lock hint.

@@ -28,6 +28,11 @@
         <mat-icon>help_outline</mat-icon>
       </a>
 
+      <!-- Notifications bell (signed-in only) -->
+      @if (auth.isSignedIn()) {
+        <app-notifications />
+      }
+
       <app-account-menu />
     </div>
   </header>
