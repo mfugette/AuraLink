@@ -22,10 +22,17 @@ secrets.*
 client/.angular/
 
 # ── Claude / AI tooling ───────────────────────────────────────────────────────
-.claude/
+# Ignore local Claude state, but keep the checked-in project instructions
+# (CLAUDE.md) and the design guidelines it references. Note: `*.claude` also
+# matches the `.claude` directory itself, so it must be re-included (`!.claude/`)
+# before the per-file exceptions can take effect.
 .claude.json
 .claude.json.backup
 *.claude
+!.claude/
+.claude/*
+!.claude/CLAUDE.md
+!.claude/frontend-design-SKILL.md
 
 # ── OS / editor noise ─────────────────────────────────────────────────────────
 .DS_Store
