@@ -164,13 +164,16 @@
   justify-content: center;
   height: 48px;
   border-radius: var(--obd-radius-sm);
-  background: var(--obd-blue);
+  background: color-mix(in srgb, var(--obd-blue) 12%, transparent);
   border: 1px solid var(--obd-blue);
-  color: #fff;
-  font-weight: 650;
-  font-size: 0.98rem;
+  color: var(--obd-blue);
+  font-family: var(--obd-font-mono);
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 
-  &:hover:not(:disabled) { filter: brightness(1.08); }
+  &:hover:not(:disabled) { background: color-mix(in srgb, var(--obd-blue) 20%, transparent); }
   &:disabled { opacity: 0.7; cursor: default; }
 }
 
@@ -399,14 +402,17 @@
   gap: 5px;
   height: 36px;
   padding: 0 16px;
-  border-radius: var(--obd-radius-pill);
-  background: var(--obd-blue);
-  border: 1px solid var(--obd-blue);
-  color: #fff;
-  font-weight: 650;
-  font-size: 0.85rem;
+  border-radius: var(--obd-radius-sm);
+  background: color-mix(in srgb, var(--obd-blue) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--obd-blue) 55%, transparent);
+  color: var(--obd-blue);
+  font-family: var(--obd-font-mono);
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 
-  &:hover:not(:disabled) { filter: brightness(1.08); }
+  &:hover:not(:disabled) { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 20%, transparent); }
   &:disabled { opacity: 0.7; cursor: default; }
 
   mat-icon { font-size: 16px; width: 16px; height: 16px; }
@@ -479,7 +485,7 @@
   gap: 12px;
   animation: checkout-enter 0.32s var(--obd-ease) both;
 
-  h1 { margin: 6px 0 0; font-size: 1.6rem; font-weight: 800; color: var(--obd-text); }
+  h1 { margin: 6px 0 0; font-family: var(--obd-font-display); font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; color: var(--obd-text); }
   p  { margin: 0; color: var(--obd-text-dim); line-height: 1.5; }
 
   > mat-icon {

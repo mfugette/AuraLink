@@ -49,9 +49,10 @@
 
 .login-title {
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.4px;
+  font-family: var(--obd-font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--obd-text);
 }
 
@@ -91,14 +92,18 @@
 .login-submit {
   height: 48px;
   margin-top: 4px;
-  border-radius: var(--obd-radius-pill);
-  background: var(--obd-blue);
-  color: #fff;
-  font-size: 0.95rem;
-  font-weight: 600;
-  transition: background var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
+  border-radius: var(--obd-radius-sm);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--obd-blue) 55%, transparent);
+  color: var(--obd-blue);
+  font-family: var(--obd-font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transition: background var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
 
-  &:hover:not(:disabled) { background: #2f74e0; }
+  &:hover:not(:disabled) { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 14%, transparent); }
   &:disabled { opacity: 0.55; cursor: default; }
 }
 

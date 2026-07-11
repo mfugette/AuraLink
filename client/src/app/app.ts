@@ -12,8 +12,6 @@ import { NotificationsComponent } from './components/notifications/notifications
 import { ToastHostComponent } from './components/toast-host/toast-host.component';
 import { ThemeService } from './services/theme.service';
 import { AuthService } from './services/auth.service';
-import { TierService } from './services/tier.service';
-import { Tier } from './models/tier.model';
 
 // App shell: persistent chrome (top bar with AI search + account menu, a
 // collapsible left sidebar) around a <router-outlet>. Full-width, YouTube-style
@@ -43,10 +41,6 @@ export class App {
   // free /home pipeline. The chrome appears once signed in. (Exposed to the
   // template.)
   protected readonly auth = inject(AuthService);
-  // Temporary tier switcher in the header (billing isn't built yet). Exposed to
-  // the template; remove this toggle once real subscription state exists.
-  protected readonly tierService = inject(TierService);
-  readonly tiers: Tier[] = ['free', 'plus', 'pro'];
 
   sidebarCollapsed = signal(true);
   // Separate mobile state: on phones the sidebar isn't part of the layout flow

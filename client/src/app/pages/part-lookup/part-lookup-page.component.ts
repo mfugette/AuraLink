@@ -40,6 +40,16 @@ export class PartLookupPageComponent {
 
   readonly hasActiveFilter = computed(() => this.query().trim().length > 0 || this.activeCategory() !== null);
 
+  // Console grid slots: pad results to at least 12 (a full 4×3, matching the
+  // gauges/garage grids) and always to a full row of 4, with blank filler cells.
+  // More than 12 results scroll within the grid frame.
+  private readonly GRID_SLOTS = 12;
+  readonly slots = computed<(CatalogPart | null)[]>(() => {
+    const parts = this.results();
+    const target = Math.max(this.GRID_SLOTS, Math.ceil(parts.length / 4) * 4);
+    return [...parts, ...Array(target - parts.length).fill(null)];
+  });
+
   onQueryInput(value: string): void {
     this.query.set(value);
   }

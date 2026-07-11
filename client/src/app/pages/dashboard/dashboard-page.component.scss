@@ -1,204 +1,190 @@
 @use '../page-shell' as *;
+@use '../console-page' as console;
 
-// ── Live view toggle ──────────────────────────────────────────────────────────
+// The dashboard is an instrument console — the shared console-page system owns
+// the viewport-locked shell, the toolbar seam, and the metric-grid geometry so
+// this page, My Vehicles, and Part Lookup stay pixel-cohesive.
+:host { @include console.host; }
+.page { @include console.page; }
+.page-eyebrow { @include console.eyebrow; }
+.page-head { @include console.head; }
+
+// ── Live view tabs (matches the History hub's tab bar) ────────────────────────
+// The shared toolbar bar; tabs bottom-align so the active underline sits on the
+// toolbar's bottom hairline (the grid's shared top seam).
 .dash-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  flex-wrap: wrap;
-  margin-bottom: 18px;
+  @include console.toolbar;
+  align-items: flex-end;
 }
 
-.view-seg {
-  display: inline-flex;
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border);
-  border-radius: var(--obd-radius-pill);
-  padding: 3px;
+.view-tabs {
+  display: flex;
   gap: 2px;
 }
 
-.view-seg-btn {
+.view-tab {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 16px;
-  border-radius: var(--obd-radius-pill);
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--obd-text-dim);
+  gap: 8px;
+  padding: 12px 16px;
+  border: 0;
   background: transparent;
-  transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+  color: var(--obd-text-dim);
+  font-family: var(--obd-font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
 
   mat-icon { font-size: 18px; width: 18px; height: 18px; }
 
-  &.active {
-    background: var(--obd-surface);
-    color: var(--obd-text);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
-  }
+  &:hover { color: var(--obd-text); }
+  &.active { color: var(--obd-blue); border-bottom-color: var(--obd-blue); }
 }
 
 .dash-toolbar-hint {
-  font-size: 0.8rem;
-  color: var(--obd-text-muted);
+  @include console.toolbar-hint;
+  align-self: flex-end;
+  padding-bottom: 11px;
 }
 
-// ── Adapter / premium banner ──────────────────────────────────────────────────
-.adapter-banner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 18px;
-  margin-bottom: 28px;
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border);
-  border-radius: var(--obd-radius);
-}
-
-.adapter-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 600;
-  color: var(--obd-text);
-}
-
-.status-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--obd-text-muted);
-  flex-shrink: 0;
-
-  &--live {
-    background: var(--obd-green);
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
-    animation: pulse 2s infinite;
-  }
-}
-
-@keyframes pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.45); }
-  70%  { box-shadow: 0 0 0 7px rgba(34, 197, 94, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-}
-
-.badge-premium {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 10px 3px 8px;
-  border-radius: var(--obd-radius-pill);
-  background: linear-gradient(135deg, var(--obd-purple), var(--obd-blue));
-  color: #fff;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-
-  mat-icon { font-size: 14px; width: 14px; height: 14px; }
-}
-
-.adapter-note {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-  font-size: 0.82rem;
-  color: var(--obd-text-dim);
-
-  mat-icon { font-size: 16px; width: 16px; height: 16px; color: var(--obd-blue); }
-}
-
-// ── Live gauges ───────────────────────────────────────────────────────────────
+// ── Live gauges: the shared console metric grid (4 columns × 3 rows) ──────────
+// Flat instrument readout: a 180° semicircle arc colored by health status, a
+// status badge in the corner, and a mono readout. No cards/shadows/glow.
 .gauges {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 16px;
-  margin-bottom: 36px;
+  @include console.grid;
 }
 
-.gauge-card {
+.gauge-cell {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 18px 12px 14px;
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border);
-  border-radius: var(--obd-radius);
-  box-shadow: var(--obd-shadow-sm);
-  transition: border-color var(--obd-dur-fast) var(--obd-ease);
+  gap: 12px;
+  padding: 16px 18px 14px;
+  background: var(--obd-bg, var(--obd-surface));
+  min-width: 0;
+  min-height: 0;
+  container-type: inline-size;     // lets the readout scale with cell width
 
-  &--warn {
-    border-color: color-mix(in srgb, var(--obd-red) 55%, transparent);
-  }
+  // A hairline of the status tone along the top of the cell — reads the health
+  // at a glance without any rounded/glowing chrome.
+  box-shadow: inset 0 2px 0 -1px color-mix(in srgb, var(--status-color) 55%, transparent);
 }
 
+// The gauge scales with its cell: it fills the available width (up to a cap so
+// it doesn't get absurd on very wide cells) and centers in the cell's free
+// vertical space. The SVG viewBox does the actual scaling.
 .gauge-svg-wrap {
   position: relative;
-  width: 118px;
-  height: 118px;
+  align-self: center;
+  width: 100%;
+  max-width: 240px;
+  aspect-ratio: 100 / 58;          // matches the semicircle viewBox
+  margin: auto 0;                  // center the gauge in the cell's free space
 }
 
 .gauge-svg {
   width: 100%;
   height: 100%;
-  transform: rotate(0deg);
+  display: block;
 }
 
 .gauge-track {
   stroke: var(--obd-surface-4);
-  stroke-width: 8;
-  stroke-linecap: round;
+  stroke-width: 6;
+  stroke-linecap: butt;            // squared ends — less bubbly
 }
 
 .gauge-value {
-  stroke-width: 8;
-  stroke-linecap: round;
+  stroke-width: 6;
+  stroke-linecap: butt;
   transition: stroke-dashoffset var(--obd-dur) var(--obd-ease);
 }
 
+// Value sits inside the semicircle's open bottom.
 .gauge-center {
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 0;
 }
 
 .gauge-value-num {
-  font-size: 1.55rem;
-  font-weight: 800;
+  font-family: var(--obd-font-mono);
+  font-size: clamp(1.2rem, 11cqw, 2rem);   // scales with the gauge/cell width
+  font-weight: 700;
   line-height: 1;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.01em;
   color: var(--obd-text);
   font-variant-numeric: tabular-nums;
-
-  &--warn { color: var(--obd-red); }
 }
 
 .gauge-unit {
-  font-size: 0.72rem;
+  font-family: var(--obd-font-mono);
+  font-size: clamp(0.6rem, 4.5cqw, 0.8rem);
   color: var(--obd-text-muted);
   margin-top: 3px;
 }
 
 .gauge-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.gauge-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.85rem;
+  min-width: 0;
+  font-family: var(--obd-font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   font-weight: 600;
   color: var(--obd-text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
-  mat-icon { font-size: 17px; width: 17px; height: 17px; }
-  .warn-icon { color: var(--obd-red); font-size: 16px; width: 16px; height: 16px; }
+  mat-icon { flex-shrink: 0; font-size: 15px; width: 15px; height: 15px; color: var(--status-color); }
+}
+
+// Status badge — squared, tinted in the health tone (green/yellow/red).
+.gauge-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 3px 7px;
+  border-radius: var(--obd-radius-sm);
+  font-family: var(--obd-font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--status-color);
+  background: color-mix(in srgb, var(--status-color) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--status-color) 40%, transparent);
+}
+
+.gauge-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--status-color);
+  flex-shrink: 0;
 }
 
 // ── Historical charts ─────────────────────────────────────────────────────────
@@ -215,60 +201,75 @@
   font-size: 0.9rem;
 }
 
+// ── Line-graph grid: the shared console grid frame, at 3 columns ──────────────
+// Charts want wider cells than gauges, so the column counts override the shared
+// 4-across default — the frame (height, hairlines, bleed) stays identical.
 .charts {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 18px;
-  padding-bottom: 8px;
+  @include console.grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  @media (max-width: 1100px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 900px)  { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 720px)  { grid-template-columns: 1fr; }
 }
 
-.chart-card {
-  padding: 16px 18px 14px;
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border);
-  border-radius: var(--obd-radius);
-  box-shadow: var(--obd-shadow-sm);
+.chart-cell {
+  display: flex;
+  flex-direction: column;
+  background: var(--obd-bg, var(--obd-surface));
+  padding: 14px 22px 16px;
+  min-width: 0;
+  min-height: 0;
 }
 
 .chart-head {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
 }
 
-.chart-title {
+.chart-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: 0.92rem;
+  font-family: var(--obd-font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   font-weight: 600;
-  color: var(--obd-text);
+  color: var(--obd-text-dim);
 
-  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
 }
 
 .chart-current {
-  font-size: 1.15rem;
-  font-weight: 800;
+  font-family: var(--obd-font-mono);
+  font-size: 1.25rem;
+  font-weight: 700;
   color: var(--obd-text);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.01em;
 
   &--warn { color: var(--obd-red); }
 }
 
 .chart-current-unit {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 500;
   color: var(--obd-text-muted);
+  margin-left: 2px;
 }
 
 .chart-plot {
   position: relative;
   width: 100%;
-  height: 120px;
+  flex: 1;                 // fill the cell's height so the plot grows with it
+  min-height: 72px;        // low floor so rows can compress to avoid page scroll
+  // reserve a right gutter so the axis value labels sit clear of the plot line
+  padding-right: 44px;
 }
 
 .chart-svg {
@@ -280,31 +281,34 @@
 .grid-line {
   stroke: var(--obd-border);
   stroke-width: 1;
+  stroke-dasharray: 2 4;          // dotted, like the example's rules
   vector-effect: non-scaling-stroke;
 }
 
 .chart-line {
-  stroke-width: 2;
+  stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
 
 .chart-dot {
-  // subtle ring so the marker reads on top of the line
-  stroke: var(--obd-surface-2);
+  stroke: var(--obd-bg, var(--obd-surface));
   stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
 }
 
+// Value labels sit in the right gutter, aligned to each dotted gridline (mono).
 .axis-label {
   position: absolute;
-  right: 4px;
-  font-size: 0.68rem;
+  right: 0;
+  width: 40px;
+  text-align: right;
+  transform: translateY(-50%);
+  font-family: var(--obd-font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.02em;
   color: var(--obd-text-muted);
   font-variant-numeric: tabular-nums;
   pointer-events: none;
-
-  &--max { top: 0; }
-  &--min { bottom: 0; }
 }

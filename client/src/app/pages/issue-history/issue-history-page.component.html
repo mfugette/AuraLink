@@ -1,7 +1,7 @@
 <div [class.page]="!embedded">
   @if (!embedded) {
     <div class="page-head">
-      <h1 class="page-title"><mat-icon>history</mat-icon> Issue History</h1>
+      <h1 class="page-title">Issue History</h1>
       <p class="page-subtitle">Every diagnostic issue logged across your vehicles. Filter by vehicle to focus in.</p>
     </div>
   }
@@ -13,9 +13,11 @@
       <input type="search" placeholder="Search issues…"
              [ngModel]="query()" (ngModelChange)="query.set($event)" autocomplete="off" />
     </div>
-    <app-custom-select class="ht-vehicle-select"
-      [options]="vehicleOptions()" [value]="vehicleFilter()"
-      (valueChange)="vehicleFilter.set($any($event))" icon="directions_car" />
+    <div class="ht-controls">
+      <app-custom-select class="ht-vehicle-select"
+        [options]="vehicleOptions()" [value]="vehicleFilter()"
+        (valueChange)="vehicleFilter.set($any($event))" icon="directions_car" />
+    </div>
   </div>
 
   @if (filtered().length > 0) {
@@ -45,7 +47,7 @@
       <tbody>
         @for (i of filtered(); track trackId($index, i)) {
           <tr [class.warn]="severeWarn(i)" tabindex="0" (click)="openDetail(i)" (keydown.enter)="openDetail(i)">
-            <td class="td-primary">{{ dateLabel(i.date) }}</td>
+            <td class="td-primary">{{ dateLabel(i.date) }}<small>{{ yearLabel(i.date) }}</small></td>
             <td class="td-title"><span class="issue-code">{{ i.code }}</span></td>
             <td>{{ i.title }}</td>
             <td>{{ i.vehicleLabel }}</td>

@@ -22,22 +22,14 @@
   margin-bottom: 24px;
 }
 
+// Terminal-flavored display type: mono face, lighter weight, no icons.
 .page-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   margin: 0;
-  font-size: 1.6rem;
-  font-weight: 800;
-  letter-spacing: -0.5px;
+  font-family: var(--obd-font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--obd-text);
-
-  mat-icon {
-    font-size: 28px;
-    width: 28px;
-    height: 28px;
-    color: var(--obd-blue);
-  }
 }
 
 .page-subtitle {

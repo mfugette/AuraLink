@@ -44,3 +44,6 @@ yarn-error.log*
 
 # ── Test coverage ─────────────────────────────────────────────────────────────
 coverage/
+
+# ── Local tooling indexes ──
+.codegraph/

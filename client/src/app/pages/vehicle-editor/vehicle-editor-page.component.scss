@@ -1,0 +1,57 @@
+@use '../page-shell' as *;
+
+// Dedicated add/edit page. Uses the shared page shell (centered reading column),
+// with the vehicle form stacked comfortably — this is a focused single-purpose
+// page, not the console grid, so it reads as a normal form.
+.page-eyebrow {
+  font-family: var(--obd-font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--obd-text-muted);
+}
+
+.editor-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.nickname-field {
+  max-width: 360px;
+}
+
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 9px 12px;
+  color: var(--obd-red);
+  font-size: 0.82rem;
+  background: color-mix(in srgb, var(--obd-red) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--obd-red) 40%, transparent);
+  border-radius: var(--obd-radius-sm);
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+.primary-toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.88rem;
+  color: var(--obd-text-dim);
+  cursor: pointer;
+
+  input { width: 16px; height: 16px; accent-color: var(--obd-blue); cursor: pointer; }
+}
+
+.editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--obd-border);
+}

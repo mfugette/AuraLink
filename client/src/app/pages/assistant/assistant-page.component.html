@@ -1,88 +1,79 @@
-<div class="assistant" [class.assistant--empty]="messages().length === 0">
+<div class="term">
+  <!-- Window chrome -->
+  <div class="term-bar">
+    <span class="term-dots"><i></i><i></i><i></i></span>
+    <span class="term-title">aura — {{ promptPath() }}</span>
+    <button type="button" class="btn term-clear" (click)="newChat()" title="Clear session (new chat)">
+      <mat-icon>restart_alt</mat-icon> clear
+    </button>
+  </div>
 
-  <!-- Empty state: centered hero + suggestion chips -->
-  @if (messages().length === 0) {
-    <div class="assistant-hero">
-      <div class="ai-badge"><mat-icon>auto_awesome</mat-icon> Aura</div>
-      <h1 class="assistant-heading" [innerHTML]="greeting"></h1>
-      <p class="assistant-sub">Describe a symptom, ask about a code, or pick a common question below.</p>
-
-      <div class="ai-chips">
-        @for (s of suggestions; track s) {
-          <button type="button" class="btn ai-chip" (click)="useSuggestion(s)">
-            <mat-icon>bolt</mat-icon> {{ s }}
-          </button>
-        }
-      </div>
-    </div>
-  }
-
-  <!-- Conversation: full-page thread -->
-  @if (messages().length > 0) {
-    <div class="assistant-toolbar">
-      <div class="ai-badge"><mat-icon>auto_awesome</mat-icon> Aura</div>
-      <button type="button" class="btn assistant-newchat" (click)="newChat()">
-        <mat-icon>add</mat-icon> New chat
-      </button>
-    </div>
-
-    <div class="ai-thread" #thread>
-      @for (msg of messages(); track $index) {
-        <div class="ai-msg" [class.ai-msg--user]="msg.role === 'user'">
-          @if (msg.role === 'assistant') {
-            <span class="ai-msg-avatar"><mat-icon>auto_awesome</mat-icon></span>
-            <div class="ai-msg-bubble ai-msg-bubble--md" [innerHTML]="msg.text | auraMarkdown"></div>
-          } @else {
-            <div class="ai-msg-bubble">{{ msg.text }}</div>
-          }
+  <!-- Console body: scrolls; the live prompt starts at the top and the session
+       grows downward as commands + Aura's output stack up. -->
+  <div class="term-body" #thread (click)="focusInput()">
+    <!-- Boot banner (only before the first command) -->
+    @if (messages().length === 0) {
+      <div class="term-banner">
+        <pre class="term-figlet">{{ banner }}</pre>
+        <div class="term-boot">
+          <span class="term-mark">▸</span> aura diagnostic shell — signed in as <b>{{ userName() }}</b><br />
+          <span class="term-mark">▸</span> ask about a code, a symptom, or your car. type <b>help</b> for ideas.<br />
+          <span class="term-dim">      terminal session — history is not saved.</span>
         </div>
-      }
-      @if (thinking()) {
-        <div class="ai-msg">
-          <span class="ai-msg-avatar"><mat-icon>auto_awesome</mat-icon></span>
-          <div class="ai-msg-bubble ai-typing">
-            <span></span><span></span><span></span>
-          </div>
-        </div>
-      }
-    </div>
-  }
-
-  <!-- Input (sticky at the bottom in chat mode, centered under the hero when empty) -->
-  <div class="assistant-input-row">
-    <!-- Quick-question chips above the input — always available, so users can
-         click a common question instead of typing. Hidden on the empty state,
-         which already shows the full chip grid in the hero. -->
-    @if (messages().length > 0) {
-      <div class="ai-chips ai-chips--bar">
-        @for (s of suggestions; track s) {
-          <button type="button" class="btn ai-chip" [disabled]="thinking()" (click)="useSuggestion(s)">
-            <mat-icon>bolt</mat-icon> {{ s }}
-          </button>
-        }
       </div>
     }
 
-    <div class="ai-input-control">
-      <mat-icon>auto_awesome</mat-icon>
+    <!-- Session transcript: each user turn is a prompt line; each Aura turn is
+         terminal output printed directly beneath, same left edge. -->
+    @for (msg of messages(); track $index) {
+      @if (msg.role === 'user') {
+        <div class="term-line term-line--in">
+          <!-- <span class="term-prompt">{{ promptPath() }}<span class="term-caret">&gt;</span></span> -->
+           <span class="term-prompt">{{ promptPath() }}<span class="term-caret">&dollar;</span></span>
+          <span class="term-cmd">{{ msg.text }}</span>
+        </div>
+      } @else {
+        <div class="term-out" [innerHTML]="msg.text | auraTerminal"></div>
+      }
+    }
+
+    @if (thinking()) {
+      <div class="term-out term-out--wait">
+        <span class="term-spin">▚</span> aura is thinking<span class="term-ellip">…</span>
+      </div>
+    }
+
+    <!-- Live input line: the active prompt the user types into. Sits at the end
+         of the stream so it visually flows top-down like a real shell. -->
+    <div class="term-line term-line--active">
+      <!-- <span class="term-prompt">{{ promptPath() }}<span class="term-caret">&gt;</span></span> -->
+       <span class="term-prompt">{{ promptPath() }}<span class="term-caret">&dollar;</span></span>
       <input
         #inputEl
-        class="ai-input"
+        class="term-input"
         [ngModel]="input()"
         (ngModelChange)="input.set($event)"
         (keydown.enter)="send()"
         [maxlength]="maxInputChars"
-        placeholder="Ask Aura anything about your car…"
+        [disabled]="thinking()"
+        spellcheck="false"
         autocomplete="off"
+        placeholder="type a command…"
+        aria-label="Ask Aura"
       />
-      <button type="button" class="btn ai-send" [disabled]="!input().trim() || thinking()" (click)="send()" aria-label="Send">
-        <mat-icon>arrow_upward</mat-icon>
-      </button>
     </div>
-    <p class="ai-disclaimer">
-      <mat-icon>info</mat-icon>
-      Aura can make mistakes — always confirm safety-critical repairs with a professional.
-    </p>
   </div>
 
+  <!-- Status footer: hint chips (as runnable commands) + disclaimer -->
+  <div class="term-foot">
+    <div class="term-hints">
+      <span class="term-dim">try:</span>
+      @for (s of suggestions; track s) {
+        <button type="button" class="btn term-hint" [disabled]="thinking()" (click)="useSuggestion(s)">{{ s }}</button>
+      }
+    </div>
+    <p class="term-disclaimer">
+      aura can make mistakes — confirm safety-critical repairs with a professional.
+    </p>
+  </div>
 </div>

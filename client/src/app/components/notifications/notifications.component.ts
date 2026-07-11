@@ -17,7 +17,28 @@ interface NotifVm extends AppNotification {
   categoryLabel: string;
   timeAgo: string;
   smsOn: boolean;   // texted, i.e. category SMS pref is on for this notification
+  // Short right-aligned status badge (the reference's colored metric slot),
+  // derived from the category — a scannable state chip instead of a % figure.
+  statusLabel: string;
+  statusTone: 'blue' | 'red' | 'green' | 'purple';
 }
+
+// Per-category status badge shown at the right of each row (label + tone).
+const CATEGORY_STATUS: Record<NotificationCategory, { label: string; tone: NotifVm['statusTone'] }> = {
+  maintenance: { label: 'Due',    tone: 'blue' },
+  health:      { label: 'Alert',  tone: 'red' },
+  aura:        { label: 'Insight', tone: 'purple' },
+  billing:     { label: 'Account', tone: 'green' },
+};
+
+// Short, scannable category descriptor shown under each title (like the
+// reference's "FITNESS & APPAREL"). Distinct from the settings-view label.
+const CATEGORY_TAG: Record<NotificationCategory, string> = {
+  maintenance: 'Maintenance',
+  health:      'Vehicle Health',
+  aura:        'Aura Insight',
+  billing:     'Account & Billing',
+};
 
 // Notifications bell (header) + right-side slide-in pane. Shows maintenance /
 // health / billing / Aura notifications with an All/Unread split and a settings
@@ -42,9 +63,12 @@ export class NotificationsComponent implements OnDestroy {
 
   readonly open = signal(false);
   readonly tab = signal<PaneTab>('all');
+  // Free-text filter over notification title/body (the pane's search box).
+  readonly query = signal('');
 
   readonly unreadCount = this.inbox.unreadCount;
   readonly smsPrefs = this.inbox.smsPrefs;
+  readonly totalCount = computed(() => this.inbox.notifications().length);
 
   // SMS escalation is a Pro capability. Free/Plus see the toggles locked.
   readonly isPro = computed(() => this.tier.tier() === 'pro');
@@ -77,22 +101,32 @@ export class NotificationsComponent implements OnDestroy {
   // Notifications shaped for the template, filtered by the active tab.
   readonly items = computed<NotifVm[]>(() => {
     const all = this.inbox.notifications();
-    const rows = this.tab() === 'unread' ? all.filter(n => !n.read) : all;
+    const byTab = this.tab() === 'unread' ? all.filter(n => !n.read) : all;
+    const q = this.query().trim().toLowerCase();
+    const rows = q
+      ? byTab.filter(n => (n.title + ' ' + n.body).toLowerCase().includes(q))
+      : byTab;
     const prefs = this.smsPrefs();
     return rows.map(n => ({
       ...n,
       icon: CATEGORY_META[n.category].icon,
-      categoryLabel: CATEGORY_META[n.category].label,
+      categoryLabel: CATEGORY_TAG[n.category],
       timeAgo: this.timeAgo(n.createdAt),
       smsOn: (n.category === 'health' || n.category === 'maintenance') && prefs[n.category] && this.isPro(),
+      statusLabel: CATEGORY_STATUS[n.category].label,
+      statusTone: CATEGORY_STATUS[n.category].tone,
     }));
   });
 
   toggle(): void {
     this.open.update(v => !v);
-    if (this.open()) this.tab.set('all');
+    if (this.open()) { this.tab.set('all'); this.query.set(''); }
   }
   close(): void { this.open.set(false); }
+
+  onSearch(event: Event): void {
+    this.query.set((event.target as HTMLInputElement).value);
+  }
 
   setTab(t: PaneTab): void { this.tab.set(t); }
 

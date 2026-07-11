@@ -269,14 +269,15 @@
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  background: var(--obd-blue);
-  color: #fff;
-  transition: background var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
+  border-radius: var(--obd-radius-sm);
+  background: color-mix(in srgb, var(--obd-blue) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--obd-blue) 45%, transparent);
+  color: var(--obd-blue);
+  transition: background var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
 
   mat-icon { font-size: 20px; width: 20px; height: 20px; }
 
-  &:hover:not(:disabled) { background: #2f74e0; }
+  &:hover:not(:disabled) { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 22%, transparent); }
   &:disabled { opacity: 0.4; }
 }
 

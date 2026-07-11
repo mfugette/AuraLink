@@ -13,17 +13,28 @@
       <input type="search" placeholder="Search sessions…"
              [ngModel]="query()" (ngModelChange)="query.set($event)" autocomplete="off" />
     </div>
-    <app-custom-select class="ht-vehicle-select"
-      [options]="vehicleOptions()" [value]="vehicleFilter()"
-      (valueChange)="vehicleFilter.set($any($event))" icon="directions_car" />
-    <button type="button" class="btn ht-toggle" [class.on]="warnOnly()" (click)="toggleWarn()">
-      <mat-icon>warning</mat-icon> Warnings only
-    </button>
+    <div class="ht-controls">
+      <app-custom-select class="ht-vehicle-select"
+        [options]="vehicleOptions()" [value]="vehicleFilter()"
+        (valueChange)="vehicleFilter.set($any($event))" icon="directions_car" />
+      <button type="button" class="btn ht-toggle" [class.on]="warnOnly()" (click)="toggleWarn()">
+        <mat-icon>warning</mat-icon> Warnings only
+      </button>
+    </div>
   </div>
 
   <!-- Table + cards -->
   <div class="ht-wrap">
     <table class="ht-table">
+      <colgroup>
+        <col class="c-date" />
+        <col class="c-session" />
+        <col class="c-num" />
+        <col class="c-num" />
+        <col class="c-num" />
+        <col class="c-num" />
+        <col class="c-status" />
+      </colgroup>
       <thead>
         <tr>
           <th class="sortable" (click)="sortBy('date')">Date

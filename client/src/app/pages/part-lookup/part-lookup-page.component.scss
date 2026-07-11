@@ -1,207 +1,254 @@
 @use '../page-shell' as *;
+@use '../console-page' as console;
 
-.search-field {
-  margin-bottom: 16px;
+// Part Lookup on the shared instrument-console system: same viewport-locked
+// shell, 44px toolbar seam (search + category filters live there), and the
+// 4-across hairline metric grid as the Dashboard and My Vehicles. Results are
+// flat console cells; blank filler slots keep the frame full, and >12 results
+// scroll within the grid frame.
+:host { @include console.host; }
+.page { @include console.page; }
+.page-eyebrow { @include console.eyebrow; }
+.page-head { @include console.head; }
+
+// ── Console toolbar: search · category chips · result count ───────────────────
+.parts-toolbar { @include console.toolbar; }
+
+.toolbar-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 1 300px;
+  min-width: 170px;
+  height: 30px;
+  padding: 0 10px;
+  background: var(--obd-surface-2);
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-sm);
+
+  > mat-icon { font-size: 16px; width: 16px; height: 16px; color: var(--obd-text-muted); flex-shrink: 0; }
+
+  &:focus-within { border-color: var(--obd-blue); }
 }
 
-.clear-search {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+.toolbar-search-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--obd-text);
+  font-size: 0.8rem;
+
+  &::placeholder { color: var(--obd-text-muted); }
+}
+
+.toolbar-search-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--obd-radius-sm);
   color: var(--obd-text-muted);
   flex-shrink: 0;
-  transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  mat-icon { font-size: 14px; width: 14px; height: 14px; }
   &:hover { background: var(--obd-surface-4); color: var(--obd-text); }
 }
 
-// ── Category chips ──────────────────────────────────────────────────────────
-.category-chips {
+// Category chips: compact mono console filters, horizontally scrollable so the
+// toolbar keeps its fixed height at any width.
+.cat-chips {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 20px;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
 }
 
 .cat-chip {
-  height: 34px;
-  padding: 0 16px;
-  border-radius: var(--obd-radius-pill);
-  border: 1px solid var(--obd-border-strong);
-  background: var(--obd-surface-2);
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: var(--obd-radius-sm);
+  border: 1px solid transparent;
   color: var(--obd-text-dim);
-  font-size: 0.82rem;
-  font-weight: 500;
+  font-family: var(--obd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
   transition: border-color var(--obd-dur-fast) var(--obd-ease),
               background var(--obd-dur-fast) var(--obd-ease),
               color var(--obd-dur-fast) var(--obd-ease);
 
-  &:hover { border-color: var(--obd-blue); color: var(--obd-text); }
+  &:hover { color: var(--obd-text); }
 
   &.active {
-    background: var(--obd-blue-dim);
-    border-color: var(--obd-blue);
     color: var(--obd-blue);
+    background: color-mix(in srgb, var(--obd-blue) 12%, transparent);
+    border-color: color-mix(in srgb, var(--obd-blue) 40%, transparent);
   }
 }
 
-// ── Result meta ─────────────────────────────────────────────────────────────
-.result-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-  font-size: 0.85rem;
-  color: var(--obd-text-muted);
-}
+.parts-toolbar-hint { @include console.toolbar-hint; }
 
-.clear-all {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--obd-text-muted);
-  font-size: 0.82rem;
-  padding: 4px 8px;
-  border-radius: var(--obd-radius-sm);
-  transition: color var(--obd-dur-fast) var(--obd-ease);
-
-  mat-icon { font-size: 15px; width: 15px; height: 15px; }
-  &:hover { color: var(--obd-red); }
-}
-
-// ── Parts grid ──────────────────────────────────────────────────────────────
+// ── Parts grid: the shared console metric grid ────────────────────────────────
 .parts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
+  @include console.grid;
+  // Rows never compress below a legible cell height: ≤12 results share the
+  // frame height evenly (gauge-like); more than that, rows floor at 250px and
+  // the grid scrolls within the frame.
+  grid-auto-rows: minmax(250px, 1fr);
+  position: relative;   // anchors the no-results overlay
+  overflow-y: auto;     // >12 results scroll within the frame
 
-  @media (max-width: 480px) { grid-template-columns: 1fr; }
+  @media (max-width: 720px) { grid-auto-rows: auto; }
 }
 
-.part-card {
+// A flat console cell (same language as the garage's vehicle cells).
+.part-cell {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 18px;
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border);
-  border-radius: var(--obd-radius-lg);
-  box-shadow: var(--obd-shadow-sm);
-  transition: border-color var(--obd-dur) var(--obd-ease),
-              box-shadow var(--obd-dur) var(--obd-ease),
-              transform var(--obd-dur) var(--obd-ease-spring);
-
-  &:hover {
-    border-color: var(--obd-border-strong);
-    box-shadow: var(--obd-shadow);
-    transform: translateY(-3px);
-  }
+  padding: 16px 20px 16px;
+  background: var(--obd-bg, var(--obd-surface));
+  min-width: 0;
+  overflow: hidden;
 }
 
-.part-card-head {
+// Blank filler slot — keeps the hairline frame full when results < 12.
+.part-cell--filler { padding: 0; }
+
+.part-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
 }
 
-.part-category {
+.part-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-family: var(--obd-font-mono);
   font-size: 0.68rem;
-  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
-  color: var(--obd-blue);
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: var(--obd-blue-dim);
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--obd-text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  mat-icon { flex-shrink: 0; font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); }
 }
 
 .part-price {
-  font-size: 0.95rem;
+  flex-shrink: 0;
+  font-family: var(--obd-font-mono);
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--obd-green);
-  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .part-name {
-  margin: 2px 0 0;
+  margin: 0;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 750;
+  letter-spacing: -0.01em;
   color: var(--obd-text);
-  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .part-desc {
   margin: 0;
-  font-size: 0.82rem;
-  color: var(--obd-text-dim);
-  line-height: 1.5;
-}
-
-.part-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 2px;
-}
-
-.part-brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
   font-size: 0.8rem;
+  line-height: 1.45;
   color: var(--obd-text-dim);
-
-  mat-icon { font-size: 14px; width: 14px; height: 14px; color: var(--obd-blue); opacity: 0.7; }
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.part-number {
-  font-family: 'Courier New', monospace;
-  font-size: 0.75rem;
-  color: var(--obd-text-muted);
+// Mono key/value readout, same pattern as the garage cells' specs.
+.part-specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-content: start;
+  gap: 8px 16px;
+  margin: 2px 0 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+
+  div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .span-2 { grid-column: 1 / -1; }
+
+  dt {
+    font-family: var(--obd-font-mono);
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--obd-text-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--obd-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &.mono { font-family: var(--obd-font-mono); font-size: 0.76rem; letter-spacing: 0.02em; }
+  }
 }
 
-.part-fitment {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.78rem;
-  color: var(--obd-text-muted);
-
-  mat-icon { font-size: 15px; width: 15px; height: 15px; flex-shrink: 0; }
-}
-
+// Related DTC tags pinned to the bottom of the cell.
 .part-codes {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  margin-top: 2px;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--obd-border);
 }
 
 .code-tag {
-  font-family: 'Courier New', monospace;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--obd-orange);
   padding: 2px 7px;
   border-radius: var(--obd-radius-sm);
-  background: rgba(249, 115, 22, 0.12);
+  font-family: var(--obd-font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--obd-yellow, #e2b23c);
+  background: color-mix(in srgb, var(--obd-yellow, #e2b23c) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--obd-yellow, #e2b23c) 35%, transparent);
 }
 
-// ── Empty state ─────────────────────────────────────────────────────────────
-.empty-state {
+// No-results message, overlaid on the blank grid frame.
+.empty-overlay {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 12px;
-  padding: 56px 20px;
   color: var(--obd-text-muted);
   text-align: center;
 
-  mat-icon { font-size: 40px; width: 40px; height: 40px; opacity: 0.4; }
+  mat-icon { font-size: 40px; width: 40px; height: 40px; color: var(--obd-blue); opacity: 0.7; }
   p { margin: 0; font-size: 0.9rem; }
-
-  .clear-all { border: 1px solid var(--obd-border-strong); padding: 8px 16px; border-radius: var(--obd-radius-pill); }
 }

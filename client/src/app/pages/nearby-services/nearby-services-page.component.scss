@@ -1,258 +1,320 @@
 @use '../page-shell' as *;
+@use '../console-page' as console;
 
-// This page manages its own scrolling (only .services-list scrolls, not the
-// page), so it needs the viewport-height math to be simple: no bottom padding
-// eating into the "1 viewport" budget the way the shared .page shell has.
-// It still keeps the shared shell's centering + horizontal padding (the
-// override only drops the *bottom* padding and adds the flex/height column),
-// otherwise the content sits flush against the viewport edge on mobile.
-.page {
-  padding: 28px 32px 0;
+// Find Help Nearby on the shared instrument-console system: viewport-locked
+// shell, 44px toolbar seam (category tabs + location status), and a full-bleed
+// two-cell hairline grid — flat result rows on the left, squared map on the
+// right. Location controls sit in the header's action slot.
+:host { @include console.host; }
+.page { @include console.page; }
+.page-eyebrow { @include console.eyebrow; }
+.page-head { @include console.head; }
+
+// Header action row: title stack left, location controls right.
+.page-head.with-action {
   display: flex;
-  flex-direction: column;
-  height: calc(100vh - var(--obd-header-height));
-  min-height: 0;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
 
-  @media (max-width: 900px) { padding: 24px 20px 0; }
-  @media (max-width: 600px) { padding: 20px 16px 0; }
+  // The inner title stack must keep the shell's column rhythm (6px gaps) so the
+  // header height — and therefore the toolbar seam — matches every other
+  // console page exactly.
+  > div:first-child {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
 }
 
-.page-head {
-  flex-shrink: 0;
-}
-
-// ── Location input ────────────────────────────────────────────────────────────
-.locate-block {
-  flex-shrink: 0;
-}
-
+// ── Location controls (compact, console-flavored) ─────────────────────────────
 .locate-bar {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 14px;
 }
 
 .locate-gps {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  height: 46px;
-  padding: 0 20px;
-  background: var(--obd-blue);
-  color: #fff;
-  border-radius: var(--obd-radius-pill);
-  font-weight: 600;
-  font-size: 0.9rem;
-  transition: background var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
+  height: 34px;
+  padding: 0 14px;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--obd-blue) 55%, transparent);
+  color: var(--obd-blue);
+  border-radius: var(--obd-radius-sm);
+  font-family: var(--obd-font-mono);
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  transition: background var(--obd-dur-fast) var(--obd-ease),
+              border-color var(--obd-dur-fast) var(--obd-ease),
+              opacity var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 19px; width: 19px; height: 19px; }
-  &:hover:not(:disabled) { background: #2f74e0; }
+  mat-icon { font-size: 17px; width: 17px; height: 17px; }
+  &:hover:not(:disabled) { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 14%, transparent); }
   &:disabled { opacity: 0.6; }
-}
-
-.locate-or {
-  color: var(--obd-text-muted);
-  font-size: 0.85rem;
 }
 
 .locate-zip {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 240px;
-  height: 46px;
-  padding: 0 6px 0 16px;
+  gap: 6px;
+  width: 260px;
+  max-width: 100%;
+  height: 34px;
+  padding: 0 4px 0 12px;
   background: var(--obd-surface-2);
   border: 1px solid var(--obd-border-strong);
-  border-radius: var(--obd-radius-pill);
+  border-radius: var(--obd-radius-sm);
   transition: border-color var(--obd-dur-fast) var(--obd-ease);
 
   &:focus-within { border-color: var(--obd-blue); }
+}
 
-  .field-input {
-    flex: 1;
-    border: none;
-    background: transparent;
-    height: 100%;
-    color: var(--obd-text);
-    font: inherit;
-    outline: none;
-    &::placeholder { color: var(--obd-text-muted); }
-  }
+.locate-zip-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  height: 100%;
+  color: var(--obd-text);
+  font-size: 0.82rem;
+  outline: none;
+  &::placeholder { color: var(--obd-text-muted); }
 }
 
 .locate-search {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--obd-blue);
-  color: #fff;
-  mat-icon { font-size: 19px; width: 19px; height: 19px; }
-  &:hover:not(:disabled) { background: #2f74e0; }
-  &:disabled { opacity: 0.5; }
-}
-
-.locate-resolved,
-.locate-error {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0 0 12px;
-  font-size: 0.85rem;
-  mat-icon { font-size: 16px; width: 16px; height: 16px; }
-}
-.locate-resolved { color: var(--obd-text-dim); }
-.locate-error { color: var(--obd-red); }
-
-// ── Category tabs ─────────────────────────────────────────────────────────────
-// nowrap + shrinkable tabs so all 4 stay on one row even in the narrower list
-// column (a plain wrap would drop "Auto parts" to its own line there).
-.category-tabs {
-  display: flex;
-  gap: 8px;
-  flex-wrap: nowrap;
-  margin-bottom: 20px;
-  min-width: 0;
-
-  // On phones the four tabs can't all fit their labels across a narrow
-  // full-width row, so instead of squashing/clipping them make the row
-  // horizontally scrollable (each tab keeps its natural size).
-  @media (max-width: 600px) {
-    // Pin to the column width so overflow-x scrolls the strip internally
-    // instead of the tab content widening the whole page.
-    width: 100%;
-    max-width: 100%;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    &::-webkit-scrollbar { display: none; }
-  }
-}
-
-.category-tab {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  flex: 1 1 0;
-  min-width: 0;
-  height: 40px;
-  padding: 0 10px;
-  border-radius: var(--obd-radius-pill);
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border-strong);
-  color: var(--obd-text-dim);
-  font-size: 0.82rem;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: all var(--obd-dur-fast) var(--obd-ease);
+  width: 26px;
+  height: 26px;
+  border-radius: var(--obd-radius-sm);
+  color: var(--obd-blue);
+  transition: background var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { flex-shrink: 0; font-size: 17px; width: 17px; height: 17px; }
-
-  // In the horizontally-scrolling mobile row, tabs keep their natural width
-  // instead of sharing/shrinking (which caused label clipping).
-  @media (max-width: 600px) {
-    flex: 0 0 auto;
-    padding: 0 16px;
-  }
-
-  &:hover { border-color: var(--obd-blue); color: var(--obd-text); }
-  &.active {
-    background: var(--obd-blue-dim);
-    border-color: var(--obd-blue);
-    color: var(--obd-blue);
-  }
+  mat-icon { font-size: 17px; width: 17px; height: 17px; }
+  &:hover:not(:disabled) { background: color-mix(in srgb, var(--obd-blue) 18%, transparent); }
+  &:disabled { opacity: 0.5; }
 }
 
-// ── Layout: list + map ────────────────────────────────────────────────────────
-// .page is a fixed-height flex column (100vh - header). Everything above this
-// (.page-head, .locate-block) is flex-shrink: 0, so .services-layout naturally
-// fills whatever's left — no magic-number height guessing. min-height: 0 is
-// required on every link of this flex chain, or children refuse to shrink
-// below their content size and the browser falls back to page-level scroll.
-.services-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 20px;
-  align-items: start;
-  flex: 1;
-  min-height: 0;
-  padding-bottom: 24px;
+// ── Console toolbar: category tabs + location status ──────────────────────────
+.nearby-toolbar {
+  @include console.toolbar;
+  align-items: flex-end;   // tabs' active underline sits on the toolbar seam
+}
 
+// Same tab language as the dashboard's Gauges/Line-graphs bar.
+.view-tabs {
+  display: flex;
+  gap: 2px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.view-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--obd-text-dim);
+  font-family: var(--obd-font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 17px; width: 17px; height: 17px; }
+
+  &:hover { color: var(--obd-text); }
+  &.active { color: var(--obd-blue); border-bottom-color: var(--obd-blue); }
+}
+
+.nearby-toolbar-hint {
+  @include console.toolbar-hint;
+  align-self: flex-end;
+  padding-bottom: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.error { color: var(--obd-red); }
+}
+
+// ── Console grid: results list cell (left) + map cell (right) ─────────────────
+.services-layout {
+  @include console.grid;
+  // The split is centered on the WINDOW, not the content area: the map cell is
+  // exactly half the viewport wide (50vw), so the seam lands at the window's
+  // horizontal center and the list cell absorbs the sidebar's width (thinner).
+  grid-template-columns: minmax(0, 1fr) 50vw;
+
+  // Stack on tablets/phones: map first (fixed height), list below, page scrolls.
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
-    display: flex;
-    flex-direction: column;
-    flex: none;
-    overflow: visible;
-    min-width: 0;
+    grid-auto-rows: auto;
+    flex: 0 0 auto;
   }
+  @media (max-width: 720px) { grid-template-columns: 1fr; }
 }
 
 .services-col {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  min-height: 0;
+  background: var(--obd-bg, var(--obd-surface));
   min-width: 0;
-  // .services-layout is itself height-bounded (flex: 1 inside the fixed-height
-  // .page column). Take up that full grid-row height so .services-list has a
-  // real box to scroll within, instead of growing to fit its content.
-  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 
-  @media (max-width: 900px) {
-    height: auto;
-    // Explicitly cap to the layout width so a long unbreakable string in a
-    // card can't push the column (and the page) past the viewport.
-    width: 100%;
-    max-width: 100%;
-  }
+  @media (max-width: 900px) { overflow: visible; min-height: 320px; }
 }
 
 .services-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
   flex: 1;
   min-height: 0;
-  // Without min-width:0 the flex item takes its min-content width — the widest
-  // unbreakable string in a card (a long address/name) — and pushes the whole
-  // column past the viewport on narrow screens. Pin it to the parent width.
-  min-width: 0;
   overflow-y: auto;
-  padding-right: 4px;
   scrollbar-width: thin;
 
   @media (max-width: 900px) { overflow-y: visible; }
 }
 
-// Fixed square map, sticky so it stays in view while the list scrolls — back
-// to the original square treatment (not stretched to the column's height).
+// ── Result rows: flat, hairline-divided console cells ─────────────────────────
+.service-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 22px 16px;
+  border-bottom: 1px solid var(--obd-border);
+  min-width: 0;
+  overflow-wrap: anywhere;
+
+  &:last-child { border-bottom: none; }
+}
+
+.service-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.service-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--obd-text);
+}
+
+// Squared status chip, same language as the garage/dashboard chips.
+.service-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border-radius: var(--obd-radius-sm);
+  font-family: var(--obd-font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--obd-green);
+  background: color-mix(in srgb, var(--obd-green) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--obd-green) 40%, transparent);
+
+  &.closed {
+    color: var(--obd-red);
+    background: color-mix(in srgb, var(--obd-red) 12%, transparent);
+    border-color: color-mix(in srgb, var(--obd-red) 40%, transparent);
+  }
+
+  .chip-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+}
+
+.service-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: var(--obd-text-dim);
+}
+
+.service-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-variant-numeric: tabular-nums;
+  .stars { color: var(--obd-yellow); letter-spacing: 1px; }
+}
+
+.service-distance {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--obd-font-mono);
+  font-size: 0.74rem;
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+}
+
+.service-address {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--obd-text-dim);
+  line-height: 1.4;
+}
+
+// Ghost mono action links (squared — no pills).
+.service-actions {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  padding-top: 2px;
+}
+
+.service-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: var(--obd-radius-sm);
+  color: var(--obd-text-dim);
+  font-family: var(--obd-font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+  &:hover { background: var(--obd-surface-2); color: var(--obd-blue); }
+}
+
+// ── Map cell: squared, fills its grid cell ────────────────────────────────────
 .services-map-wrap {
-  position: sticky;
-  top: 0;
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: var(--obd-radius-lg);
+  position: relative;
+  background: var(--obd-bg, var(--obd-surface));
+  min-width: 0;
+  min-height: 0;
   overflow: hidden;
-  border: 1px solid var(--obd-border);
-  background: var(--obd-surface-2);
-  // The Google Maps SDK renders into .services-map with its own internal
-  // stacking context, which can escape a plain ancestor overflow:hidden clip
-  // (visible as square tile corners poking past the rounded border). Forcing
-  // this wrapper onto its own compositor layer makes the clip authoritative.
-  isolation: isolate;
-  transform: translateZ(0);
 
   @media (max-width: 900px) {
-    position: static;
-    aspect-ratio: auto;
     height: 360px;
     order: -1;
   }
@@ -268,8 +330,6 @@
 .services-map {
   width: 100%;
   height: 100%;
-  border-radius: var(--obd-radius-lg);
-  overflow: hidden;
 }
 
 .map-placeholder {
@@ -283,104 +343,11 @@
   padding: 20px;
   text-align: center;
   color: var(--obd-text-muted);
-  background: var(--obd-surface-2);
+  background: var(--obd-bg, var(--obd-surface));
   pointer-events: none;
 
   mat-icon { font-size: 38px; width: 38px; height: 38px; opacity: 0.45; }
   p { margin: 0; font-size: 0.88rem; max-width: 240px; }
-}
-
-// ── Result cards ──────────────────────────────────────────────────────────────
-.service-card {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 16px 18px;
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border);
-  border-radius: var(--obd-radius);
-  box-shadow: var(--obd-shadow-sm);
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.service-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.service-name {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--obd-text);
-}
-
-.open-badge {
-  flex-shrink: 0;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  background: rgba(34, 197, 94, 0.15);
-  color: var(--obd-green);
-
-  &.closed { background: rgba(239, 68, 68, 0.15); color: var(--obd-red); }
-}
-
-.service-meta {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  font-size: 0.82rem;
-  color: var(--obd-text-dim);
-}
-
-.service-rating {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  .stars { color: var(--obd-yellow); letter-spacing: 1px; }
-}
-
-.service-distance {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  mat-icon { font-size: 15px; width: 15px; height: 15px; }
-}
-
-.service-address {
-  margin: 0;
-  font-size: 0.85rem;
-  color: var(--obd-text-dim);
-  line-height: 1.4;
-}
-
-.service-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  padding-top: 4px;
-}
-
-.service-action {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  height: 34px;
-  padding: 0 14px;
-  border-radius: var(--obd-radius-pill);
-  border: 1px solid var(--obd-border-strong);
-  color: var(--obd-text-dim);
-  font-size: 0.8rem;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all var(--obd-dur-fast) var(--obd-ease);
-
-  mat-icon { font-size: 16px; width: 16px; height: 16px; }
-  &:hover { border-color: var(--obd-blue); color: var(--obd-blue); }
 }
 
 // ── States ────────────────────────────────────────────────────────────────────
@@ -389,8 +356,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 12px;
   padding: 48px 20px;
+  height: 100%;
   color: var(--obd-text-muted);
   text-align: center;
 

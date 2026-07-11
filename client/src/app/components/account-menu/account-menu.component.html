@@ -58,6 +58,22 @@
       <button type="button" class="btn account-item account-item--danger" role="menuitem" (click)="signOut()">
         <mat-icon>logout</mat-icon> Sign out
       </button>
+
+      <!-- TEMPORARY tier switcher — for testing tier-gated features before real
+           billing exists. Tucked at the bottom of the menu, out of the way. -->
+      <hr class="divider" />
+      <div class="tier-switch" role="group" aria-label="Switch plan (testing)">
+        <span class="tier-switch-tag">Test tier</span>
+        <div class="tier-switch-btns">
+          @for (t of tiers; track t) {
+            <button type="button" class="tier-switch-btn"
+                    [class.active]="tierService.tier() === t"
+                    (click)="tierService.set(t)">
+              {{ t }}
+            </button>
+          }
+        </div>
+      </div>
     </div>
   }
 </div>

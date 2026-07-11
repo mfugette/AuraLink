@@ -7,6 +7,8 @@ import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { AccountService } from '../../services/account.service';
 import { AuthService } from '../../services/auth.service';
+import { TierService } from '../../services/tier.service';
+import { Tier } from '../../models/tier.model';
 import { ProfilePanelComponent } from '../account-panels/profile-panel/profile-panel.component';
 import { VehiclesPanelComponent } from '../account-panels/vehicles-panel/vehicles-panel.component';
 import { SettingsPanelComponent } from '../account-panels/settings-panel/settings-panel.component';
@@ -28,6 +30,11 @@ export class AccountMenuComponent implements OnDestroy {
 
   protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+
+  // Temporary tier switcher (billing not built yet) — lives at the bottom of
+  // the account menu. Remove once real subscription state exists.
+  protected readonly tierService = inject(TierService);
+  readonly tiers: Tier[] = ['free', 'plus', 'pro'];
 
   open = signal(false);
   activePanel = signal<AccountPanel>(null);

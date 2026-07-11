@@ -133,13 +133,18 @@
 .panel-save-btn {
   height: 40px;
   padding: 0 20px;
-  background: var(--obd-blue);
-  color: #fff;
-  border-radius: var(--obd-radius-pill);
-  font-weight: 600;
-  transition: background var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
+  background: color-mix(in srgb, var(--obd-blue) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--obd-blue) 55%, transparent);
+  color: var(--obd-blue);
+  border-radius: var(--obd-radius-sm);
+  font-family: var(--obd-font-mono);
+  font-weight: 700;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transition: background var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
 
-  &:hover:not(:disabled) { background: #2f74e0; }
+  &:hover:not(:disabled) { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 20%, transparent); }
   &:disabled { opacity: 0.5; }
 }
 
@@ -150,13 +155,18 @@
   height: 40px;
   padding: 0 20px;
   margin-left: auto;
-  background: var(--obd-blue);
-  color: #fff;
-  border-radius: var(--obd-radius-pill);
-  font-weight: 600;
-  transition: background var(--obd-dur-fast) var(--obd-ease);
+  background: color-mix(in srgb, var(--obd-blue) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--obd-blue) 55%, transparent);
+  color: var(--obd-blue);
+  border-radius: var(--obd-radius-sm);
+  font-family: var(--obd-font-mono);
+  font-weight: 700;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transition: background var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
 
-  &:hover { background: #2f74e0; }
+  &:hover { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 20%, transparent); }
 
   mat-icon { font-size: 18px; width: 18px; height: 18px; }
 }

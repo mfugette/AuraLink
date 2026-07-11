@@ -176,12 +176,16 @@
   height: 42px;
   padding: 0 20px;
   border-radius: var(--obd-radius-sm);
-  background: var(--obd-blue);
+  background: color-mix(in srgb, var(--obd-blue) 12%, transparent);
   border: 1px solid var(--obd-blue);
-  color: #fff;
-  font-weight: 600;
+  color: var(--obd-blue);
+  font-family: var(--obd-font-mono);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 
-  &:hover { filter: brightness(1.08); }
+  &:hover { background: color-mix(in srgb, var(--obd-blue) 20%, transparent); }
 
   @media (max-width: 480px) { width: 100%; }
 }

@@ -1,355 +1,212 @@
-:host {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
+// Aura, rendered as a terminal. A single monospace console: the user types at a
+// shell prompt and Aura's reply is printed as blue console output directly
+// beneath, growing top-down. Fills the viewport (the app shell locks height, so
+// only the console body scrolls). All type is --obd-font-mono.
 
-.assistant {
+:host { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+
+.term {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 24px 24px 20px;
-  // Fill the routed area so the input can sit at the bottom in chat mode.
-  min-height: calc(100vh - var(--obd-header-height));
-
-  @media (max-width: 600px) { padding: 20px 16px 16px; }
-
-  // Empty state centers the hero + input vertically.
-  &--empty {
-    justify-content: center;
-  }
-}
-
-// ── Empty-state hero ─────────────────────────────────────────────────────────
-.assistant-hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 12px;
-  margin-bottom: 28px;
-}
-
-.assistant-heading {
-  margin: 0;
-  font-size: clamp(1.7rem, 4vw, 2.3rem);
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  color: var(--obd-text);
-
-  // Match the Home hero: the personalized name is injected via [innerHTML] as a
-  // .hero-accent span, so it needs the same gradient here. ::ng-deep because the
-  // injected markup isn't tagged with this component's view-encapsulation attr.
-  ::ng-deep .hero-accent {
-    background: linear-gradient(90deg, var(--obd-blue), #818cf8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-}
-
-.assistant-sub {
-  margin: 0;
-  font-size: 0.98rem;
-  color: var(--obd-text-dim);
-}
-
-// ── Chat-mode toolbar ────────────────────────────────────────────────────────
-.assistant-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.assistant-newchat {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 14px;
-  border-radius: var(--obd-radius-pill);
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border-strong);
-  color: var(--obd-text-dim);
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: border-color var(--obd-dur-fast) var(--obd-ease),
-              color var(--obd-dur-fast) var(--obd-ease),
-              background var(--obd-dur-fast) var(--obd-ease);
-
-  mat-icon { font-size: 18px; width: 18px; height: 18px; }
-
-  &:hover {
-    border-color: var(--obd-blue);
-    color: var(--obd-text);
-    background: var(--obd-surface-3);
-  }
-}
-
-// ── Shared AI pieces (mirrors the former overlay styling) ────────────────────
-.ai-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 14px;
-  border-radius: 999px;
-  background: var(--obd-blue-dim);
-  color: var(--obd-blue);
-  font-size: 0.78rem;
-  font-weight: 600;
-
-  mat-icon { font-size: 16px; width: 16px; height: 16px; }
-}
-
-// ── Conversation ─────────────────────────────────────────────────────────────
-.ai-thread {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  overflow-y: auto;
-  padding: 4px 4px 8px;
-  scrollbar-width: thin;
-}
-
-.ai-msg {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  max-width: 88%;
-
-  &--user {
-    align-self: flex-end;
-    flex-direction: row-reverse;
-
-    .ai-msg-bubble {
-      background: var(--obd-blue);
-      color: #fff;
-      border-color: transparent;
-    }
-  }
-}
-
-.ai-msg-avatar {
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--obd-blue-dim);
-  color: var(--obd-blue);
-
-  mat-icon { font-size: 17px; width: 17px; height: 17px; }
-}
-
-.ai-msg-bubble {
-  padding: 12px 16px;
-  border-radius: var(--obd-radius);
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border);
+  min-height: 0;
+  margin: 0;
+  font-family: var(--obd-font-mono);
   color: var(--obd-text);
-  font-size: 0.92rem;
-  line-height: 1.55;
+  background: var(--obd-bg, var(--obd-surface));
 }
 
-// Rendered Markdown in Aura's replies (see AuraMarkdownPipe). Themed so bold
-// terms pop with the brand accent and lists/code read cleanly.
-.ai-msg-bubble--md {
-  .md-p { margin: 0 0 8px; &:last-child { margin-bottom: 0; } }
-
-  .md-strong {
-    font-weight: 650;
-    color: var(--obd-blue);
-  }
-
-  .md-list {
-    margin: 6px 0 8px;
-    padding-left: 20px;
-    &:last-child { margin-bottom: 0; }
-    li { margin: 3px 0; }
-  }
-
-  .md-code {
-    font-family: var(--obd-font-mono, ui-monospace, monospace);
-    font-size: 0.85em;
-    padding: 1px 5px;
-    border-radius: 5px;
-    background: var(--obd-surface-3);
-    border: 1px solid var(--obd-border);
-  }
-
-  br { display: block; content: ''; height: 4px; }
-}
-
-.ai-typing {
+// ── Window chrome ─────────────────────────────────────────────────────────────
+.term-bar {
   display: flex;
   align-items: center;
-  gap: 5px;
-
-  span {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--obd-text-muted);
-    animation: ai-bounce 1.2s infinite ease-in-out;
-
-    &:nth-child(2) { animation-delay: 0.15s; }
-    &:nth-child(3) { animation-delay: 0.3s; }
-  }
+  gap: 12px;
+  flex-shrink: 0;
+  height: 40px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--obd-border-strong);
+  background: var(--obd-surface);
 }
 
-@keyframes ai-bounce {
-  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-  30%           { transform: translateY(-5px); opacity: 1; }
-}
-
-// ── Suggestion chips ─────────────────────────────────────────────────────────
-.ai-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 4px;
-}
-
-.ai-chip {
+.term-dots {
   display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 10px 16px;
-  border-radius: var(--obd-radius-pill);
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border-strong);
-  color: var(--obd-text-dim);
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: border-color var(--obd-dur-fast) var(--obd-ease),
-              color var(--obd-dur-fast) var(--obd-ease),
-              background var(--obd-dur-fast) var(--obd-ease),
-              transform var(--obd-dur-fast) var(--obd-ease-spring);
-
-  mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); }
-
-  &:hover:not(:disabled) {
-    border-color: var(--obd-blue);
-    color: var(--obd-text);
-    background: var(--obd-surface-3);
-    transform: translateY(-1px);
+  gap: 6px;
+  i {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--obd-surface-4);
   }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: default;
-  }
+  // The three "traffic lights" — tinted but flat (no glossy gloss).
+  i:nth-child(1) { background: color-mix(in srgb, var(--obd-red) 60%, transparent); }
+  i:nth-child(2) { background: color-mix(in srgb, var(--obd-yellow) 60%, transparent); }
+  i:nth-child(3) { background: color-mix(in srgb, var(--obd-green) 60%, transparent); }
 }
 
-// Compact chip strip above the composer in chat mode: a single scrollable row
-// (never wraps into a tall block that pushes the input down), left-aligned.
-.ai-chips--bar {
-  flex-wrap: nowrap;
-  justify-content: flex-start;
-  gap: 8px;
-  margin-top: 0;
-  overflow-x: auto;
-  padding-bottom: 2px;
-  scrollbar-width: thin;
-
-  .ai-chip {
-    flex: 0 0 auto;
-    padding: 7px 13px;
-    font-size: 0.8rem;
-  }
-
-  // Hide the scrollbar on WebKit while keeping the row scrollable.
-  &::-webkit-scrollbar { height: 4px; }
-  &::-webkit-scrollbar-thumb { background: var(--obd-border-strong); border-radius: 2px; }
-}
-
-// ── Input ────────────────────────────────────────────────────────────────────
-.assistant-input-row {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-top: 14px;
-
-  // In chat mode the thread scrolls; keep the composer pinned to the bottom.
-  .assistant:not(.assistant--empty) & {
-    position: sticky;
-    bottom: 0;
-    background: linear-gradient(to top, var(--obd-bg) 72%, transparent);
-    padding-bottom: 6px;
-  }
-}
-
-.ai-input-control {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  height: 56px;
-  padding: 0 8px 0 18px;
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border-strong);
-  border-radius: var(--obd-radius-pill);
-  transition: border-color var(--obd-dur-fast) var(--obd-ease),
-              box-shadow var(--obd-dur-fast) var(--obd-ease);
-
-  &:focus-within {
-    border-color: var(--obd-blue);
-    box-shadow: 0 0 0 3px var(--obd-blue-dim);
-  }
-
-  > mat-icon {
-    flex-shrink: 0;
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-    color: var(--obd-blue);
-  }
-}
-
-.ai-input {
+.term-title {
   flex: 1;
   min-width: 0;
-  height: 100%;
-  background: transparent;
+  font-size: 0.76rem;
+  letter-spacing: 0.02em;
+  color: var(--obd-text-muted);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.term-clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-sm);
+  color: var(--obd-text-dim);
+  font-family: var(--obd-font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transition: border-color var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+  &:hover { border-color: var(--obd-text-muted); color: var(--obd-text); }
+}
+
+// ── Console body ──────────────────────────────────────────────────────────────
+.term-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px 20px 24px;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  cursor: text;
+  scrollbar-width: thin;
+
+  @media (max-width: 600px) { padding: 14px 14px 20px; font-size: 0.82rem; }
+}
+
+// Boot banner (empty state)
+.term-banner { margin-bottom: 14px; }
+.term-figlet {
+  margin: 0 0 10px;
+  font-family: var(--obd-font-mono);
+  color: var(--obd-blue);
+  font-size: 0.7rem;
+  line-height: 1.15;
+  white-space: pre;
+  overflow-x: auto;
+}
+.term-boot {
+  color: var(--obd-text-dim);
+  b { color: var(--obd-text); font-weight: 700; }
+}
+.term-dim { color: var(--obd-text-muted); }
+
+// A shell line: prompt + command/input.
+.term-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.term-line--in { margin-top: 12px; }
+
+.term-prompt {
+  flex-shrink: 0;
+  color: var(--obd-green);
+  font-weight: 700;
+  white-space: nowrap;
+  user-select: none;
+}
+.term-caret { color: var(--obd-text-dim); margin-left: 2px; font-weight: 400; }
+
+.term-cmd {
+  color: var(--obd-text);
+  word-break: break-word;
+}
+
+// Aura's output block — printed beneath the prompt, blue, whitespace preserved
+// so her ▸ / → markers and indentation land exactly as written.
+.term-out {
+  margin: 4px 0 6px;
+  color: var(--obd-blue);
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  .term-strong { color: var(--obd-text); font-weight: 700; }
+  .term-mark { color: color-mix(in srgb, var(--obd-blue) 70%, var(--obd-text-muted)); font-weight: 700; }
+  .term-safety {
+    color: var(--obd-red);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+}
+
+.term-out--wait { color: var(--obd-text-muted); }
+.term-spin { display: inline-block; animation: term-spin 0.9s steps(4) infinite; color: var(--obd-blue); }
+.term-ellip { animation: term-blink 1s steps(1) infinite; }
+
+// The live, active input line. The native text caret is colored blue so it
+// reads as the terminal cursor (reliable and always at the true caret position).
+.term-line--active { margin-top: 12px; align-items: center; }
+.term-input {
+  flex: 1;
+  min-width: 120px;
   border: none;
   outline: none;
+  background: transparent;
   color: var(--obd-text);
   font: inherit;
-  font-size: 1rem;
+  caret-color: var(--obd-text-dim);
+  caret-shape: block;         // block cursor where supported; falls back to bar
+  padding: 0;
 
   &::placeholder { color: var(--obd-text-muted); }
+  &:disabled { color: var(--obd-text-muted); }
 }
 
-.ai-send {
+// ── Status footer ─────────────────────────────────────────────────────────────
+.term-foot {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--obd-blue);
-  color: #fff;
-  transition: background var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
+  border-top: 1px solid var(--obd-border-strong);
+  background: var(--obd-surface);
+  padding: 10px 20px;
 
-  mat-icon { font-size: 20px; width: 20px; height: 20px; }
-
-  &:hover:not(:disabled) { background: #2f74e0; }
-  &:disabled { opacity: 0.4; }
+  @media (max-width: 600px) { padding: 10px 14px; }
 }
 
-.ai-disclaimer {
+.term-hints {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin: 0;
-  font-size: 0.75rem;
-  color: var(--obd-text-muted);
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.74rem;
+}
 
-  mat-icon { font-size: 14px; width: 14px; height: 14px; color: var(--obd-blue); opacity: 0.7; }
+.term-hint {
+  padding: 4px 9px;
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius-sm);
+  background: transparent;
+  color: var(--obd-text-dim);
+  font-family: var(--obd-font-mono);
+  font-size: 0.72rem;
+  transition: border-color var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+  &:hover:not(:disabled) { border-color: var(--obd-blue); color: var(--obd-blue); }
+  &:disabled { opacity: 0.5; cursor: default; }
+}
+
+.term-disclaimer {
+  margin: 8px 0 0;
+  font-size: 0.68rem;
+  color: var(--obd-text-muted);
+  letter-spacing: 0.01em;
+}
+
+@keyframes term-blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+@keyframes term-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .term-cursor, .term-ellip, .term-spin { animation: none; }
+  .term-cursor { opacity: 1; }
 }

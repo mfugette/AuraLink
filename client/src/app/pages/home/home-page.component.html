@@ -11,6 +11,7 @@
           <div class="page-container hero-inner">
             @if (auth.isSignedIn()) {
               <!-- ── Authenticated hero: welcome + quick actions ─────────────── -->
+              <span class="hero-eyebrow">Diagnostics Console</span>
               <h1 class="hero-title">
                 Welcome back@if (firstName()) {, <span class="hero-accent">{{ firstName() }}</span>}.
               </h1>
@@ -25,7 +26,7 @@
                   <mat-icon>bluetooth</mat-icon> Sync
                 </button>
                 <button type="button" class="btn hero-action" (click)="go('/dashboard')">
-                  <mat-icon>monitoring</mat-icon> Dashboard
+                  <mat-icon>monitoring</mat-icon> Telemetry
                 </button>
                 <button type="button" class="btn hero-action" (click)="go('/my-vehicles')">
                   <mat-icon>directions_car</mat-icon> My Vehicles
@@ -42,6 +43,7 @@
               </div>
             } @else {
               <!-- ── Guest hero: unchanged free-pipeline pitch ───────────────── -->
+              <span class="hero-eyebrow">OBD2 Fault Code Analysis</span>
               <h1 class="hero-title">
                 Diagnose your car.<br>
                 <span class="hero-accent">For free.</span>

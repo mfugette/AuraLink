@@ -2,16 +2,19 @@
 
   <!-- ── Top bar ──────────────────────────────────────────────────────────── -->
   <header class="app-header">
-    <div class="header-left" [class.sidebar-collapsed]="sidebarCollapsed()">
-      <!-- Sidebar (and thus its toggle) is a signed-in-only feature. -->
+    <div class="header-left">
+      <!-- Mobile-only hamburger: opens the overlay drawer (desktop collapse now
+           lives in the sidebar's own toggle section). Signed-in only. -->
       @if (auth.isSignedIn()) {
         <button type="button" class="btn hamburger" (click)="toggleSidebar()" aria-label="Toggle menu">
           <mat-icon>menu</mat-icon>
         </button>
       }
-      <a class="logo" routerLink="/home">
+      <!-- Logo: its icon is centered over the collapsed rail's width and stays
+           fixed there whether the rail is expanded or collapsed. -->
+      <a class="logo" [class.logo--railed]="auth.isSignedIn()" routerLink="/home">
         <mat-icon class="logo-icon">bluetooth_drive</mat-icon>
-        <span class="logo-text">Aura<span class="logo-text-accent">Link.vin</span></span>
+        <span class="logo-text">Aura<span class="logo-text-accent">Link</span></span>
       </a>
     </div>
 
@@ -56,6 +59,7 @@
         <app-sidebar
           [collapsed]="sidebarCollapsed() && !mobileDrawerOpen()"
           (navigate)="closeMobileDrawer()"
+          (toggle)="sidebarCollapsed.set(!sidebarCollapsed())"
         />
       </aside>
     }
@@ -74,24 +78,6 @@
       </footer>
     </main>
   </div>
-
-  <!-- TEMPORARY floating tier switcher — for testing tier-gated features before
-       real billing exists. Signed-in only. Remove once subscriptions are wired. -->
-  @if (auth.isSignedIn()) {
-    <div class="tier-switch" role="group" aria-label="Switch plan (testing)">
-      <span class="tier-switch-tag">Test tier</span>
-      @for (t of tiers; track t) {
-        <button type="button" class="tier-switch-btn"
-                [class.active]="tierService.tier() === t"
-                (click)="tierService.set(t)">
-          {{ t }}
-        </button>
-      }
-      <a class="tier-switch-plans" routerLink="/plan" matTooltip="Plans & pricing" aria-label="Plans">
-        <mat-icon>workspace_premium</mat-icon>
-      </a>
-    </div>
-  }
 
   <!-- App-wide toasts + offline banner (fixed-position, renders above content). -->
   <app-toast-host />

@@ -1,57 +1,59 @@
 <div class="page">
-  <div class="page-head">
-    <h1 class="page-title"><mat-icon>near_me</mat-icon> Find Help Nearby</h1>
-    <p class="page-subtitle">Locate mechanics, tow services, tire shops, and auto parts stores near you.</p>
-  </div>
+  <div class="page-head with-action">
+    <div>
+      <span class="page-eyebrow">— Local services</span>
+      <h1 class="page-title">Find Help Nearby</h1>
+      <p class="page-subtitle">Locate mechanics, tow services, tire shops, and auto parts stores near you.</p>
+    </div>
 
-  <!-- Location input -->
-  <div class="locate-block">
+    <!-- Location controls: header action slot (compact console styling) -->
     <div class="locate-bar">
       <button type="button" class="btn locate-gps" [disabled]="locating()" (click)="useMyLocation()">
         <mat-icon>my_location</mat-icon>
         {{ locating() ? 'Locating…' : 'Use my location' }}
       </button>
-      <span class="locate-or">or</span>
       <div class="locate-zip">
         <input
-          class="field-input"
+          class="locate-zip-input"
           [ngModel]="zip()"
           (ngModelChange)="zip.set($event)"
           (keydown.enter)="searchZip()"
-          placeholder="Enter zip code or address"
+          placeholder="Zip code or address"
           autocomplete="postal-code"
         />
-        <button type="button" class="btn locate-search" [disabled]="loading()" (click)="searchZip()">
+        <button type="button" class="btn locate-search" [disabled]="loading()" (click)="searchZip()" aria-label="Search">
           <mat-icon>search</mat-icon>
         </button>
       </div>
     </div>
-
-    @if (resolvedLocation()) {
-      <p class="locate-resolved"><mat-icon>place</mat-icon> Searching near {{ resolvedLocation() }}</p>
-    }
-    @if (error()) {
-      <p class="locate-error"><mat-icon>error_outline</mat-icon> {{ error() }}</p>
-    }
   </div>
 
-  <!-- Map (left col) + results (right col) — both columns start at this row so
-       the map's top edge lines up with the category tabs. -->
+  <!-- Console toolbar: category tabs + location status hint -->
+  <div class="nearby-toolbar">
+    <div class="view-tabs" role="tablist" aria-label="Service category">
+      @for (cat of categories; track cat.key) {
+        <button
+          type="button"
+          class="view-tab"
+          role="tab"
+          [class.active]="category() === cat.key"
+          [attr.aria-selected]="category() === cat.key"
+          (click)="selectCategory(cat.key)"
+        >
+          <mat-icon>{{ cat.icon }}</mat-icon> {{ cat.label }}
+        </button>
+      }
+    </div>
+    <span class="nearby-toolbar-hint" [class.error]="error()">
+      @if (error()) { {{ error() }} }
+      @else if (resolvedLocation()) { Searching near {{ resolvedLocation() }} }
+      @else { Share a location to search }
+    </span>
+  </div>
+
+  <!-- Console grid: results list (left cell) + map (right cell) -->
   <div class="services-layout">
     <div class="services-col">
-      <div class="category-tabs">
-        @for (cat of categories; track cat.key) {
-          <button
-            type="button"
-            class="btn category-tab"
-            [class.active]="category() === cat.key"
-            (click)="selectCategory(cat.key)"
-          >
-            <mat-icon>{{ cat.icon }}</mat-icon> {{ cat.label }}
-          </button>
-        }
-      </div>
-
       <div class="services-list">
         @if (loading()) {
           <div class="services-loading">
@@ -69,12 +71,12 @@
           </div>
         } @else {
           @for (p of results(); track p.id) {
-            <div class="service-card">
-              <div class="service-card-head">
+            <div class="service-cell">
+              <div class="service-head">
                 <span class="service-name">{{ p.name }}</span>
                 @if (p.openNow !== null) {
-                  <span class="open-badge" [class.closed]="!p.openNow">
-                    {{ p.openNow ? 'Open now' : 'Closed' }}
+                  <span class="service-chip" [class.closed]="!p.openNow">
+                    <span class="chip-dot"></span>{{ p.openNow ? 'Open now' : 'Closed' }}
                   </span>
                 }
               </div>

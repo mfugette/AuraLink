@@ -143,8 +143,13 @@ export class RepairLogComponent {
     if (this.detail()?.id === r.id) this.closeDetail();
   }
 
+  // Date is split into a short primary line + a mono year sub-line so it reads
+  // like the Drives tab's date column (Mon DD / sub-line).
   dateLabel(iso: string): string {
-    return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
+  yearLabel(iso: string): string {
+    return new Date(iso).toLocaleDateString(undefined, { year: 'numeric' });
   }
   isSeed(r: RepairRecord): boolean { return r.id.startsWith('rep-seed-'); }
 

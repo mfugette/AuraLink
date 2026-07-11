@@ -1,0 +1,48 @@
+<div class="page">
+  <div class="page-head">
+    <span class="page-eyebrow">— {{ isEditing() ? 'Edit vehicle' : 'Add vehicle' }}</span>
+    <h1 class="page-title">
+      {{ isEditing() ? 'Edit vehicle' : 'Add a vehicle' }}
+    </h1>
+    <p class="page-subtitle">
+      Scan or enter a VIN to auto-fill the details, or pick year / make / model manually.
+    </p>
+  </div>
+
+  <div class="editor-body">
+    @if (saveError()) {
+      <p class="field-error"><mat-icon>error_outline</mat-icon> {{ saveError() }}</p>
+    }
+
+    <div class="field nickname-field">
+      <label class="field-label" for="nickname-input">Nickname (optional)</label>
+      <div class="field-control">
+        <input
+          id="nickname-input"
+          class="field-input"
+          [ngModel]="nickname()"
+          (ngModelChange)="nickname.set($event)"
+          placeholder="My Daily"
+        />
+      </div>
+    </div>
+
+    <!-- VIN scan/entry + year/make/model/trim autocompletes + extra spec -->
+    <app-vehicle-selector
+      [initialVehicle]="editSeed()"
+      (vehicleChanged)="onVehicleChange($event)"
+    />
+
+    <label class="primary-toggle">
+      <input type="checkbox" [ngModel]="makePrimary()" (ngModelChange)="makePrimary.set($event)" />
+      <span>Set as primary vehicle</span>
+    </label>
+  </div>
+
+  <div class="editor-actions">
+    <button type="button" class="btn btn-action" (click)="cancel()">Cancel</button>
+    <button type="button" class="btn btn-action is-primary" [disabled]="saving()" (click)="save()">
+      @if (saving()) { Saving… } @else { {{ isEditing() ? 'Save changes' : 'Save vehicle' }} }
+    </button>
+  </div>
+</div>

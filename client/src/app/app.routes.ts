@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { HomePageComponent } from './pages/home/home-page.component';
 import { PartLookupPageComponent } from './pages/part-lookup/part-lookup-page.component';
 import { MyVehiclesPageComponent } from './pages/my-vehicles/my-vehicles-page.component';
+import { VehicleEditorPageComponent } from './pages/vehicle-editor/vehicle-editor-page.component';
 import { IssueHistoryPageComponent } from './pages/issue-history/issue-history-page.component';
 import { AssistantPageComponent } from './pages/assistant/assistant-page.component';
 import { NearbyServicesPageComponent } from './pages/nearby-services/nearby-services-page.component';
@@ -61,6 +62,18 @@ export const routes: Routes = [
     path: 'my-vehicles',
     component: MyVehiclesPageComponent,
     title: 'My Vehicles — AuraLink',
+    canActivate: [authGuard],
+  },
+  {
+    path: 'my-vehicles/add',
+    component: VehicleEditorPageComponent,
+    title: 'Add a vehicle — AuraLink',
+    canActivate: [authGuard],
+  },
+  {
+    path: 'my-vehicles/:id/edit',
+    component: VehicleEditorPageComponent,
+    title: 'Edit vehicle — AuraLink',
     canActivate: [authGuard],
   },
   {

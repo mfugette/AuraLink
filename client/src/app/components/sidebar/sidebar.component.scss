@@ -6,30 +6,121 @@
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 1px;
   height: 100%;
-  padding: 12px 12px;
+  // No top padding: the toggle bar is a true 40px header bar flush with the top
+  // of the rail (aligning with the terminal chrome). Horizontal + bottom padding
+  // only; the toggle section and nav items carry their own inner spacing.
+  padding: 0 8px 10px;
   width: var(--obd-sidebar-width);
   transition: width var(--obd-dur) var(--obd-ease);
 
   &.collapsed {
     width: var(--obd-sidebar-collapsed-width);
-    padding: 12px 8px;
+    padding: 0 0 10px;
     align-items: center;
   }
 }
 
-.nav-item {
+// ── Toggle section (top): a distinct "NAVIGATION" header bar + collapse toggle ──
+.sidebar-toggle-section {
   display: flex;
   align-items: center;
-  gap: 16px;
-  height: 44px;
-  padding: 0 14px;
-  border-radius: var(--obd-radius);
+  justify-content: space-between;
+  gap: 8px;
+  height: 38px;
+  flex: none;
+  padding: 0 0 0 12px;
+  .collapsed & {
+    justify-content: center;
+    padding: 0;
+  }
+
+  // The desktop rail's collapse/expand toggle is meaningless on the mobile
+  // overlay drawer (opened/closed from the header hamburger + scrim), so hide
+  // the whole toggle section — and its divider — there.
+  @media (max-width: 520px) { display: none; }
+}
+
+// "NAVIGATION" eyebrow — monospace, tracked-out, expanded rail only.
+.sidebar-nav-label {
+  font-family: var(--obd-font-mono);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--obd-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--obd-radius-sm);
+  border: 1px solid var(--obd-border-strong);
+  background: var(--obd-surface-2);
+  color: var(--obd-text-dim);
+  transition: background var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease),
+              border-color var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &:hover {
+    background: var(--obd-surface-3);
+    color: var(--obd-text);
+    border-color: var(--obd-text-muted);
+  }
+}
+
+.sidebar-divider {
+  border: none;
+  border-bottom: 1px solid var(--obd-border-strong);
+  // Break out of the sidebar's 8px horizontal padding so the line runs flush to
+  // the rail's left/right borders (matching the terminal header's full-width rule).
+  margin: 0 -8px 6px;
+  height: 0;
+  // In the collapsed rail the parent uses `align-items: center`, which shrinks a
+  // zero-height <hr> to zero width (the line vanishes). Force it to span the rail.
+  align-self: stretch;
+  width: auto;
+
+  // Collapsed rail has 0 horizontal padding, so no breakout is needed there.
+  .collapsed & { margin-left: 0; margin-right: 0; }
+
+  // Hidden on the mobile drawer along with the toggle section above it.
+  @media (max-width: 520px) { display: none; }
+}
+
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 34px;
+  // Left pad = 11px so the 18px icon's center lands at 8(container) + 11 + 9 =
+  // 28px — the same x as the collapsed rail's icon center (56/2) and the header
+  // logo icon, keeping all three vertically aligned in one column.
+  padding: 0 10px 0 11px;
+  border-radius: var(--obd-radius-sm);
   color: var(--obd-text-dim);
   text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   white-space: nowrap;
   overflow: hidden;
   transition: background var(--obd-dur-fast) var(--obd-ease),
@@ -37,9 +128,9 @@
 
   mat-icon {
     flex-shrink: 0;
-    font-size: 22px;
-    width: 22px;
-    height: 22px;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
   }
 
   &:hover {
@@ -47,17 +138,20 @@
     color: var(--obd-text);
   }
 
+  // Active state: a solid, filled accent block — the reference's flat, filled
+  // selection (bright square), reworked into our blue accent.
   &.active {
-    background: var(--obd-blue-dim);
-    color: var(--obd-blue);
-    font-weight: 600;
+    background: var(--obd-blue);
+    color: #fff;
 
-    mat-icon { color: var(--obd-blue); }
+    mat-icon { color: #fff; }
+
+    &:hover { background: var(--obd-blue); }
   }
 
-  // Collapsed: icon-only, centered square targets.
+  // Collapsed: icon-only, centered square targets sized to the narrow rail.
   .collapsed & {
-    width: 48px;
+    width: 36px;
     justify-content: center;
     gap: 0;
     padding: 0;

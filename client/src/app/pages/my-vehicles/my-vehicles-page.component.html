@@ -1,123 +1,57 @@
 <div class="page">
-  <div class="page-head with-action">
-    <div>
-      <h1 class="page-title"><mat-icon>directions_car</mat-icon> My Vehicles</h1>
-      <p class="page-subtitle">Vehicles saved to your account. Set a primary to auto-fill it during diagnostics.</p>
-    </div>
-    @if (editorMode() === null) {
-      @if (atVehicleLimit()) {
-        <a class="btn add-vehicle-btn add-vehicle-btn--locked" routerLink="/plan"
-           [queryParams]="{ locked: 'vehicles' }">
-          <mat-icon>lock</mat-icon>
-          {{ maxVehicles() }}-vehicle limit reached — Upgrade
-        </a>
-      } @else {
-        <button type="button" class="btn add-vehicle-btn" (click)="openAdd()">
-          <mat-icon>add</mat-icon> Add a vehicle
-        </button>
-      }
-    }
+  <div class="page-head">
+    <span class="page-eyebrow">— Garage</span>
+    <h1 class="page-title">My Vehicles</h1>
+    <p class="page-subtitle">Vehicles saved to your account. Set a primary to auto-fill it during diagnostics.</p>
   </div>
 
-  <!-- Add / Edit form (reuses the rich vehicle selector) -->
-  @if (editorMode() !== null) {
-    <div class="vehicle-editor">
-      <div class="editor-head">
-        <h2 class="editor-title">
-          <mat-icon>{{ isEditing ? 'edit' : 'add_circle' }}</mat-icon>
-          {{ isEditing ? 'Edit vehicle' : 'Add a vehicle' }}
-        </h2>
-      </div>
+  <!-- Console toolbar: slot usage hint + bulk-add action (future bulk-import). -->
+  <div class="garage-toolbar">
+    <span class="garage-toolbar-hint">
+      {{ accountService.vehicles().length }} of {{ slots().length }} slots used
+    </span>
+    <button type="button" class="btn btn-action garage-bulk-add" (click)="bulkAdd()">
+      <mat-icon>library_add</mat-icon> Bulk add
+    </button>
+  </div>
 
-      @if (saveError()) {
-        <p class="field-error"><mat-icon>error_outline</mat-icon> {{ saveError() }}</p>
-      }
-
-      <div class="field">
-        <label class="field-label">Nickname (optional)</label>
-        <div class="field-control">
-          <input
-            class="field-input"
-            [ngModel]="nickname()"
-            (ngModelChange)="nickname.set($event)"
-            placeholder="My Daily"
-          />
-        </div>
-      </div>
-
-      <!-- VIN scan/entry + year/make/model/trim autocompletes + extra spec -->
-      <app-vehicle-selector
-        [initialVehicle]="editSeed()"
-        (vehicleChanged)="onVehicleChange($event)"
-      />
-
-      <label class="primary-toggle">
-        <input type="checkbox" [ngModel]="makePrimary()" (ngModelChange)="makePrimary.set($event)" />
-        <span>Set as primary vehicle</span>
-      </label>
-
-      <div class="editor-actions">
-        <button type="button" class="btn cancel-btn" (click)="cancel()">Cancel</button>
-        <button type="button" class="btn save-btn" [disabled]="saving()" (click)="save()">
-          @if (saving()) { Saving… } @else { {{ isEditing ? 'Save changes' : 'Save vehicle' }} }
-        </button>
-      </div>
-    </div>
-  }
-
-  <!-- Empty state -->
-  @if (accountService.vehicles().length === 0 && editorMode() === null) {
-    <div class="empty-state">
-      <mat-icon>directions_car</mat-icon>
-      <p>No saved vehicles yet.</p>
-      <button type="button" class="btn add-vehicle-btn" (click)="openAdd()">
-        <mat-icon>add</mat-icon> Add your first vehicle
-      </button>
-    </div>
-  }
-
-  <!-- Vehicle list -->
+  <!-- Garage slots: a fixed console grid (4 across, like the dashboard gauges).
+       Filled slots hold a saved vehicle; empty slots are "add" tiles. Clicking a
+       slot opens the dedicated editor page (add / edit). -->
   <div class="vehicles-grid">
-    @for (v of accountService.vehicles(); track v.id) {
-      <div class="vehicle-card" [class.primary]="v.isPrimary">
-        <div class="vehicle-card-head">
-          <div class="vehicle-title">
-            <mat-icon>directions_car</mat-icon>
-            <span>{{ v.nickname || (v.year + ' ' + v.make + ' ' + v.model) }}</span>
+    @for (v of slots(); track $index) {
+      @if (v) {
+        <a class="vehicle-cell" [class.primary]="v.isPrimary" [routerLink]="['/my-vehicles', v.id, 'edit']">
+          <div class="vehicle-head">
+            <span class="vehicle-eyebrow">
+              <mat-icon>directions_car</mat-icon>
+              {{ v.make || 'Vehicle' }}{{ v.model ? ' · ' + v.model : '' }}
+            </span>
+            @if (v.isPrimary) {
+              <span class="vehicle-chip primary"><span class="chip-dot"></span>Primary</span>
+            }
           </div>
-          @if (v.isPrimary) {
-            <span class="primary-badge"><mat-icon>star</mat-icon> Primary</span>
-          }
-        </div>
 
-        <dl class="vehicle-specs">
-          <div><dt>Year</dt><dd>{{ v.year ?? '—' }}</dd></div>
-          <div><dt>Make</dt><dd>{{ v.make ?? '—' }}</dd></div>
-          <div><dt>Model</dt><dd>{{ v.model ?? '—' }}</dd></div>
-          <div><dt>Trim</dt><dd>{{ v.subModel ?? '—' }}</dd></div>
-          <div><dt>Engine</dt><dd>{{ v.engine ?? '—' }}</dd></div>
-          @if (v.driveType) { <div><dt>Drive</dt><dd>{{ v.driveType }}</dd></div> }
-          @if (v.transmission) { <div><dt>Trans</dt><dd>{{ v.transmission }}</dd></div> }
-          @if (v.fuelType) { <div><dt>Fuel</dt><dd>{{ v.fuelType }}</dd></div> }
-          @if (v.bodyStyle) { <div><dt>Body</dt><dd>{{ v.bodyStyle }}</dd></div> }
-          @if (v.mileage != null) { <div><dt>Mileage</dt><dd>{{ v.mileage }}</dd></div> }
-          <div><dt>VIN</dt><dd>{{ v.vin ?? '—' }}</dd></div>
-        </dl>
+          <h3 class="vehicle-name">{{ v.nickname || (v.year + ' ' + v.make + ' ' + v.model) }}</h3>
 
-        <div class="vehicle-actions">
-          <button type="button" class="btn ghost-btn" (click)="openEdit(v)">
-            <mat-icon>edit</mat-icon> Edit
-          </button>
-          @if (!v.isPrimary) {
-            <button type="button" class="btn ghost-btn" (click)="setPrimary(v.id)">
-              <mat-icon>star_outline</mat-icon> Set primary
-            </button>
-          }
-          <button type="button" class="btn ghost-btn ghost-btn--danger" (click)="remove(v.id)">
-            <mat-icon>delete_outline</mat-icon> Remove
-          </button>
-        </div>
-      </div>
+          <dl class="vehicle-specs">
+            <div><dt>Year</dt><dd>{{ v.year ?? '—' }}</dd></div>
+            <div><dt>Make</dt><dd>{{ v.make ?? '—' }}</dd></div>
+            <div><dt>Model</dt><dd>{{ v.model ?? '—' }}</dd></div>
+            <div><dt>Trim</dt><dd>{{ v.subModel ?? '—' }}</dd></div>
+            <div><dt>Engine</dt><dd>{{ v.engine ?? '—' }}</dd></div>
+            <div class="span-2"><dt>VIN</dt><dd class="mono">{{ v.vin ?? '—' }}</dd></div>
+          </dl>
+
+          <span class="vehicle-cta"><mat-icon>edit</mat-icon> Edit details</span>
+        </a>
+      } @else {
+        <!-- Empty garage slot: click to add a vehicle -->
+        <a class="vehicle-cell vehicle-cell--empty" routerLink="/my-vehicles/add">
+          <mat-icon>add</mat-icon>
+          <span class="empty-slot-label">Add a vehicle</span>
+        </a>
+      }
     }
   </div>
 </div>

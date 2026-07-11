@@ -1,4 +1,25 @@
 <nav class="sidebar" [class.collapsed]="collapsed" aria-label="Primary">
+  <!-- Toggle section: a distinct top bar with a "NAVIGATION" header (expanded)
+       and the collapse/expand toggle, separated from the nav list by a divider
+       (matches the reference). Hidden on the mobile drawer (always expanded). -->
+  <div class="sidebar-toggle-section">
+    @if (!collapsed) {
+      <span class="sidebar-nav-label">Navigation</span>
+    }
+    <button
+      type="button"
+      class="btn sidebar-toggle"
+      (click)="toggle.emit()"
+      [matTooltip]="collapsed ? 'Expand menu' : 'Collapse menu'"
+      matTooltipPosition="right"
+      [attr.aria-label]="collapsed ? 'Expand menu' : 'Collapse menu'"
+    >
+      <mat-icon>{{ collapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+    </button>
+  </div>
+
+  <hr class="sidebar-divider" />
+
   @for (item of items; track item.route) {
     <a
       class="nav-item"

@@ -2,10 +2,33 @@
 
 @include ht.history-table;
 
-:host { display: block; margin-top: 34px; }
+:host { display: block; margin-top: 8px; }
 
-// Vehicle dropdown sizing to match the search field height/row.
-.ht-vehicle-select { min-width: 190px; display: inline-block; }
+// ── Drives table: column widths only ──────────────────────────────────────────
+// Everything else (console look, 38px controls, prominent date, row rhythm,
+// centered numeric headers) is shared via the history-table mixin so all tabs
+// match. Drives-specific: fixed column widths + title ellipsis.
+.ht-title { font-size: 1.15rem; }
+
+.ht-table {
+  .td-title {
+    overflow: hidden; text-overflow: ellipsis;
+    small { overflow: hidden; text-overflow: ellipsis; }
+  }
+}
+
+// Fixed column widths on wide screens; below 820px the mixin switches the table
+// to auto layout + horizontal scroll, so the widths are scoped to wide only.
+@media (min-width: 821px) {
+  .ht-table {
+    table-layout: fixed;
+    // Keep the numeric readouts compact and let Session/Status absorb the slack.
+    colgroup col.c-date    { width: 9%; }
+    colgroup col.c-session { width: 26%; }
+    colgroup col.c-num     { width: 11%; }
+    colgroup col.c-status  { width: 14%; }
+  }
+}
 
 // ── Drive-specific: metric traces inside the drill-in dialog ──────────────────
 .sh-traces-head {

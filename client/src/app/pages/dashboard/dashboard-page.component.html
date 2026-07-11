@@ -1,33 +1,19 @@
 <div class="page">
   <div class="page-head">
-    <h1 class="page-title"><mat-icon>monitoring</mat-icon> Live Dashboard</h1>
+    <span class="page-eyebrow">— Live telemetry</span>
+    <h1 class="page-title">Live Dashboard</h1>
     <p class="page-subtitle">Real-time and historical readings streamed from your vehicle.</p>
   </div>
 
-  <!-- Premium / adapter status banner -->
-  <div class="adapter-banner">
-    <div class="adapter-status">
-      <span class="status-dot" [class.status-dot--live]="connected()"></span>
-      <span class="status-text">
-        {{ connected() ? 'AuraLink Adapter — Connected' : 'No adapter connected' }}
-      </span>
-      <span class="badge-premium"><mat-icon>workspace_premium</mat-icon> Premium</span>
-    </div>
-    <p class="adapter-note">
-      <mat-icon>info</mat-icon>
-      Demo data. Live telemetry requires the AuraLink Bluetooth adapter and a premium plan.
-    </p>
-  </div>
-
-  <!-- ── Live view toggle ────────────────────────────────────────────────────── -->
+  <!-- ── Live view tabs ──────────────────────────────────────────────────────── -->
   <div class="dash-toolbar">
-    <div class="view-seg" role="tablist" aria-label="Live view">
-      <button type="button" class="view-seg-btn" role="tab"
+    <div class="view-tabs" role="tablist" aria-label="Live view">
+      <button type="button" class="view-tab" role="tab"
               [class.active]="view() === 'gauges'" [attr.aria-selected]="view() === 'gauges'"
               (click)="setView('gauges')">
         <mat-icon>speed</mat-icon> Gauges
       </button>
-      <button type="button" class="view-seg-btn" role="tab"
+      <button type="button" class="view-tab" role="tab"
               [class.active]="view() === 'charts'" [attr.aria-selected]="view() === 'charts'"
               (click)="setView('charts')">
         <mat-icon>show_chart</mat-icon> Line graphs
@@ -40,29 +26,29 @@
   @if (view() === 'gauges') {
   <section class="gauges">
     @for (c of charts(); track trackByKey($index, c)) {
-      <div class="gauge-card" [class.gauge-card--warn]="c.isWarn"
-           [style.--metric-color]="'var(' + c.def.colorVar + ')'">
+      <div class="gauge-cell" [class]="'gauge-cell--' + c.health"
+           [style.--status-color]="'var(' + c.healthColorVar + ')'">
+        <div class="gauge-label">
+          <span class="gauge-eyebrow">
+            <mat-icon>{{ c.def.icon }}</mat-icon>
+            {{ c.def.label }}
+          </span>
+          <span class="gauge-badge">
+            <span class="gauge-badge-dot"></span>{{ c.healthLabel }}
+          </span>
+        </div>
         <div class="gauge-svg-wrap">
-          <svg viewBox="0 0 100 100" class="gauge-svg" aria-hidden="true">
-            <!-- Track -->
+          <svg viewBox="0 0 100 58" class="gauge-svg" aria-hidden="true">
+            <!-- Track (180° semicircle) -->
             <path [attr.d]="gaugeTrackPath" class="gauge-track" fill="none" />
-            <!-- Value arc -->
+            <!-- Value arc, colored by health status -->
             <path [attr.d]="gaugeArc(c.gaugeFrac)" class="gauge-value" fill="none"
-                  [style.stroke]="c.isWarn ? 'var(--obd-red)' : 'var(--metric-color)'" />
+                  [style.stroke]="'var(--status-color)'" />
           </svg>
           <div class="gauge-center">
-            <span class="gauge-value-num" [class.gauge-value-num--warn]="c.isWarn">
-              {{ format(c.current, c.def) }}
-            </span>
+            <span class="gauge-value-num">{{ format(c.current, c.def) }}</span>
             <span class="gauge-unit">{{ c.def.unit }}</span>
           </div>
-        </div>
-        <div class="gauge-label">
-          <mat-icon [style.color]="'var(' + c.def.colorVar + ')'">{{ c.def.icon }}</mat-icon>
-          {{ c.def.label }}
-          @if (c.isWarn) {
-            <mat-icon class="warn-icon" matTooltip="Reading outside the healthy range">warning</mat-icon>
-          }
         </div>
       </div>
     }
@@ -73,40 +59,43 @@
   @if (view() === 'charts') {
   <section class="charts">
     @for (c of charts(); track trackByKey($index, c)) {
-      <div class="chart-card" [style.--metric-color]="'var(' + c.def.colorVar + ')'">
+      <div class="chart-cell" [style.--metric-color]="'var(' + c.def.colorVar + ')'">
         <div class="chart-head">
-          <div class="chart-title">
+          <span class="chart-eyebrow">
             <mat-icon [style.color]="'var(' + c.def.colorVar + ')'">{{ c.def.icon }}</mat-icon>
             {{ c.def.label }}
-          </div>
-          <div class="chart-current" [class.chart-current--warn]="c.isWarn">
-            {{ format(c.current, c.def) }} <span class="chart-current-unit">{{ c.def.unit }}</span>
-          </div>
+          </span>
+          <span class="chart-current" [class.chart-current--warn]="c.isWarn">
+            {{ format(c.current, c.def) }}<span class="chart-current-unit">{{ c.def.unit }}</span>
+          </span>
         </div>
 
         <div class="chart-plot">
+          <!-- Dotted y-axis gridlines + value labels, drawn in the plot's own
+               coordinate space so strokes stay crisp (labels are HTML overlays). -->
+          @for (t of c.ticks; track $index) {
+            <span class="axis-label" [style.top.%]="(t.y / 120) * 100">{{ t.label }}</span>
+          }
           <svg [attr.viewBox]="'0 0 320 120'" preserveAspectRatio="none" class="chart-svg" aria-hidden="true">
             <defs>
               <linearGradient [attr.id]="'grad-' + c.def.key" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" [style.stop-color]="'var(' + c.def.colorVar + ')'" stop-opacity="0.28" />
+                <stop offset="0%" [style.stop-color]="'var(' + c.def.colorVar + ')'" stop-opacity="0.18" />
                 <stop offset="100%" [style.stop-color]="'var(' + c.def.colorVar + ')'" stop-opacity="0" />
               </linearGradient>
             </defs>
-            <!-- Recessive gridlines (thirds) -->
-            <line x1="6" y1="40" x2="314" y2="40" class="grid-line" />
-            <line x1="6" y1="80" x2="314" y2="80" class="grid-line" />
+            <!-- Dotted horizontal gridlines at each tick -->
+            @for (t of c.ticks; track $index) {
+              <line x1="0" [attr.y1]="t.y" x2="320" [attr.y2]="t.y" class="grid-line" />
+            }
             <!-- Area fill -->
             <path [attr.d]="c.areaPath" [attr.fill]="'url(#grad-' + c.def.key + ')'" />
             <!-- Line -->
             <path [attr.d]="c.linePath" fill="none" class="chart-line"
                   [style.stroke]="'var(' + c.def.colorVar + ')'" />
             <!-- Last-point marker -->
-            <circle [attr.cx]="c.lastX" [attr.cy]="c.lastY" r="3" class="chart-dot"
+            <circle [attr.cx]="c.lastX" [attr.cy]="c.lastY" r="2.5" class="chart-dot"
                     [style.fill]="'var(' + c.def.colorVar + ')'" />
           </svg>
-          <!-- Y-axis min/max labels -->
-          <span class="axis-label axis-label--max">{{ format(c.yMax, c.def) }}</span>
-          <span class="axis-label axis-label--min">{{ format(c.yMin, c.def) }}</span>
         </div>
       </div>
     }

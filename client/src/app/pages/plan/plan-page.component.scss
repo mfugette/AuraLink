@@ -203,10 +203,14 @@
   &:hover:not(:disabled) { background: var(--obd-surface-4); }
 
   &--primary {
-    background: var(--obd-blue);
+    background: color-mix(in srgb, var(--obd-blue) 12%, transparent);
     border-color: var(--obd-blue);
-    color: #fff;
-    &:hover:not(:disabled) { filter: brightness(1.08); }
+    color: var(--obd-blue);
+    font-family: var(--obd-font-mono);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    &:hover:not(:disabled) { background: color-mix(in srgb, var(--obd-blue) 20%, transparent); }
   }
 
   &:disabled {
@@ -337,10 +341,14 @@
   &:hover { background: var(--obd-surface-4); }
 
   &--primary {
-    background: var(--obd-blue);
+    background: color-mix(in srgb, var(--obd-blue) 12%, transparent);
     border-color: var(--obd-blue);
-    color: #fff;
-    &:hover { filter: brightness(1.08); }
+    color: var(--obd-blue);
+    font-family: var(--obd-font-mono);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    &:hover { background: color-mix(in srgb, var(--obd-blue) 20%, transparent); }
   }
 }
 

@@ -14,7 +14,22 @@
   .ht-sub { font-size: 0.82rem; color: var(--obd-text-muted); }
 
   // ── Filters row ─────────────────────────────────────────────────────────────
-  .ht-filters { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  // Search box, vehicle dropdown, and any toggle/add button all share the same
+  // 38px height and sit on one baseline.
+  .ht-filters { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  // On wide screens the controls flow inline as if they were direct children of
+  // the filters row; on narrow screens (below) this becomes its own flex row.
+  .ht-controls { display: contents; }
+
+  // The shared custom-select defaults to 48px tall + a rounded radius; pin it to
+  // the 38px row height and squared radius so it matches the search box/buttons.
+  .ht-vehicle-select { min-width: 190px; display: inline-block;
+    ::ng-deep .select-trigger {
+      min-height: 38px; height: 38px; padding: 0 12px;
+      border-radius: var(--obd-radius-sm); border-color: var(--obd-border);
+      background: var(--obd-surface); font-size: 0.88rem;
+    }
+  }
 
   .ht-search {
     position: relative; flex: 1; min-width: 180px; display: flex; align-items: center;
@@ -46,11 +61,15 @@
     }
   }
 
+  // Outline accent action (moved away from solid fill; matches .btn-action).
   .ht-add {
     height: 38px; padding: 0 16px; border-radius: var(--obd-radius-sm); gap: 6px;
-    background: var(--obd-blue); color: #fff; font-weight: 650; font-size: 0.88rem; display: inline-flex; align-items: center;
+    background: transparent; border: 1px solid color-mix(in srgb, var(--obd-blue) 55%, transparent);
+    color: var(--obd-blue); font-family: var(--obd-font-mono); font-weight: 700; font-size: 0.76rem;
+    text-transform: uppercase; letter-spacing: 0.06em; display: inline-flex; align-items: center;
+    transition: background var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
     mat-icon { font-size: 18px; width: 18px; height: 18px; }
-    &:hover { filter: brightness(1.06); }
+    &:hover { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 14%, transparent); }
   }
 
   .ht-summary {
@@ -59,32 +78,38 @@
   }
 
   // ── Table (desktop) ─────────────────────────────────────────────────────────
-  .ht-wrap { border: 1px solid var(--obd-border); border-radius: var(--obd-radius); overflow: hidden; background: var(--obd-surface); }
+  // Instrument-console readout: no surrounding card, rows divided by full-bleed
+  // hairlines, mono tracked-out headers. Numeric headers center over their
+  // (right-aligned) data column.
+  .ht-wrap { border: 0; border-radius: 0; overflow: visible; background: transparent; }
 
   .ht-table {
     width: 100%; border-collapse: collapse; font-size: 0.88rem;
 
     thead th {
-      text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;
-      color: var(--obd-text-muted); font-weight: 600; padding: 11px 14px; white-space: nowrap;
-      background: var(--obd-surface-2); border-bottom: 1px solid var(--obd-border);
+      text-align: left; font-family: var(--obd-font-mono); font-size: 0.76rem;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--obd-text-muted); font-weight: 600; padding: 9px 14px 11px; white-space: nowrap;
+      background: transparent; border-bottom: 1px solid var(--obd-border-strong);
     }
-    th.num { text-align: right; }
+    th.num { text-align: center; }
     th.sortable { cursor: pointer; user-select: none; }
     th.sortable:hover { color: var(--obd-text-dim); }
     .ht-arr { font-size: 14px; width: 14px; height: 14px; vertical-align: middle; color: var(--obd-blue); }
 
     tbody tr {
       cursor: pointer; border-bottom: 1px solid var(--obd-border); transition: background var(--obd-dur-fast) var(--obd-ease);
-      &:last-child { border-bottom: 0; }
+      &:last-child { border-bottom: 1px solid var(--obd-border); }
       &:hover { background: var(--obd-surface-2); }
       &:focus-visible { outline: 2px solid var(--obd-blue); outline-offset: -2px; }
       &.warn { box-shadow: inset 3px 0 0 var(--obd-red); }
     }
-    td { padding: 12px 14px; vertical-align: middle; color: var(--obd-text); }
-    td.num { text-align: right; font-variant-numeric: tabular-nums; }
-    .td-primary { font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums;
-      small { display: block; color: var(--obd-text-muted); font-weight: 400; font-size: 0.72rem; } }
+    td { padding: 14px 14px; vertical-align: middle; color: var(--obd-text); }
+    td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+    // Date is the row's anchor: prominent leftmost readout, matching the Drives
+    // tab across every history table.
+    .td-primary { font-size: 1rem; font-weight: 700; white-space: nowrap; color: var(--obd-text); font-variant-numeric: tabular-nums;
+      small { display: block; margin-top: 2px; color: var(--obd-text-muted); font-weight: 400; font-size: 0.72rem; font-family: var(--obd-font-mono); letter-spacing: 0.04em; } }
     .td-title { font-weight: 600;
       small { display: block; color: var(--obd-text-muted); font-weight: 400; font-size: 0.76rem; } }
     .cell-warn { color: var(--obd-red); }
@@ -112,39 +137,29 @@
   }
 
   .ht-retention {
-    text-align: center; font-size: 0.8rem; color: var(--obd-text-muted); padding: 12px; margin-top: 12px;
-    border: 1px dashed var(--obd-border); border-radius: var(--obd-radius-sm);
+    text-align: right; font-family: var(--obd-font-mono); font-size: 0.72rem; letter-spacing: 0.04em;
+    color: var(--obd-text-muted); padding: 13px 14px 0; margin-top: 0;
+    border: 0; border-top: 1px solid var(--obd-border); border-radius: 0;
   }
 
-  // ── Card fallback (mobile) ────────────────────────────────────────────────────
+  // The mobile card layout is retired — the console table is the single, always-
+  // consistent presentation. When the viewport is too narrow for all columns,
+  // the table scrolls horizontally inside its wrapper rather than reverting to
+  // a different (rounded, pill-based) card style.
   .ht-cards { display: none; }
 
-  @media (max-width: 720px) {
-    .ht-table { display: none; }
-    .ht-wrap { border: 0; background: transparent; overflow: visible; }
-    .ht-cards { display: flex; flex-direction: column; gap: 10px; }
+  // Below this width the columns get too tight, so the table scrolls sideways
+  // (keeping the console styling) and the filters stack.
+  @media (max-width: 820px) {
+    .ht-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .ht-table { min-width: 720px; table-layout: auto; }
 
-    .ht-card {
-      background: var(--obd-surface); border: 1px solid var(--obd-border); border-radius: var(--obd-radius);
-      padding: 14px 16px; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; text-align: left; width: 100%;
-      &.warn { border-left: 3px solid var(--obd-red); }
-      &:focus-visible { outline: 2px solid var(--obd-blue); outline-offset: 2px; }
-    }
-    .ht-card-badge {
-      grid-row: span 2; width: 46px; height: 46px; border-radius: 10px; background: var(--obd-surface-3);
-      display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--obd-text-dim);
-      .d { font-size: 1.15rem; font-weight: 700; line-height: 1; color: var(--obd-text); }
-      .m { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--obd-text-muted); }
-      mat-icon { font-size: 22px; width: 22px; height: 22px; }
-    }
-    .ht-card-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .ht-card-title { font-weight: 650; font-size: 0.95rem; color: var(--obd-text); }
-    .ht-card-meta { font-size: 0.78rem; color: var(--obd-text-muted); font-variant-numeric: tabular-nums; }
-    .ht-card-stats {
-      grid-column: 1 / -1; display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.78rem; color: var(--obd-text-dim); margin-top: 2px;
-      b { color: var(--obd-text); font-weight: 600; font-variant-numeric: tabular-nums; }
-      .cell-warn { color: var(--obd-red); }
-    }
+    // Filters stack: search spans the full width, controls sit on a row beneath.
+    .ht-filters { flex-direction: column; align-items: stretch; }
+    .ht-search { width: 100%; flex: 1 1 auto; }
+    .ht-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .ht-vehicle-select { flex: 1 1 auto; min-width: 0; }
+    .ht-toggle, .ht-add { flex: 0 0 auto; }
   }
 
   // ── Drill-in dialog ───────────────────────────────────────────────────────────

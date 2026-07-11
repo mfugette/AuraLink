@@ -99,8 +99,13 @@ export class IssueHistoryPageComponent implements OnInit {
   }
   // Severity is warn-flavored for high/critical.
   severeWarn(i: IssueRecord): boolean { return i.severity === 'high' || i.severity === 'critical'; }
+  // Date is split into a short primary line + a mono year sub-line so it reads
+  // like the Drives tab's date column (Mon DD / sub-line).
   dateLabel(iso: string): string {
-    return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
+  yearLabel(iso: string): string {
+    return new Date(iso).toLocaleDateString(undefined, { year: 'numeric' });
   }
 
   trackId = (_: number, i: IssueRecord) => i.id;

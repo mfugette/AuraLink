@@ -30,17 +30,19 @@ export class SidebarComponent {
   // Emitted when a nav item is activated — lets the mobile drawer close itself
   // on navigation (a no-op on desktop, where nothing listens).
   @Output() navigate = new EventEmitter<void>();
+  // Emitted by the rail's own collapse/expand toggle (top section).
+  @Output() toggle = new EventEmitter<void>();
 
   protected readonly tier = inject(TierService);
 
   readonly items: NavItem[] = [
-    { label: 'Home',          icon: 'home',           route: '/home' },
-    { label: 'Dashboard',     icon: 'monitoring',     route: '/dashboard',     feature: 'dashboard' },
-    { label: 'Aura',          icon: 'auto_awesome',   route: '/assistant' },
-    { label: 'Part Lookup',   icon: 'search',         route: '/part-lookup' },
-    { label: 'Find Help',     icon: 'near_me',        route: '/nearby',        feature: 'nearby' },
-    { label: 'My Vehicles',   icon: 'directions_car', route: '/my-vehicles' },
-    { label: 'History',       icon: 'history',        route: '/history' },
+    { label: 'Dashboard', icon: 'dashboard', route: '/home' },
+    { label: 'Aura', icon: 'auto_awesome', route: '/assistant' },
+    { label: 'My Vehicles', icon: 'directions_car', route: '/my-vehicles' },
+    { label: 'Metrics', icon: 'bar_chart_4_bars', route: '/dashboard', feature: 'dashboard' },
+    { label: 'Part Lookup', icon: 'search', route: '/part-lookup' },
+    { label: 'Find Help', icon: 'near_me', route: '/nearby', feature: 'nearby' },
+    { label: 'History', icon: 'history', route: '/history' },
   ];
 
   // A gated item the current tier hasn't unlocked — render a lock hint.

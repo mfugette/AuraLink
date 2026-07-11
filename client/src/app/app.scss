@@ -4,9 +4,21 @@
 }
 
 .app-shell {
-  min-height: 100vh;
+  // Lock the shell to the viewport so the header stays put and the body region
+  // owns its own scroll — pages that fit (e.g. the dashboard) show no scrollbar
+  // and keep the footer pinned at the bottom; only genuinely long pages scroll,
+  // and only within .app-main. On phones we release this (see below) so mobile
+  // can scroll the whole document normally.
+  height: 100vh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
+
+  @media (max-width: 520px) {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
 }
 
 // ── Top bar ───────────────────────────────────────────────────────────────────
@@ -47,77 +59,72 @@
   }
 }
 
+// Mobile-only: opens the overlay drawer. On desktop the rail's own toggle
+// section handles collapse/expand, so the header hamburger is hidden there.
 .hamburger {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  display: none;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--obd-radius-sm);
   color: var(--obd-text-dim);
   transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 24px; width: 24px; height: 24px; }
+  mat-icon { font-size: 22px; width: 22px; height: 22px; }
   &:hover { background: var(--obd-surface-3); color: var(--obd-text); }
+
+  @media (max-width: 520px) { display: inline-flex; align-items: center; justify-content: center; }
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   text-decoration: none;
-  margin-left: 0;
   // Let the wordmark truncate instead of overflowing into .header-right when
   // both sides' flex-basis get squeezed on very narrow screens.
   min-width: 0;
   overflow: hidden;
-  // Match the sidebar's own width transition so the two move in sync
-  // instead of the logo snapping instantly while the sidebar animates.
-  transition: margin-left var(--obd-dur) var(--obd-ease);
 
-  // When the sidebar is collapsed, its right border sits at
-  // --obd-sidebar-collapsed-width from the viewport edge (same edge the
-  // header starts from). Push the logo's left edge out to meet it exactly.
-  // Only applied in the collapsed state per design — left alone (natural
-  // position after the hamburger) when the sidebar is open.
-  .sidebar-collapsed & {
-    margin-left: calc(var(--obd-sidebar-collapsed-width) - 16px - 40px - 10px);
+  // Signed-in: fix the logo so its ICON is centered over the collapsed rail
+  // (--obd-sidebar-collapsed-width) and stays put whether the rail is expanded
+  // or collapsed — it never shifts on toggle. The header has 16px left padding;
+  // the logo icon is 24px wide, so to center its 24px within the rail:
+  //   margin-left = railWidth/2 − headerPad − iconWidth/2
+  &.logo--railed {
+    margin-left: calc(var(--obd-sidebar-collapsed-width) / 2 - 16px - 12px);
 
-    // On phones the sidebar is an out-of-flow overlay drawer, not an in-flow
-    // rail — there's no fixed edge to align the logo to, so keep it in its
-    // natural position right after the hamburger.
+    // On phones the rail is an out-of-flow overlay drawer with no fixed edge to
+    // align to — keep the logo in its natural position after the hamburger.
     @media (max-width: 520px) { margin-left: 0; }
   }
 }
 
 .logo-icon {
-  font-size: 26px;
-  width: 26px;
-  height: 26px;
-  background: linear-gradient(135deg, var(--obd-purple), var(--obd-blue));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  color: var(--obd-blue);
 
-  @media (max-width: 600px) { font-size: 22px; width: 22px; height: 22px; }
+  @media (max-width: 600px) { font-size: 21px; width: 21px; height: 21px; }
 }
 
 .logo-text {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
-  letter-spacing: -0.5px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
   color: var(--obd-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
 
-  @media (max-width: 600px) { font-size: 19px; }
-  @media (max-width: 340px) { font-size: 16px; }
+  @media (max-width: 600px) { font-size: 16px; }
+  @media (max-width: 340px) { font-size: 14px; }
 }
 
 .logo-text-accent {
-  background: linear-gradient(135deg, var(--obd-purple), var(--obd-blue));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--obd-blue);
 }
 
 .header-right {
@@ -128,70 +135,6 @@
   flex: 1;
   min-width: 0;
   justify-content: flex-end;
-}
-
-// TEMPORARY tier switcher (testing). Floats at the bottom-center of the screen:
-// a compact segmented pill (Test tier: Free | Plus | Pro) + a Plan-page shortcut.
-// Remove when real billing lands.
-.tier-switch {
-  position: fixed;
-  bottom: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 250;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 5px 6px 5px 12px;
-  border-radius: var(--obd-radius-pill);
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border-strong);
-  box-shadow: var(--obd-shadow);
-}
-
-.tier-switch-tag {
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--obd-text-muted);
-  margin-right: 4px;
-}
-
-.tier-switch-btn {
-  padding: 4px 11px;
-  border-radius: var(--obd-radius-pill);
-  background: transparent;
-  border: none;
-  color: var(--obd-text-dim);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: capitalize;
-  cursor: pointer;
-  transition: background var(--obd-dur-fast) var(--obd-ease),
-              color var(--obd-dur-fast) var(--obd-ease);
-
-  &:hover { color: var(--obd-text); }
-
-  &.active {
-    background: var(--obd-blue);
-    color: #fff;
-  }
-}
-
-.tier-switch-plans {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  margin-left: 2px;
-  border-radius: 50%;
-  color: var(--obd-text-dim);
-
-  &:hover { color: var(--obd-blue); background: var(--obd-surface-3); }
-
-  mat-icon { font-size: 17px; width: 17px; height: 17px; }
 }
 
 // The single <app-ai-search> instance physically lives in .header-right (so
@@ -220,15 +163,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--obd-radius-sm);
+  border: 1px solid var(--obd-border-strong);
+  background: var(--obd-surface-2);
   color: var(--obd-text-dim);
   text-decoration: none;
-  transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+  transition: background var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease),
+              border-color var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 22px; width: 22px; height: 22px; }
-  &:hover { background: var(--obd-surface-3); color: var(--obd-text); }
+  mat-icon { font-size: 20px; width: 20px; height: 20px; }
+  &:hover { background: var(--obd-surface-3); color: var(--obd-text); border-color: var(--obd-text-muted); }
 
   // Hidden on phones by default (kept for the OBD2 guide link) — the theme
   // toggle specifically opts back in via .theme-toggle below, sitting next
@@ -254,8 +201,8 @@
   top: var(--obd-header-height);
   align-self: flex-start;
   height: calc(100vh - var(--obd-header-height));
-  border-right: 1px solid var(--obd-border);
-  background: var(--obd-bg);
+  border-right: 1px solid var(--obd-border-strong);
+  background: var(--obd-surface);
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 50;
@@ -304,8 +251,14 @@
 .app-main {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  // Scroll happens here (not on the document) so the header stays fixed. Pages
+  // that fit the viewport show no scrollbar; long ones scroll within this region.
+  overflow-y: auto;
+
+  @media (max-width: 520px) { overflow-y: visible; }
 }
 
 // Global footer: pinned below content (margin-top:auto pushes it to the bottom
@@ -325,7 +278,12 @@
   @media (max-width: 600px) { padding: 14px 16px; }
 }
 
-.app-footer-brand { font-variant-numeric: tabular-nums; }
+.app-footer-brand {
+  font-family: var(--obd-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
 
 .app-footer-links {
   display: flex;

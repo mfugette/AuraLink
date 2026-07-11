@@ -105,32 +105,38 @@
   height: 44px;
   padding: 0 18px;
   border-radius: var(--obd-radius-sm);
-  font-weight: 650;
-  font-size: 0.92rem;
-  background: var(--obd-blue);
-  color: #fff;
+  font-family: var(--obd-font-mono);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: color-mix(in srgb, var(--obd-blue) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--obd-blue) 55%, transparent);
+  color: var(--obd-blue);
   display: inline-flex;
   align-items: center;
   gap: 8px;
   white-space: nowrap;
+  transition: background var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
 
   mat-icon { font-size: 19px; width: 19px; height: 19px; }
 
-  &:hover:not(:disabled) { filter: brightness(1.06); }
+  &:hover:not(:disabled) { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 20%, transparent); }
   &:disabled { opacity: 0.55; cursor: default; }
 }
 
 .acct-btn--ghost {
   background: var(--obd-surface-2);
-  color: var(--obd-text);
+  color: var(--obd-text-dim);
   border: 1px solid var(--obd-border-strong);
-  &:hover:not(:disabled) { background: var(--obd-surface-3); filter: none; }
+  &:hover:not(:disabled) { background: var(--obd-surface-3); color: var(--obd-text); }
 }
 
 .acct-btn--danger {
-  background: var(--obd-red);
-  color: #fff;
-  &:hover:not(:disabled) { filter: brightness(1.06); }
+  background: color-mix(in srgb, var(--obd-red) 10%, transparent);
+  border-color: color-mix(in srgb, var(--obd-red) 50%, transparent);
+  color: var(--obd-red);
+  &:hover:not(:disabled) { border-color: var(--obd-red); background: color-mix(in srgb, var(--obd-red) 16%, transparent); }
 }
 
 // ── Hints / notes ─────────────────────────────────────────────────────────────

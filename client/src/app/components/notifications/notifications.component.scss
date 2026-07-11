@@ -3,30 +3,35 @@
 // ── Bell trigger ──────────────────────────────────────────────────────────────
 .notif-bell {
   position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--obd-radius-sm);
+  border: 1px solid var(--obd-border-strong);
+  background: var(--obd-surface-2);
   display: grid;
   place-items: center;
   color: var(--obd-text-dim);
-  background: transparent;
+  transition: background var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease),
+              border-color var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 22px; width: 22px; height: 22px; }
+  mat-icon { font-size: 20px; width: 20px; height: 20px; }
 
-  &:hover, &.active { background: var(--obd-surface-3); color: var(--obd-text); }
+  &:hover, &.active { background: var(--obd-surface-3); color: var(--obd-text); border-color: var(--obd-text-muted); }
 }
 
 .notif-badge {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  min-width: 16px;
-  height: 16px;
+  top: 4px;
+  right: 4px;
+  min-width: 15px;
+  height: 15px;
   padding: 0 4px;
-  border-radius: 999px;
+  border-radius: var(--obd-radius-sm);
   background: var(--obd-red);
   color: #fff;
-  font-size: 0.62rem;
+  font-family: var(--obd-font-mono);
+  font-size: 0.6rem;
   font-weight: 700;
   display: grid;
   place-items: center;
@@ -34,27 +39,40 @@
 }
 
 // ── Pane (right slide-in) ─────────────────────────────────────────────────────
+// The pane sits below the top bar on desktop (flush with the header's bottom
+// edge, not covering it) — the scrim starts at --obd-header-height. On phones
+// it goes full-height (top: 0) since the mobile top bar is more compact and the
+// pane takes the whole screen there.
 .notif-scrim {
   position: fixed;
-  inset: 0;
+  top: var(--obd-header-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 320;
   display: flex;
   justify-content: flex-end;
   background: var(--obd-overlay-scrim, rgba(0, 0, 0, 0.45));
   backdrop-filter: blur(2px);
   animation: notif-fade 0.16s var(--obd-ease) both;
+
+  @media (max-width: 520px) { top: 0; }
 }
 
 .notif-pane {
   width: 100%;
-  max-width: 420px;
+  max-width: 400px;
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--obd-bg, var(--obd-surface));
+  background: var(--obd-surface);
   border-left: 1px solid var(--obd-border-strong);
-  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.3);
-  animation: notif-slide 0.22s var(--obd-ease-spring) both;
+  // Top border only on desktop, where the pane meets the header's bottom edge.
+  border-top: 1px solid var(--obd-border-strong);
+  box-shadow: var(--obd-shadow-lg);
+  animation: notif-slide 0.22s var(--obd-ease) both;
+
+  @media (max-width: 520px) { border-top: none; }
 }
 
 .notif-head {
@@ -62,28 +80,124 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 16px 18px;
-  border-bottom: 1px solid var(--obd-border);
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--obd-border-strong);
 
-  h2 { margin: 0; font-size: 1.05rem; color: var(--obd-text); }
+  h2 {
+    margin: 0;
+    font-family: var(--obd-font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--obd-text);
+  }
 }
+.notif-head-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .notif-head-actions { display: flex; align-items: center; gap: 6px; }
 
-.notif-txtbtn {
-  background: transparent;
-  border: 0;
-  color: var(--obd-blue);
-  font-size: 0.8rem;
-  font-weight: 600;
+// Leading collapse chevron in a bordered box (the reference's panel toggle).
+.notif-collapse {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--obd-radius-sm);
+  border: 1px solid var(--obd-border-strong);
+  background: var(--obd-surface-2);
+  color: var(--obd-text-dim);
+  display: grid;
+  place-items: center;
   cursor: pointer;
-  padding: 6px 8px;
-  border-radius: 7px;
-  &:hover { background: var(--obd-surface-2); }
+  transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
+  mat-icon { font-size: 19px; width: 19px; height: 19px; }
+  &:hover { background: var(--obd-surface-3); color: var(--obd-text); }
 }
+
+// ── Search box ─────────────────────────────────────────────────────────────────
+.notif-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 14px 0;
+  padding: 0 10px;
+  height: 38px;
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-sm);
+  background: var(--obd-surface-2);
+  transition: border-color var(--obd-dur-fast) var(--obd-ease);
+
+  &:focus-within { border-color: var(--obd-blue); }
+
+  > mat-icon { flex-shrink: 0; font-size: 18px; width: 18px; height: 18px; color: var(--obd-text-muted); }
+}
+.notif-search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--obd-text);
+  font-family: var(--obd-font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+  &::placeholder { color: var(--obd-text-muted); }
+}
+.notif-search-clear {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: transparent;
+  color: var(--obd-text-muted);
+  border-radius: var(--obd-radius-sm);
+  cursor: pointer;
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  &:hover { background: var(--obd-surface-3); color: var(--obd-text); }
+}
+
+// ── Selection / filter row (N OF N SHOWN — All / Unread) ───────────────────────
+.notif-selrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 15px 8px;
+}
+.notif-selcount {
+  font-family: var(--obd-font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--obd-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.notif-selfilters { display: flex; gap: 12px; }
+.notif-selbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--obd-font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--obd-text-muted);
+  transition: color var(--obd-dur-fast) var(--obd-ease);
+  &.on { color: var(--obd-blue); }
+  &:hover:not(.on) { color: var(--obd-text); }
+}
+.notif-selbtn-count { font-variant-numeric: tabular-nums; opacity: 0.9; }
+
 .notif-icon-btn, .notif-x {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--obd-radius-sm);
   display: grid;
   place-items: center;
   border: 1px solid transparent;
@@ -91,32 +205,63 @@
   color: var(--obd-text-dim);
   cursor: pointer;
   mat-icon { font-size: 19px; width: 19px; height: 19px; }
-  &:hover { background: var(--obd-surface-2); color: var(--obd-text); }
+  &:hover { background: var(--obd-surface-3); color: var(--obd-text); }
 }
-.notif-x { border-color: var(--obd-border); background: var(--obd-surface); }
+.notif-x { border-color: var(--obd-border-strong); background: var(--obd-surface-2); }
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
 .notif-tabs { display: flex; gap: 4px; padding: 10px 14px 4px; }
 .notif-tab {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   background: transparent;
-  border: 0;
+  border: 1px solid transparent;
   color: var(--obd-text-dim);
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   padding: 6px 12px;
-  border-radius: 999px;
+  border-radius: var(--obd-radius-sm);
   cursor: pointer;
   mat-icon { font-size: 18px; width: 18px; height: 18px; }
-  &.on { background: var(--obd-surface-2); color: var(--obd-text); }
+  &.on { background: var(--obd-surface-3); border-color: var(--obd-border-strong); color: var(--obd-text); }
   &:hover:not(.on) { color: var(--obd-text); }
 }
-.notif-tab-count { font-size: 0.72rem; opacity: 0.8; }
+.notif-tab-count { font-family: var(--obd-font-mono); font-size: 0.7rem; opacity: 0.85; }
 
 // ── List ──────────────────────────────────────────────────────────────────────
-.notif-body { flex: 1; overflow-y: auto; padding: 8px 12px 20px; }
+.notif-body { flex: 1; overflow-y: auto; padding: 4px 12px 12px; }
+
+// ── Bottom action bar (mirrors the reference's APPLY bar) ──────────────────────
+.notif-footer {
+  flex-shrink: 0;
+  padding: 12px 14px;
+  border-top: 1px solid var(--obd-border-strong);
+}
+.notif-apply {
+  width: 100%;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--obd-blue);
+  border-radius: var(--obd-radius-sm);
+  background: transparent;
+  color: var(--obd-blue);
+  font-family: var(--obd-font-mono);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  &:hover:not(:disabled) { background: color-mix(in srgb, var(--obd-blue) 12%, transparent); }
+  &:disabled { opacity: 0.4; cursor: default; }
+}
 
 .notif-empty {
   display: flex;
@@ -129,64 +274,101 @@
   mat-icon { font-size: 30px; width: 30px; height: 30px; opacity: 0.7; }
 }
 
+// Row: checkbox | title + category | status badge + time. Compact, with a
+// hairline divider between rows (the reference's list rhythm).
 .notif-item {
+  width: 100%;
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 2px 12px;
-  padding: 12px 10px;
-  border-radius: var(--obd-radius-sm);
+  align-items: center;
+  gap: 12px;
+  padding: 12px 8px;
+  border: none;
+  background: transparent;
+  text-align: left;
   cursor: pointer;
   transition: background var(--obd-dur-fast) var(--obd-ease);
+
+  & + .notif-item { border-top: 1px solid var(--obd-border); }
+
   &:hover { background: var(--obd-surface-2); }
-  &.unread { background: color-mix(in srgb, var(--obd-blue) 7%, transparent); }
-  &.unread:hover { background: color-mix(in srgb, var(--obd-blue) 11%, transparent); }
 }
 
-.notif-item-ic {
-  grid-row: span 2;
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
+// Leading checkbox — empty box when read, filled accent w/ check when unread.
+.notif-item-check {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--obd-radius-sm);
+  border: 1px solid var(--obd-border-strong);
+  background: var(--obd-surface-2);
   display: grid;
   place-items: center;
-  margin-top: 2px;
-  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  color: #fff;
+  transition: background var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
 
-  &[data-cat='maintenance'] { background: color-mix(in srgb, var(--obd-blue) 18%, transparent); color: var(--obd-blue); }
-  &[data-cat='health'] { background: color-mix(in srgb, var(--obd-red) 18%, transparent); color: var(--obd-red); }
-  &[data-cat='billing'] { background: color-mix(in srgb, var(--obd-green) 18%, transparent); color: var(--obd-green); }
-  &[data-cat='aura'] { background: color-mix(in srgb, var(--obd-purple) 18%, transparent); color: var(--obd-purple); }
+  mat-icon { font-size: 14px; width: 14px; height: 14px; }
+
+  &.on { background: var(--obd-blue); border-color: var(--obd-blue); }
 }
 
-.notif-item-top { display: flex; align-items: center; gap: 8px; }
-.notif-item-title { font-weight: 620; font-size: 0.9rem; color: var(--obd-text); }
-.notif-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--obd-blue); flex-shrink: 0; }
-.notif-sms {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 0.6rem;
-  letter-spacing: 0.04em;
+.notif-item-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.notif-item-title {
+  font-weight: 650;
+  font-size: 0.9rem;
+  color: var(--obd-text);
+  letter-spacing: -0.01em;
+  // Keep titles to one crisp line — no long wrapping summaries.
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.notif-item-cat {
+  font-family: var(--obd-font-mono);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--obd-text-muted);
-  border: 1px solid var(--obd-border);
-  border-radius: 5px;
-  padding: 1px 5px;
-  mat-icon { font-size: 11px; width: 11px; height: 11px; }
 }
-.notif-item-time { grid-row: span 2; font-size: 0.72rem; color: var(--obd-text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.notif-item-body { font-size: 0.83rem; color: var(--obd-text-dim); line-height: 1.45; }
-.notif-item-cta { grid-column: 2 / -1; margin-top: 7px; }
-.notif-item-cta a {
-  display: inline-block;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--obd-blue);
-  text-decoration: none;
-  border: 1px solid color-mix(in srgb, var(--obd-blue) 40%, transparent);
-  border-radius: 7px;
-  padding: 5px 10px;
-  &:hover { background: color-mix(in srgb, var(--obd-blue) 12%, transparent); }
+
+.notif-item-side {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+}
+.notif-item-time {
+  font-family: var(--obd-font-mono);
+  font-size: 0.68rem;
+  color: var(--obd-text-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+// Status badge (replaces the reference's % metric) — small monospace chip,
+// toned by category.
+.notif-item-status {
+  font-family: var(--obd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: var(--obd-radius-sm);
+  border: 1px solid transparent;
+
+  &[data-tone='blue']   { color: var(--obd-blue);   background: color-mix(in srgb, var(--obd-blue) 12%, transparent);   border-color: color-mix(in srgb, var(--obd-blue) 35%, transparent); }
+  &[data-tone='red']    { color: var(--obd-red);    background: color-mix(in srgb, var(--obd-red) 12%, transparent);    border-color: color-mix(in srgb, var(--obd-red) 35%, transparent); }
+  &[data-tone='green']  { color: var(--obd-green);  background: color-mix(in srgb, var(--obd-green) 12%, transparent);  border-color: color-mix(in srgb, var(--obd-green) 35%, transparent); }
+  &[data-tone='purple'] { color: var(--obd-purple); background: color-mix(in srgb, var(--obd-purple) 12%, transparent); border-color: color-mix(in srgb, var(--obd-purple) 35%, transparent); }
 }
 
 // ── Settings (SMS prefs) ──────────────────────────────────────────────────────
@@ -195,14 +377,15 @@
 .notif-settings-desc { font-size: 0.82rem; color: var(--obd-text-dim); margin: 0 0 14px; line-height: 1.5; }
 
 .notif-pro {
-  font-size: 0.6rem;
-  letter-spacing: 0.05em;
+  font-family: var(--obd-font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--obd-purple), var(--obd-blue));
+  background: var(--obd-purple);
   color: #fff;
   padding: 2px 7px;
-  border-radius: 5px;
+  border-radius: var(--obd-radius-sm);
 }
 
 .notif-setrow {
@@ -217,7 +400,7 @@
   grid-row: span 2;
   width: 30px;
   height: 30px;
-  border-radius: 8px;
+  border-radius: var(--obd-radius-sm);
   display: grid;
   place-items: center;
   mat-icon { font-size: 17px; width: 17px; height: 17px; }

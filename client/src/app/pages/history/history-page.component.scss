@@ -1,11 +1,22 @@
 @use '../page-shell' as *;
+@use '../console-page' as console;
 
-// ── Tab bar ───────────────────────────────────────────────────────────────────
+// The History hub is on the shared instrument-console system: viewport-locked
+// shell, 44px toolbar seam (the tab bar), and the tab panel filling down to the
+// footer — same geometry as Dashboard / My Vehicles / Part Lookup / Find Help.
+:host { @include console.host; }
+.page { @include console.page; }
+.page-eyebrow { @include console.eyebrow; }
+.page-head { @include console.head; }
+
+// ── Tab bar: the shared console toolbar ───────────────────────────────────────
+// Tabs bottom-align so the active underline sits on the toolbar's bottom
+// hairline — the shared seam the tab panel sits flush against.
 .hist-tabs {
-  display: flex;
-  gap: 4px;
-  border-bottom: 1px solid var(--obd-border);
-  margin-bottom: 22px;
+  @include console.toolbar;
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 2px;
   overflow-x: auto;
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
@@ -14,34 +25,37 @@
 .hist-tab {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 11px 16px;
+  gap: 8px;
+  padding: 12px 16px;
   border: 0;
   background: transparent;
   color: var(--obd-text-dim);
-  font-size: 0.9rem;
+  font-family: var(--obd-font-mono);
+  font-size: 0.74rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   cursor: pointer;
   white-space: nowrap;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
   transition: color var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 19px; width: 19px; height: 19px; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
 
   &:hover { color: var(--obd-text); }
   &.active { color: var(--obd-blue); border-bottom-color: var(--obd-blue); }
 }
 
 .hist-tab-soon {
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--obd-text-muted);
   background: var(--obd-surface-3);
   padding: 2px 6px;
-  border-radius: 5px;
+  border-radius: var(--obd-radius-sm);
 }
 
 @media (max-width: 560px) {
@@ -54,7 +68,50 @@
 }
 
 // ── Panel ─────────────────────────────────────────────────────────────────────
-.hist-panel { min-height: 200px; }
+// Fills the remaining height (like the metric grids) and scrolls internally, so
+// the panel's top edge sits at the shared seam and the footer never moves. The
+// full-bleed table margins (below) overflow horizontally by design — clip that
+// axis, scroll only vertically.
+.hist-panel {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px 0 48px;
+
+  // Mobile: unlock, let the page scroll naturally (matches the metric grids).
+  @media (max-width: 720px) { flex: 0 0 auto; overflow: visible; }
+}
+
+// Full-bleed the data table (in every tab) out to both edges of the content
+// area — flush against the sidebar on the left and the viewport on the right —
+// while the tab's own header/filters keep the page gutter. The table lives
+// inside child components, so reach into it.
+$pad: 40px;
+.hist-panel ::ng-deep .ht-wrap,
+.hist-panel ::ng-deep .ht-retention {
+  margin-left: -#{$pad};
+  margin-right: -#{$pad};
+}
+.hist-panel ::ng-deep .ht-table td:first-child,
+.hist-panel ::ng-deep .ht-table th:first-child { padding-left: $pad; }
+.hist-panel ::ng-deep .ht-table td:last-child,
+.hist-panel ::ng-deep .ht-table th:last-child { padding-right: $pad; }
+.hist-panel ::ng-deep .ht-retention { padding-left: $pad; padding-right: $pad; }
+
+@media (max-width: 900px) {
+  $pad: 24px;
+  .hist-panel ::ng-deep .ht-wrap,
+  .hist-panel ::ng-deep .ht-retention { margin-left: -#{$pad}; margin-right: -#{$pad}; }
+  .hist-panel ::ng-deep .ht-table td:first-child,
+  .hist-panel ::ng-deep .ht-table th:first-child { padding-left: $pad; }
+  .hist-panel ::ng-deep .ht-table td:last-child,
+  .hist-panel ::ng-deep .ht-table th:last-child { padding-right: $pad; }
+  .hist-panel ::ng-deep .ht-retention { padding-left: $pad; padding-right: $pad; }
+}
+// Note: the table stays full-bleed and horizontally scrollable at every width
+// (the card fallback was retired), so the narrow-screen overrides above at 900px
+// / the base still apply — no card special-case needed here.
 
 // ── "Coming soon" placeholder ─────────────────────────────────────────────────
 .hist-soon {

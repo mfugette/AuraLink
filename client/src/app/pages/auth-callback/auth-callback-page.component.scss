@@ -29,9 +29,10 @@
 
 .cb-title {
   margin: 0;
-  font-size: 1.35rem;
-  font-weight: 800;
-  letter-spacing: -0.3px;
+  font-family: var(--obd-font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--obd-text);
 }
 
@@ -66,10 +67,16 @@
   padding: 0 22px;
   display: inline-flex;
   align-items: center;
-  border-radius: var(--obd-radius-pill);
-  background: var(--obd-blue);
-  color: #fff;
-  font-weight: 600;
+  border-radius: var(--obd-radius-sm);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--obd-blue) 55%, transparent);
+  color: var(--obd-blue);
+  font-family: var(--obd-font-mono);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transition: background var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
 
-  &:hover { background: #2f74e0; }
+  &:hover { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 14%, transparent); }
 }

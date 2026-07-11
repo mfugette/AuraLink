@@ -122,10 +122,14 @@
   mat-icon { font-size: 18px; width: 18px; height: 18px; }
 
   &--primary {
-    background: var(--obd-blue);
+    background: color-mix(in srgb, var(--obd-blue) 12%, transparent);
     border-color: var(--obd-blue);
-    color: #fff;
-    &:hover { filter: brightness(1.08); background: var(--obd-blue); }
+    color: var(--obd-blue);
+    font-family: var(--obd-font-mono);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    &:hover { background: color-mix(in srgb, var(--obd-blue) 20%, transparent); }
   }
 
   &--ghost {
