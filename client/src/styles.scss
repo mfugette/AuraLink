@@ -24,9 +24,12 @@ html {
       tertiary: mat.$orange-palette,
       theme-type: dark,
     ),
+    // Terminal-mono is the app-wide face (matches --obd-font-mono); keep the
+    // Material typography families in sync so Material components don't fall
+    // back to Inter/Roboto.
     typography: (
-      brand-family: 'Inter',
-      plain-family: 'Inter',
+      brand-family: 'JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+      plain-family: 'JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
     ),
     density: 0,
   ));
@@ -157,26 +160,23 @@ html, body {
 
 body {
   margin: 0;
-  font-family: 'Inter', 'Helvetica Neue', sans-serif;
+  // The terminal-mono face is now the app-wide default (matching the sidebar
+  // and the Aura console), not just an accent — the whole UI reads as an
+  // instrument readout. --obd-font-mono is the single source; changing it there
+  // moves everything.
+  font-family: var(--obd-font-mono);
   background-color: var(--obd-bg);
   color: var(--obd-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  letter-spacing: -0.011em;   // subtle optical tightening, à la SF/Google Sans
-  // Sharpen Inter: optical sizing on, and turn OFF the softer contextual
-  // alternates (`calt`) that give it its rounder, "bubbly" default look —
-  // yields harder, more mechanical glyph shapes closer to the reference face.
-  font-optical-sizing: auto;
-  font-feature-settings: 'calt' 0, 'liga' 1, 'cv05' 1, 'cv08' 1, 'ss01' 1;
+  letter-spacing: 0;   // mono is already evenly spaced; no optical tightening
 }
 
-// Headings read sharper with tighter tracking than body text — the larger the
-// type, the tighter it wants to sit. Applied broadly so every page (Hero, Aura,
-// dashboards) loses the soft, loosely-spaced feel.
+// Headings are terminal mono like the rest of the app — even-width glyphs, so
+// no negative tracking (that only suited the old Inter face).
 h1, h2, h3, .obd-section-title {
-  letter-spacing: -0.02em;
-  font-optical-sizing: auto;
+  letter-spacing: 0;
 }
 
 // ─── Scrollbar (Google/Material style: thin, borderless, translucent) ─────────
@@ -222,7 +222,7 @@ h1, h2, h3, .obd-section-title {
   align-items: center;
   gap: 8px;
 
-  mat-icon {
+  app-icon {
     color: var(--obd-blue);
     font-size: 20px;
     width: 20px;
@@ -305,7 +305,7 @@ h1, h2, h3, .obd-section-title {
               border-color var(--obd-dur-fast) var(--obd-ease),
               color var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  app-icon { font-size: 18px; width: 18px; height: 18px; }
 
   &:hover { border-color: var(--obd-text-muted); color: var(--obd-text); background: var(--obd-surface-2); }
 
@@ -359,7 +359,7 @@ h1, h2, h3, .obd-section-title {
   font-weight: 500;
   color: var(--obd-text-dim);
 
-  mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-text-muted); }
+  app-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-text-muted); }
   .req { color: var(--obd-blue); }
 }
 
@@ -384,7 +384,7 @@ h1, h2, h3, .obd-section-title {
   }
 
   // Leading/trailing icons inside the box.
-  > mat-icon {
+  > app-icon {
     flex-shrink: 0;
     font-size: 20px;
     width: 20px;

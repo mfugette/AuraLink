@@ -1,9 +1,9 @@
 <div class="panel-backdrop" (click)="close()">
   <div class="panel-modal" (click)="$event.stopPropagation()">
     <div class="panel-header">
-      <h3 class="panel-title"><mat-icon>settings</mat-icon> Settings</h3>
+      <h3 class="panel-title"><app-icon name="settings" /> Settings</h3>
       <button type="button" class="btn panel-close" (click)="close()" aria-label="Close">
-        <mat-icon>close</mat-icon>
+        <app-icon name="close" />
       </button>
     </div>
 
@@ -14,7 +14,7 @@
 
           <button type="button" class="btn setting-row" (click)="toggleNotifyEmail()">
             <div class="setting-row-text">
-              <mat-icon>email</mat-icon>
+              <app-icon name="email" />
               <span>Email me when a parts list is sent</span>
             </div>
             <span class="toggle" [class.on]="settings.notifyEmail"><span class="toggle-knob"></span></span>
@@ -22,7 +22,7 @@
 
           <button type="button" class="btn setting-row" (click)="toggleNotifySms()">
             <div class="setting-row-text">
-              <mat-icon>sms</mat-icon>
+              <app-icon name="sms" />
               <span>Text me when a parts list is sent</span>
             </div>
             <span class="toggle" [class.on]="settings.notifySms"><span class="toggle-knob"></span></span>
@@ -60,7 +60,7 @@
               [class.active]="!theme.isLight()"
               (click)="setTheme('dark')"
             >
-              <mat-icon>dark_mode</mat-icon> Dark
+              <app-icon name="dark_mode" /> Dark
             </button>
             <button
               type="button"
@@ -68,7 +68,7 @@
               [class.active]="theme.isLight()"
               (click)="setTheme('light')"
             >
-              <mat-icon>light_mode</mat-icon> Light
+              <app-icon name="light_mode" /> Light
             </button>
           </div>
         </div>
@@ -79,7 +79,7 @@
 
     <div class="panel-footer">
       @if (saved()) {
-        <span class="save-confirm"><mat-icon>check_circle</mat-icon> Saved</span>
+        <span class="save-confirm"><app-icon name="check_circle" /> Saved</span>
       }
       <button type="button" class="btn panel-cancel-btn" (click)="close()">Close</button>
     </div>

@@ -3,15 +3,14 @@ import {
   ViewContainerRef, ComponentRef, effect, inject, signal, Type,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
-import { AccountService } from '../../services/account.service';
+import { Router } from '@angular/router';import { AccountService } from '../../services/account.service';
 import { AuthService } from '../../services/auth.service';
 import { TierService } from '../../services/tier.service';
 import { Tier } from '../../models/tier.model';
 import { ProfilePanelComponent } from '../account-panels/profile-panel/profile-panel.component';
 import { VehiclesPanelComponent } from '../account-panels/vehicles-panel/vehicles-panel.component';
 import { SettingsPanelComponent } from '../account-panels/settings-panel/settings-panel.component';
+import { IconComponent } from '../shared/icon/icon.component';
 
 type AccountPanel = 'profile' | 'vehicles' | 'settings' | null;
 
@@ -21,7 +20,7 @@ type AccountPanel = 'profile' | 'vehicles' | 'settings' | null;
 @Component({
   selector: 'app-account-menu',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, IconComponent],
   templateUrl: './account-menu.component.html',
   styleUrl: './account-menu.component.scss',
 })

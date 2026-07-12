@@ -9,16 +9,19 @@
   <!-- Filters -->
   <div class="ht-filters">
     <div class="ht-search">
-      <mat-icon>search</mat-icon>
-      <input type="search" placeholder="Search sessions…"
-             [ngModel]="query()" (ngModelChange)="query.set($event)" autocomplete="off" />
+      <span class="ts-prompt">sessions<span class="ts-caret">$</span></span>
+      <input type="search" placeholder="filter…"
+             [ngModel]="query()" (ngModelChange)="query.set($event)" autocomplete="off" spellcheck="false" />
+      @if (query()) {
+        <button type="button" class="ts-clear" (click)="query.set('')" aria-label="Clear search"><app-icon name="close" /></button>
+      }
     </div>
     <div class="ht-controls">
       <app-custom-select class="ht-vehicle-select"
         [options]="vehicleOptions()" [value]="vehicleFilter()"
         (valueChange)="vehicleFilter.set($any($event))" icon="directions_car" />
       <button type="button" class="btn ht-toggle" [class.on]="warnOnly()" (click)="toggleWarn()">
-        <mat-icon>warning</mat-icon> Warnings only
+        <app-icon name="warning" /> Warnings only
       </button>
     </div>
   </div>
@@ -38,16 +41,16 @@
       <thead>
         <tr>
           <th class="sortable" (click)="sortBy('date')">Date
-            @if (arrow('date')) { <mat-icon class="ht-arr">{{ arrow('date') }}</mat-icon> }</th>
+            @if (arrow('date')) { <app-icon class="ht-arr" [name]="arrow('date')" /> }</th>
           <th>Session</th>
           <th class="num sortable" (click)="sortBy('duration')">Duration
-            @if (arrow('duration')) { <mat-icon class="ht-arr">{{ arrow('duration') }}</mat-icon> }</th>
+            @if (arrow('duration')) { <app-icon class="ht-arr" [name]="arrow('duration')" /> }</th>
           <th class="num sortable" (click)="sortBy('distance')">Distance
-            @if (arrow('distance')) { <mat-icon class="ht-arr">{{ arrow('distance') }}</mat-icon> }</th>
+            @if (arrow('distance')) { <app-icon class="ht-arr" [name]="arrow('distance')" /> }</th>
           <th class="num sortable" (click)="sortBy('rpm')">Max RPM
-            @if (arrow('rpm')) { <mat-icon class="ht-arr">{{ arrow('rpm') }}</mat-icon> }</th>
+            @if (arrow('rpm')) { <app-icon class="ht-arr" [name]="arrow('rpm')" /> }</th>
           <th class="num sortable" (click)="sortBy('coolant')">Peak coolant
-            @if (arrow('coolant')) { <mat-icon class="ht-arr">{{ arrow('coolant') }}</mat-icon> }</th>
+            @if (arrow('coolant')) { <app-icon class="ht-arr" [name]="arrow('coolant')" /> }</th>
           <th>Status</th>
         </tr>
       </thead>
@@ -62,9 +65,9 @@
             <td class="num" [class.cell-warn]="coolantWarn(s)">{{ peakCoolant(s) }}°F</td>
             <td>
               @if (s.warnLabel) {
-                <span class="ht-chip warn"><mat-icon>warning</mat-icon> {{ s.warnLabel }}</span>
+                <span class="ht-chip warn"><app-icon name="warning" /> {{ s.warnLabel }}</span>
               } @else {
-                <span class="ht-chip ok"><mat-icon>check</mat-icon> Nominal</span>
+                <span class="ht-chip ok"><app-icon name="check" /> Nominal</span>
               }
             </td>
           </tr>
@@ -79,9 +82,9 @@
           <div class="ht-card-top">
             <span class="ht-card-title">{{ title(s) }}</span>
             @if (s.warnLabel) {
-              <span class="ht-chip warn"><mat-icon>warning</mat-icon> {{ s.warnLabel }}</span>
+              <span class="ht-chip warn"><app-icon name="warning" /> {{ s.warnLabel }}</span>
             } @else {
-              <span class="ht-chip ok"><mat-icon>check</mat-icon> Nominal</span>
+              <span class="ht-chip ok"><app-icon name="check" /> Nominal</span>
             }
             <span class="ht-card-meta">{{ timeLabel(s) }} · {{ s.durationMin }} min · {{ s.distanceMi.toFixed(1) }} mi</span>
           </div>
@@ -113,12 +116,12 @@
           <h3 class="ht-dialog-title" id="sh-dialog-title">
             {{ title(s) }}
             @if (s.warnLabel) {
-              <span class="ht-chip warn"><mat-icon>warning</mat-icon> {{ s.warnLabel }}</span>
+              <span class="ht-chip warn"><app-icon name="warning" /> {{ s.warnLabel }}</span>
             }
           </h3>
           <p class="ht-dialog-when">{{ dateLabel(s) }} · {{ timeLabel(s) }} · {{ s.vehicleLabel }}</p>
         </div>
-        <button type="button" class="ht-x" (click)="close()" aria-label="Close"><mat-icon>close</mat-icon></button>
+        <button type="button" class="ht-x" (click)="close()" aria-label="Close"><app-icon name="close" /></button>
       </div>
 
       <div class="ht-tiles">
@@ -139,7 +142,7 @@
           <div class="sh-trace" [style.--metric-color]="'var(' + c.def.colorVar + ')'">
             <div class="sh-trace-head">
               <span class="sh-trace-title">
-                <mat-icon [style.color]="'var(' + c.def.colorVar + ')'">{{ c.def.icon }}</mat-icon>
+                <app-icon [style.color]="'var(' + c.def.colorVar + ')'" [name]="c.def.icon" />
                 {{ c.def.label }}
               </span>
               <span class="sh-trace-peak">{{ format(c.peak, c.def) }}<small>{{ c.def.unit }}</small></span>

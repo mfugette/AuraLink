@@ -8,47 +8,56 @@
 }
 
 // ── Compact top-bar trigger ─────────────────────────────────────────────────
+// A miniature shell prompt: mono, squared, hairline-ruled — echoes the Aura
+// terminal instead of a rounded search pill.
 .ai-trigger {
   display: flex;
   align-items: center;
   gap: 10px;
   width: 100%;
   height: 42px;
-  padding: 0 8px 0 16px;
-  background: var(--obd-surface-2);
+  padding: 0 8px 0 14px;
+  background: var(--obd-bg, var(--obd-surface));
   border: 1px solid var(--obd-border-strong);
-  border-radius: var(--obd-radius-pill);
+  border-radius: var(--obd-radius-sm);
   color: var(--obd-text-muted);
-  font: inherit;
-  font-size: 0.9rem;
+  font-family: var(--obd-font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
   cursor: pointer;
   text-align: left;
   transition: border-color var(--obd-dur-fast) var(--obd-ease),
-              background var(--obd-dur-fast) var(--obd-ease),
-              box-shadow var(--obd-dur-fast) var(--obd-ease);
+              background var(--obd-dur-fast) var(--obd-ease);
 
   &:hover {
     border-color: var(--obd-blue);
-    background: var(--obd-surface-3);
+    background: var(--obd-surface);
   }
 
-  > mat-icon {
-    flex-shrink: 0;
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-    color: var(--obd-blue);
-  }
-
-  // Icon-only on phones — text/kbd hint would be cramped, and tapping
-  // navigates straight to /assistant instead of opening the hero overlay.
+  // Icon-only on phones — the prompt/kbd hint would be cramped, and tapping
+  // navigates straight to /assistant instead of opening the terminal overlay.
   @media (max-width: 520px) {
     width: 42px;
     height: 42px;
     padding: 0;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: var(--obd-radius-sm);
   }
+}
+
+// "aura$" prompt prefix — green like the real shell prompt.
+.ai-trigger-prompt {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: var(--obd-green);
+  user-select: none;
+  white-space: nowrap;
+}
+.ai-trigger-caret { color: var(--obd-text-dim); margin-left: 2px; font-weight: 400; }
+
+// On phones the trigger collapses to an icon — show the prompt caret alone.
+@media (max-width: 520px) {
+  .ai-trigger-prompt { color: var(--obd-blue); }
 }
 
 .ai-trigger-text {
@@ -63,12 +72,12 @@
 
 .ai-trigger-kbd {
   flex-shrink: 0;
-  font-size: 0.68rem;
-  font-family: inherit;
+  font-family: var(--obd-font-mono);
+  font-size: 0.72rem;
   color: var(--obd-text-muted);
-  padding: 3px 8px;
+  padding: 2px 8px;
   border-radius: var(--obd-radius-sm);
-  background: var(--obd-surface-4);
+  background: var(--obd-surface-3);
   border: 1px solid var(--obd-border);
 
   @media (max-width: 520px) { display: none; }
@@ -102,154 +111,143 @@
   to   { opacity: 1; }
 }
 
+// The overlay panel is a terminal window: squared, hairline-framed, mono.
 .ai-panel {
   position: relative;
   width: 100%;
-  max-width: 680px;
+  max-width: 640px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
-  animation: ai-rise 0.32s var(--obd-ease-emphasized);
-}
-
-// In light mode the dark scrim would wash out the (now dark) panel text, so the
-// panel gets a real elevated card surface. That rule lives in global styles.scss
-// because :root is outside this component's encapsulated DOM (see .ai-panel--card).
-:host-context(:root[data-theme='light']) .ai-panel {
-  background: var(--obd-surface);
-  border: 1px solid var(--obd-border);
-  border-radius: var(--obd-radius-lg);
+  font-family: var(--obd-font-mono);
+  background: var(--obd-bg, var(--obd-surface));
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-sm);
   box-shadow: var(--obd-shadow-lg);
-  padding: 28px 26px;
-
-  // Pull the close button inside the padded card corner.
-  .ai-close { top: 10px; right: 10px; }
+  overflow: hidden;
+  animation: ai-rise 0.28s var(--obd-ease-emphasized);
 }
 
 @keyframes ai-rise {
-  from { opacity: 0; transform: translateY(24px); }
+  from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.ai-close {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  color: var(--obd-text-dim);
-  background: var(--obd-surface-3);
-  border: 1px solid var(--obd-border);
-  transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
-
-  &:hover { background: var(--obd-surface-4); color: var(--obd-text); }
-
-  @media (max-width: 720px) { top: 0; right: 4px; }
-}
-
-.ai-hero {
+// ── Window chrome (matches .term-bar on the Aura page) ───────────────────────
+.ai-bar {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  text-align: center;
-  gap: 10px;
+  gap: 12px;
+  flex-shrink: 0;
+  height: 40px;
+  padding: 0 12px 0 16px;
+  border-bottom: 1px solid var(--obd-border-strong);
+  background: var(--obd-surface);
 }
 
-.ai-badge {
+.ai-dots {
+  display: inline-flex;
+  gap: 6px;
+  i {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--obd-surface-4);
+  }
+  i:nth-child(1) { background: color-mix(in srgb, var(--obd-red) 60%, transparent); }
+  i:nth-child(2) { background: color-mix(in srgb, var(--obd-yellow) 60%, transparent); }
+  i:nth-child(3) { background: color-mix(in srgb, var(--obd-green) 60%, transparent); }
+}
+
+.ai-bar-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.76rem;
+  letter-spacing: 0.02em;
+  color: var(--obd-text-muted);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ai-close {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 14px;
-  border-radius: 999px;
-  background: var(--obd-blue-dim);
-  color: var(--obd-blue);
-  font-size: 0.78rem;
-  font-weight: 600;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--obd-radius-sm);
+  color: var(--obd-text-dim);
+  background: transparent;
+  border: 1px solid transparent;
+  transition: background var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease),
+              border-color var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  app-icon { font-size: 18px; width: 18px; height: 18px; }
+
+  &:hover { background: var(--obd-surface-3); color: var(--obd-text); border-color: var(--obd-border-strong); }
 }
 
-.ai-heading {
-  margin: 0;
-  font-size: clamp(1.5rem, 4vw, 2.1rem);
-  font-weight: 800;
-  letter-spacing: -0.5px;
+// ── Console body ─────────────────────────────────────────────────────────────
+.ai-body {
+  padding: 18px 20px 20px;
+  font-size: 0.86rem;
+  line-height: 1.65;
   color: var(--obd-text);
 }
 
-.ai-sub {
-  margin: 0;
-  font-size: 0.95rem;
+// Boot banner — printed like Aura's shell greeting.
+.ai-boot {
   color: var(--obd-text-dim);
+  margin-bottom: 16px;
 }
+.ai-mark { color: color-mix(in srgb, var(--obd-blue) 70%, var(--obd-text-muted)); font-weight: 700; }
 
-// ── Suggestion chips ────────────────────────────────────────────────────────
+// ── Suggestion chips (squared, mono — runnable commands) ─────────────────────
 .ai-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
 .ai-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 10px 16px;
-  border-radius: var(--obd-radius-pill);
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border-strong);
+  padding: 5px 10px;
+  border: 1px solid var(--obd-border);
+  border-radius: var(--obd-radius-sm);
+  background: transparent;
   color: var(--obd-text-dim);
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-family: var(--obd-font-mono);
+  font-size: 0.74rem;
   transition: border-color var(--obd-dur-fast) var(--obd-ease),
-              color var(--obd-dur-fast) var(--obd-ease),
-              background var(--obd-dur-fast) var(--obd-ease),
-              transform var(--obd-dur-fast) var(--obd-ease-spring);
+              color var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); }
-
-  &:hover {
-    border-color: var(--obd-blue);
-    color: var(--obd-text);
-    background: var(--obd-surface-3);
-    transform: translateY(-1px);
-  }
+  &:hover { border-color: var(--obd-blue); color: var(--obd-blue); }
 }
 
-// ── Input ───────────────────────────────────────────────────────────────────
+// ── Live prompt line ─────────────────────────────────────────────────────────
 .ai-input-row {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.ai-input-control {
-  display: flex;
   align-items: center;
-  gap: 10px;
-  height: 56px;
-  padding: 0 8px 0 18px;
-  background: var(--obd-surface-2);
+  gap: 8px;
+  height: 40px;
+  padding: 0 6px 0 12px;
+  background: var(--obd-surface);
   border: 1px solid var(--obd-border-strong);
-  border-radius: var(--obd-radius-pill);
-  transition: border-color var(--obd-dur-fast) var(--obd-ease),
-              box-shadow var(--obd-dur-fast) var(--obd-ease);
+  border-radius: var(--obd-radius-sm);
+  transition: border-color var(--obd-dur-fast) var(--obd-ease);
 
-  &:focus-within {
-    border-color: var(--obd-blue);
-    box-shadow: 0 0 0 3px var(--obd-blue-dim);
-  }
-
-  > mat-icon {
-    flex-shrink: 0;
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-    color: var(--obd-blue);
-  }
+  &:focus-within { border-color: var(--obd-blue); }
 }
+
+.ai-prompt {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: var(--obd-green);
+  user-select: none;
+  white-space: nowrap;
+}
+.ai-caret { color: var(--obd-text-dim); margin-left: 2px; font-weight: 400; }
 
 .ai-input {
   flex: 1;
@@ -259,36 +257,42 @@
   border: none;
   outline: none;
   color: var(--obd-text);
-  font: inherit;
-  font-size: 1rem;
+  font-family: var(--obd-font-mono);
+  font-size: 0.86rem;
+  caret-color: var(--obd-text-dim);
+  caret-shape: block;
 
   &::placeholder { color: var(--obd-text-muted); }
 }
 
 .ai-send {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
   border-radius: var(--obd-radius-sm);
-  background: color-mix(in srgb, var(--obd-blue) 14%, transparent);
-  border: 1px solid color-mix(in srgb, var(--obd-blue) 45%, transparent);
+  background: transparent;
+  border: 1px solid var(--obd-border);
   color: var(--obd-blue);
   transition: background var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 20px; width: 20px; height: 20px; }
+  app-icon { font-size: 18px; width: 18px; height: 18px; }
 
-  &:hover:not(:disabled) { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 22%, transparent); }
-  &:disabled { opacity: 0.4; }
+  &:hover:not(:disabled) { border-color: var(--obd-blue); }
+  &:disabled { opacity: 0.35; }
 }
 
+// ── Status footer ─────────────────────────────────────────────────────────────
 .ai-disclaimer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+  flex-shrink: 0;
   margin: 0;
-  font-size: 0.75rem;
+  padding: 10px 20px;
+  border-top: 1px solid var(--obd-border-strong);
+  background: var(--obd-surface);
+  font-family: var(--obd-font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.01em;
   color: var(--obd-text-muted);
-
-  mat-icon { font-size: 14px; width: 14px; height: 14px; color: var(--obd-blue); opacity: 0.7; }
 }

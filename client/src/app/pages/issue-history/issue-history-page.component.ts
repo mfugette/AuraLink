@@ -1,10 +1,9 @@
 import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { AccountService } from '../../services/account.service';
+import { FormsModule } from '@angular/forms';import { AccountService } from '../../services/account.service';
 import { CustomSelectComponent, SelectOption } from '../../components/shared/custom-select/custom-select.component';
 import { ISSUE_HISTORY, IssueRecord } from '../../data/issue-history';
+import { IconComponent } from '../../components/shared/icon/icon.component';
 
 type SortKey = 'date' | 'severity' | 'status';
 
@@ -15,7 +14,7 @@ type SortKey = 'date' | 'severity' | 'status';
 @Component({
   selector: 'app-issue-history-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, CustomSelectComponent],
+  imports: [CommonModule, FormsModule, IconComponent, CustomSelectComponent],
   templateUrl: './issue-history-page.component.html',
   styleUrl: './issue-history-page.component.scss',
 })

@@ -2,9 +2,7 @@ import {
   Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, computed, signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, takeUntil } from 'rxjs';
 import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
@@ -12,13 +10,14 @@ import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 import { VehicleService, VehicleTrim } from '../../services/vehicle.service';
 import { Vehicle } from '../../models/vehicle.model';
 import { CustomSelectComponent, SelectOption } from '../shared/custom-select/custom-select.component';
+import { IconComponent } from '../shared/icon/icon.component';
 
 @Component({
   selector: 'app-vehicle-selector',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule,
-    MatIconModule, MatProgressSpinnerModule,
+    IconComponent, MatProgressSpinnerModule,
     MatTooltipModule, CustomSelectComponent,
   ],
   templateUrl: './vehicle-selector.component.html',

@@ -2,18 +2,17 @@ import {
   Component, ElementRef, EventEmitter, Input, Output, ViewChild, signal, computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { FormsModule } from '@angular/forms';import { MatTooltipModule } from '@angular/material/tooltip';
 import { DtcService } from '../../services/dtc.service';
 import { DtcCode } from '../../models/dtc-code.model';
+import { IconComponent } from '../shared/icon/icon.component';
 
 @Component({
   selector: 'app-code-entry',
   standalone: true,
   imports: [
     CommonModule, FormsModule,
-    MatIconModule, MatTooltipModule,
+    IconComponent, MatTooltipModule,
   ],
   templateUrl: './code-entry.component.html',
   styleUrl: './code-entry.component.scss',

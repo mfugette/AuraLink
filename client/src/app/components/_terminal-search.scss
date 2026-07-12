@@ -1,0 +1,77 @@
+// Shared terminal-style search field — one look for every search across the app,
+// echoing the top-bar Aura prompt (green `<context>$` prefix + mono input, squared
+// hairline frame on the page base). Each search sets its own prompt word via a
+// leading `.ts-prompt` span (sessions$, issues$, repairs$, parts$, …).
+//
+// Usage in a component SCSS:
+//   @use '../terminal-search' as ts;   // adjust path
+//   .my-search { @include ts.field; }
+// with markup:
+//   <div class="my-search">
+//     <span class="ts-prompt">sessions<span class="ts-caret">$</span></span>
+//     <input … />
+//     <button class="ts-clear">…</button>   (optional)
+//   </div>
+
+@mixin field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 8px 0 12px;
+  background: var(--obd-bg, var(--obd-surface));
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-sm);
+  transition: border-color var(--obd-dur-fast) var(--obd-ease);
+
+  &:focus-within { border-color: var(--obd-blue); }
+
+  // Green shell prompt: "<context>$"
+  .ts-prompt {
+    flex-shrink: 0;
+    font-family: var(--obd-font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--obd-green);
+    user-select: none;
+    white-space: nowrap;
+  }
+  .ts-caret { color: var(--obd-text-dim); margin-left: 1px; font-weight: 400; }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--obd-text);
+    font-family: var(--obd-font-mono);
+    font-size: 0.82rem;
+    letter-spacing: 0.01em;
+    caret-color: var(--obd-text-dim);
+    caret-shape: block;
+
+    &::placeholder { color: var(--obd-text-muted); }
+    // Kill the native search-clear "x" — we render our own .ts-clear.
+    &::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+  }
+
+  // Optional clear button (mirrors the top-bar send button treatment).
+  .ts-clear {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: var(--obd-radius-sm);
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--obd-text-muted);
+    transition: color var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
+    app-icon { font-size: 16px; width: 16px; height: 16px; }
+    &:hover { color: var(--obd-text); border-color: var(--obd-border-strong); }
+  }
+}

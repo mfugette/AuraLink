@@ -2,11 +2,10 @@ import {
   Component, ElementRef, ViewChild, effect, inject, signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { ServicesService } from '../../services/services.service';
+import { FormsModule } from '@angular/forms';import { ServicesService } from '../../services/services.service';
 import { GoogleMapsLoader } from '../../services/google-maps-loader';
 import { ServiceCategory, ServicePlace } from '../../models/service-place.model';
+import { IconComponent } from '../../components/shared/icon/icon.component';
 
 interface CategoryTab {
   key: ServiceCategory;
@@ -20,7 +19,7 @@ interface CategoryTab {
 @Component({
   selector: 'app-nearby-services-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, IconComponent],
   templateUrl: './nearby-services-page.component.html',
   styleUrl: './nearby-services-page.component.scss',
 })

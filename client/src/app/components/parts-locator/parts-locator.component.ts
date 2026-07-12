@@ -1,8 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { FormsModule } from '@angular/forms';import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { forkJoin } from 'rxjs';
@@ -10,13 +8,14 @@ import { PartsService } from '../../services/parts.service';
 import { NotificationService } from '../../services/notification.service';
 import { PartCondition, PartSearchResult } from '../../models/part.model';
 import { Vehicle } from '../../models/vehicle.model';
+import { IconComponent } from '../shared/icon/icon.component';
 
 @Component({
   selector: 'app-parts-locator',
   standalone: true,
   imports: [
     CommonModule, FormsModule,
-    MatIconModule,
+    IconComponent,
     MatProgressSpinnerModule, MatSnackBarModule,
     MatTooltipModule,
   ],

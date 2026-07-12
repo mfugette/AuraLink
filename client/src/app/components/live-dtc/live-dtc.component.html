@@ -3,7 +3,7 @@
   <!-- Top bar -->
   <div class="live-header">
     <button type="button" class="btn back-btn" (click)="goBack()">
-      <mat-icon>arrow_back</mat-icon>
+      <app-icon name="arrow_back" />
       Back
     </button>
     <div class="live-progress">
@@ -21,7 +21,7 @@
       <div class="step-panel" [class.active]="step() === 0"
            [style.transform]="'translateX(' + ((0 - step()) * 100) + '%)'">
         <div class="panel-inner">
-          <span class="eyebrow"><mat-icon>bluetooth</mat-icon> Live Diagnostics</span>
+          <span class="eyebrow"><app-icon name="bluetooth" /> Live Diagnostics</span>
           <h2 class="panel-title">Connect your OBD2 dongle</h2>
           <p class="panel-sub">
             Read fault codes straight from your car in seconds — no typing required.
@@ -32,7 +32,7 @@
             @for (s of steps; track s.title; let i = $index) {
               <div class="instruction">
                 <div class="instruction-num">{{ i + 1 }}</div>
-                <div class="instruction-icon"><mat-icon>{{ s.icon }}</mat-icon></div>
+                <div class="instruction-icon"><app-icon [name]="s.icon" /></div>
                 <div class="instruction-text">
                   <h3>{{ s.title }}</h3>
                   <p>{{ s.text }}</p>
@@ -42,12 +42,12 @@
           </div>
 
           <button type="button" class="btn connect-btn" (click)="connect()">
-            <mat-icon>bluetooth_searching</mat-icon>
+            <app-icon name="bluetooth_searching" />
             Connect Now
           </button>
 
           <p class="demo-note">
-            <mat-icon>info</mat-icon>
+            <app-icon name="info" />
             Demo mode — this preview simulates a connection with sample data.
           </p>
         </div>
@@ -59,13 +59,13 @@
         <div class="panel-inner connecting-inner">
           <div class="radar">
             <mat-spinner diameter="120" strokeWidth="3" />
-            <mat-icon class="radar-icon">bluetooth_searching</mat-icon>
+            <app-icon class="radar-icon" name="bluetooth_searching" />
           </div>
           <h2 class="panel-title">Connecting…</h2>
           <p class="panel-sub">Pairing with your dongle and scanning the ECU for stored trouble codes.</p>
           <ul class="connect-log">
-            <li class="done"><mat-icon>check</mat-icon> Bluetooth link established</li>
-            <li class="done"><mat-icon>check</mat-icon> Handshake with ECU</li>
+            <li class="done"><app-icon name="check" /> Bluetooth link established</li>
+            <li class="done"><app-icon name="check" /> Handshake with ECU</li>
             <li class="active"><mat-spinner diameter="14" strokeWidth="2" /> Reading diagnostic trouble codes…</li>
           </ul>
         </div>
@@ -75,7 +75,7 @@
       <div class="step-panel" [class.active]="step() === 2"
            [style.transform]="'translateX(' + ((2 - step()) * 100) + '%)'">
         <div class="panel-inner results-inner">
-          <span class="eyebrow success"><mat-icon>check_circle</mat-icon> Scan complete</span>
+          <span class="eyebrow success"><app-icon name="check_circle" /> Scan complete</span>
           <h2 class="panel-title">
             {{ detected().length }} trouble code{{ detected().length !== 1 ? 's' : '' }} detected
           </h2>
@@ -92,11 +92,11 @@
 
           <div class="results-actions">
             <button type="button" class="btn connect-btn" (click)="lookupDetected()">
-              <mat-icon>article</mat-icon>
+              <app-icon name="article" />
               Look Up These Codes
             </button>
             <button type="button" class="btn rescan-btn" (click)="rescan()">
-              <mat-icon>refresh</mat-icon>
+              <app-icon name="refresh" />
               Rescan
             </button>
           </div>
@@ -105,18 +105,18 @@
           <div class="scanner-actions">
             <button type="button" class="btn scanner-btn" [class.active]="showFreezeFrame()"
                     (click)="toggleFreezeFrame()">
-              <mat-icon>ac_unit</mat-icon>
+              <app-icon name="ac_unit" />
               Freeze Frame
             </button>
             <button type="button" class="btn scanner-btn" [class.active]="showReadiness()"
                     (click)="toggleReadiness()">
-              <mat-icon>checklist</mat-icon>
+              <app-icon name="checklist" />
               I/M Readiness
             </button>
             <button type="button" class="btn scanner-btn scanner-btn--danger"
                     [class.active]="confirmingClear()"
                     (click)="confirmingClear.set(true)">
-              <mat-icon>delete_sweep</mat-icon>
+              <app-icon name="delete_sweep" />
               Clear Codes
             </button>
           </div>
@@ -125,7 +125,7 @@
           @if (showFreezeFrame()) {
             <div class="scanner-panel">
               <div class="scanner-panel-header">
-                <mat-icon>ac_unit</mat-icon>
+                <app-icon name="ac_unit" />
                 Freeze Frame — {{ detected()[0]?.code ?? 'DTC' }}
                 <span class="scanner-panel-sub">Sensor snapshot at time of fault</span>
               </div>
@@ -144,16 +144,14 @@
           @if (showReadiness()) {
             <div class="scanner-panel">
               <div class="scanner-panel-header">
-                <mat-icon>checklist</mat-icon>
+                <app-icon name="checklist" />
                 I/M Readiness Monitors
                 <span class="scanner-panel-sub">Emissions test readiness status</span>
               </div>
               <div class="readiness-grid">
                 @for (m of readinessMonitors; track m.name) {
                   <div class="readiness-item" [class]="'readiness-' + m.status">
-                    <mat-icon>
-                      {{ m.status === 'complete' ? 'check_circle' : m.status === 'incomplete' ? 'cancel' : 'remove_circle' }}
-                    </mat-icon>
+                    <app-icon [name]="m.status === 'complete' ? 'check_circle' : m.status === 'incomplete' ? 'cancel' : 'remove_circle'" />
                     <span>{{ m.name }}</span>
                   </div>
                 }
@@ -165,13 +163,13 @@
           @if (confirmingClear()) {
             <div class="scanner-panel scanner-panel--warn">
               <div class="scanner-panel-header">
-                <mat-icon>warning</mat-icon>
+                <app-icon name="warning" />
                 Clear all stored codes?
                 <span class="scanner-panel-sub">This resets the check engine light and erases freeze frame data. The codes may return if the fault is still present.</span>
               </div>
               <div class="clear-actions">
                 <button type="button" class="btn clear-confirm-btn" (click)="clearCodes()">
-                  <mat-icon>delete_sweep</mat-icon>
+                  <app-icon name="delete_sweep" />
                   Yes, Clear
                 </button>
                 <button type="button" class="btn clear-cancel-btn" (click)="confirmingClear.set(false)">
@@ -185,7 +183,7 @@
           @if (codesCleared()) {
             <div class="scanner-panel scanner-panel--success">
               <div class="scanner-panel-header">
-                <mat-icon>check_circle</mat-icon>
+                <app-icon name="check_circle" />
                 Codes cleared
                 <span class="scanner-panel-sub">The ECU has been reset. Monitor for returning faults.</span>
               </div>

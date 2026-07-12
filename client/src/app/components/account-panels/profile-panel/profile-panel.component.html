@@ -1,9 +1,9 @@
 <div class="panel-backdrop" (click)="close()">
   <div class="panel-modal" (click)="$event.stopPropagation()">
     <div class="panel-header">
-      <h3 class="panel-title"><mat-icon>person</mat-icon> My Profile</h3>
+      <h3 class="panel-title"><app-icon name="person" /> My Profile</h3>
       <button type="button" class="btn panel-close" (click)="close()" aria-label="Close">
-        <mat-icon>close</mat-icon>
+        <app-icon name="close" />
       </button>
     </div>
 
@@ -11,7 +11,7 @@
       <div class="field">
         <label class="field-label" for="profile-name">Display name</label>
         <div class="field-control">
-          <mat-icon>badge</mat-icon>
+          <app-icon name="badge" />
           <input
             id="profile-name"
             class="field-input"
@@ -24,7 +24,7 @@
       <div class="field">
         <label class="field-label" for="profile-email">Email address</label>
         <div class="field-control">
-          <mat-icon>alternate_email</mat-icon>
+          <app-icon name="alternate_email" />
           <input
             id="profile-email"
             class="field-input"
@@ -36,14 +36,14 @@
       </div>
 
       <p class="panel-note">
-        <mat-icon>info</mat-icon>
+        <app-icon name="info" />
         This is a preview of account settings — profile changes are stored in-memory on the demo server and reset on restart.
       </p>
     </div>
 
     <div class="panel-footer">
       @if (saved()) {
-        <span class="save-confirm"><mat-icon>check_circle</mat-icon> Saved</span>
+        <span class="save-confirm"><app-icon name="check_circle" /> Saved</span>
       }
       <button type="button" class="btn panel-cancel-btn" (click)="close()">Cancel</button>
       <button type="button" class="btn panel-save-btn" [disabled]="saving()" (click)="save()">

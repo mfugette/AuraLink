@@ -10,36 +10,79 @@
         <div class="stage-panel hero">
           <div class="page-container hero-inner">
             @if (auth.isSignedIn()) {
-              <!-- ── Authenticated hero: welcome + quick actions ─────────────── -->
-              <span class="hero-eyebrow">Diagnostics Console</span>
-              <h1 class="hero-title">
-                Welcome back@if (firstName()) {, <span class="hero-accent">{{ firstName() }}</span>}.
-              </h1>
-              <p class="hero-sub">
-                Pick up where you left off, or start a new diagnosis.
-              </p>
-              <div class="hero-actions">
-                <button type="button" class="btn hero-action hero-action--primary" (click)="scrollToForm()">
-                  <mat-icon>keyboard</mat-icon> Enter Codes
-                </button>
-                <button type="button" class="btn hero-action hero-action--primary" (click)="enterLiveMode()">
-                  <mat-icon>bluetooth</mat-icon> Sync
-                </button>
-                <button type="button" class="btn hero-action" (click)="go('/dashboard')">
-                  <mat-icon>monitoring</mat-icon> Telemetry
-                </button>
-                <button type="button" class="btn hero-action" (click)="go('/my-vehicles')">
-                  <mat-icon>directions_car</mat-icon> My Vehicles
-                </button>
-                <button type="button" class="btn hero-action" (click)="go('/nearby')">
-                  <mat-icon>near_me</mat-icon> Find Help
-                </button>
-                <button type="button" class="btn hero-action" (click)="go('/issue-history')">
-                  <mat-icon>history</mat-icon> Issue History
-                </button>
-                <button type="button" class="btn hero-action" (click)="go('/assistant')">
-                  <mat-icon>auto_awesome</mat-icon> Ask Aura
-                </button>
+              <!-- ── Authenticated hero: report-style console dashboard ────────── -->
+              <!-- Top row: welcome headline (left) + Aura status terminal (right) -->
+              <div class="console-top">
+                <div class="console-lede">
+                  <span class="hero-eyebrow">Diagnostics Console</span>
+                  <h1 class="hero-title">
+                    Welcome back@if (firstName()) {,<br /><span class="hero-accent">{{ firstName() }}</span>}.
+                  </h1>
+                  <p class="hero-sub">
+                    @if (heroVehicle()) {
+                      Here's the current state of your <b>{{ heroVehicle() }}</b>.
+                    } @else {
+                      Pick up where you left off, or start a new diagnosis.
+                    }
+                  </p>
+                  <div class="console-actions">
+                    <button type="button" class="btn hero-action hero-action--primary" (click)="scrollToForm()">
+                      <app-icon name="keyboard" /> Enter Codes
+                    </button>
+                    <button type="button" class="btn hero-action hero-action--primary" (click)="enterLiveMode()">
+                      <app-icon name="bluetooth" /> Sync
+                    </button>
+                    <button type="button" class="btn hero-action" (click)="go('/dashboard')">
+                      <app-icon name="monitoring" /> Telemetry
+                    </button>
+                    <button type="button" class="btn hero-action" (click)="go('/history')">
+                      <app-icon name="history" /> History
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Aura status terminal (replaces the reference's "Download Report") -->
+                <div class="aura-box">
+                  <div class="aura-box-bar">
+                    <span class="aura-box-dots"><i></i><i></i><i></i></span>
+                    <span class="aura-box-title">aura — status</span>
+                  </div>
+                  <div class="aura-box-body">
+                    <div class="aura-box-line">
+                      <span class="aura-mark">▸</span> aura status readout
+                    </div>
+                    @for (line of auraSummary(); track $index) {
+                      <div class="aura-box-out"><span class="aura-arrow">→</span> {{ line }}</div>
+                    }
+                    <button type="button" class="btn aura-box-cta" (click)="go('/assistant')">
+                      ask aura <app-icon name="arrow_outward" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Performance Overview: full-bleed hairline stat grid -->
+              <div class="console-overview">
+                <div class="overview-head">
+                  <span class="overview-eyebrow">01 — Key metrics</span>
+                  <h2 class="overview-title">Performance Overview</h2>
+                  <span class="overview-updated">Recent sessions</span>
+                </div>
+                <div class="overview-grid">
+                  @for (s of heroStats(); track s.label) {
+                    <div class="stat-cell" [class.warn]="s.warn">
+                      <div class="stat-top">
+                        <app-icon class="stat-icon" [name]="s.icon" />
+                        @if (s.delta) {
+                          <span class="stat-delta" [class.warn]="s.deltaWarn">{{ s.delta }}</span>
+                        }
+                      </div>
+                      <div class="stat-value" [class.warn]="s.warn">{{ s.value }}</div>
+                      <div class="stat-label">{{ s.label }}</div>
+                      <div class="stat-sub">{{ s.sub }}</div>
+                    </div>
+                  }
+                </div>
               </div>
             } @else {
               <!-- ── Guest hero: unchanged free-pipeline pitch ───────────────── -->
@@ -53,19 +96,19 @@
                 parts you need at nearby stores — all in one place, no account required.
               </p>
               <div class="hero-badges">
-                <span class="badge"><mat-icon>check</mat-icon> No account needed</span>
-                <span class="badge"><mat-icon>check</mat-icon> Works on any device</span>
-                <span class="badge"><mat-icon>check</mat-icon> 100% free</span>
+                <span class="badge"><app-icon name="check" /> No account needed</span>
+                <span class="badge"><app-icon name="check" /> Works on any device</span>
+                <span class="badge"><app-icon name="check" /> 100% free</span>
               </div>
               <div class="hero-cta">
                 <button type="button" class="btn get-started-btn" (click)="scrollToForm()">
                   Enter DTCs
-                  <mat-icon>arrow_downward</mat-icon>
+                  <app-icon name="arrow_downward" />
                 </button>
                 <span class="cta-or">or</span>
                 <button type="button" class="btn detect-live-btn" (click)="goToSignup()">
                   Sign Up
-                  <mat-icon>arrow_forward</mat-icon>
+                  <app-icon name="arrow_forward" />
                 </button>
               </div>
             }
@@ -93,7 +136,7 @@
       <!-- Back to hero -->
       <div class="form-header">
         <button type="button" class="btn form-back-btn" (click)="backToHero()">
-          <mat-icon>arrow_back</mat-icon>
+          <app-icon name="arrow_back" />
           Back
         </button>
       </div>
@@ -103,7 +146,7 @@
         <div class="section-label">
           <span class="step-num">1</span>
           <div>
-            <div class="obd-section-title"><mat-icon>qr_code_scanner</mat-icon> Enter Your Fault Codes</div>
+            <div class="obd-section-title"><app-icon name="qr_code_scanner" /> Enter Your Fault Codes</div>
             <p class="obd-section-subtitle">Type each code from your OBD2 scanner and press Enter or comma to add it.</p>
           </div>
         </div>
@@ -117,7 +160,7 @@
         <div class="section-label">
           <span class="step-num">2</span>
           <div>
-            <div class="obd-section-title"><mat-icon>directions_car</mat-icon> Your Vehicle</div>
+            <div class="obd-section-title"><app-icon name="directions_car" /> Your Vehicle</div>
             <p class="obd-section-subtitle">Used to find the right parts for your year, make, and model.</p>
           </div>
         </div>
@@ -132,13 +175,13 @@
           [disabled]="!canLookup()"
           (click)="lookup()"
         >
-          <mat-icon>search</mat-icon>
+          <app-icon name="search" />
           Look Up {{ codes().length > 0 ? codes().length : '' }} Code{{ codes().length !== 1 ? 's' : '' }}
         </button>
 
         @if (showResults()) {
           <button type="button" class="btn reset-btn" (click)="reset()">
-            <mat-icon>refresh</mat-icon>
+            <app-icon name="refresh" />
             Start Over
           </button>
         }
@@ -154,7 +197,7 @@
             <div class="section-label">
               <span class="step-num">3</span>
               <div>
-                <div class="obd-section-title"><mat-icon>article</mat-icon> Code Explanations</div>
+                <div class="obd-section-title"><app-icon name="article" /> Code Explanations</div>
                 <p class="obd-section-subtitle">Detailed breakdown of each fault code.</p>
               </div>
             </div>
@@ -171,7 +214,7 @@
               <div class="section-label">
                 <span class="step-num">4</span>
                 <div>
-                  <div class="obd-section-title"><mat-icon>store</mat-icon> Find Parts</div>
+                  <div class="obd-section-title"><app-icon name="store" /> Find Parts</div>
                   <p class="obd-section-subtitle">
                     Locate the parts you selected at your preferred online retailer and send your shopping list.
                   </p>

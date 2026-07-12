@@ -5,7 +5,7 @@
     <div class="field vin-field">
       <label class="field-label" for="vin-input">VIN (auto-fills year/make/model)</label>
       <div class="field-control">
-        <mat-icon>directions_car</mat-icon>
+        <app-icon name="directions_car" />
         <input
           id="vin-input"
           class="field-input"
@@ -27,7 +27,7 @@
       (click)="decodeVin()"
       [disabled]="loadingVin()"
     >
-      <mat-icon>search</mat-icon>
+      <app-icon name="search" />
       Decode VIN
     </button>
 
@@ -37,17 +37,17 @@
         class="btn scan-btn"
         (click)="scannerActive() ? stopScanner() : startScanner()"
       >
-        <mat-icon>{{ scannerActive() ? 'camera_off' : 'photo_camera' }}</mat-icon>
+        <app-icon [name]="scannerActive() ? 'camera_off' : 'photo_camera'" />
         {{ scannerActive() ? 'Cancel' : 'Scan VIN' }}
       </button>
     }
   </div>
 
   @if (vinError()) {
-    <p class="field-error"><mat-icon>error_outline</mat-icon> {{ vinError() }}</p>
+    <p class="field-error"><app-icon name="error_outline" /> {{ vinError() }}</p>
   }
   @if (scanError()) {
-    <p class="field-error"><mat-icon>error_outline</mat-icon> {{ scanError() }}</p>
+    <p class="field-error"><app-icon name="error_outline" /> {{ scanError() }}</p>
   }
 
   <!-- Camera scanner (mobile only) -->
@@ -63,7 +63,7 @@
         </div>
         <p class="scanner-hint">Point camera at the barcode sticker on your door jamb or windshield</p>
         <button type="button" class="btn scanner-close" (click)="stopScanner()" aria-label="Close scanner">
-          <mat-icon>close</mat-icon>
+          <app-icon name="close" />
         </button>
       </div>
     </div>
@@ -147,7 +147,7 @@
     <div class="field">
       <label class="field-label" for="engine-input">Engine</label>
       <div class="field-control">
-        <mat-icon>settings</mat-icon>
+        <app-icon name="settings" />
         <input id="engine-input" class="field-input" formControlName="engine" placeholder="3.5L V6" />
       </div>
     </div>
@@ -158,7 +158,7 @@
     @if (vinFilledDetails()) {
       <!-- VIN decode populated extra fields — show them automatically -->
       <div class="details-header">
-        <mat-icon>verified</mat-icon>
+        <app-icon name="verified" />
         <span>Additional details filled from VIN</span>
       </div>
       <div class="details-grid">
@@ -185,7 +185,7 @@
         <div class="field">
           <label class="field-label">Mileage (optional)</label>
           <div class="field-control">
-            <mat-icon>speed</mat-icon>
+            <app-icon name="speed" />
             <input class="field-input" type="number" formControlName="mileage" placeholder="85000" min="0" />
             <span class="field-suffix">mi</span>
           </div>
@@ -194,7 +194,7 @@
     } @else {
       <!-- No VIN decode — offer an expandable section -->
       <button type="button" class="btn details-toggle" (click)="toggleDetails()">
-        <mat-icon>{{ detailsExpanded() ? 'expand_less' : 'expand_more' }}</mat-icon>
+        <app-icon [name]="detailsExpanded() ? 'expand_less' : 'expand_more'" />
         Additional info (optional)
       </button>
 
@@ -223,7 +223,7 @@
           <div class="field">
             <label class="field-label">Mileage (optional)</label>
             <div class="field-control">
-              <mat-icon>speed</mat-icon>
+              <app-icon name="speed" />
               <input class="field-input" type="number" formControlName="mileage" placeholder="85000" min="0" />
               <span class="field-suffix">mi</span>
             </div>

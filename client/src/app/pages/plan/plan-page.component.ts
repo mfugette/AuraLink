@@ -2,10 +2,9 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
-import { MatIconModule } from '@angular/material/icon';
-import { TierService } from '../../services/tier.service';
+import { map } from 'rxjs';import { TierService } from '../../services/tier.service';
 import { CheckoutService } from '../../services/checkout.service';
+import { IconComponent } from '../../components/shared/icon/icon.component';
 import {
   ADAPTER, BillingInterval, Feature, Tier, TIERS, tierDef, annualPrice, ANNUAL_MONTHS_PAID,
 } from '../../models/tier.model';
@@ -20,7 +19,7 @@ import {
 @Component({
   selector: 'app-plan-page',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, IconComponent],
   templateUrl: './plan-page.component.html',
   styleUrl: './plan-page.component.scss',
 })

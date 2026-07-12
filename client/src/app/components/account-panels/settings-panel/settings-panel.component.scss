@@ -36,7 +36,7 @@
   gap: 10px;
   font-size: 0.85rem;
 
-  mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--obd-text-muted); }
+  app-icon { font-size: 18px; width: 18px; height: 18px; color: var(--obd-text-muted); }
 }
 
 // ── Toggle switch ────────────────────────────────────────────────────────────
@@ -110,7 +110,7 @@
   line-height: 1.5;
   color: var(--obd-text-muted);
 
-  mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); opacity: 0.7; flex-shrink: 0; margin-top: 1px; }
+  app-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); opacity: 0.7; flex-shrink: 0; margin-top: 1px; }
 }
 
 .save-confirm {
@@ -121,7 +121,7 @@
   font-size: 0.82rem;
   color: var(--obd-green);
 
-  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  app-icon { font-size: 16px; width: 16px; height: 16px; }
 }
 
 .panel-cancel-btn {

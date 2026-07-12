@@ -2,11 +2,11 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
 import { AccountService } from '../../services/account.service';
 import { NewSavedVehicle, SavedVehicle } from '../../models/account.model';
 import { VehicleSelectorComponent } from '../../components/vehicle-selector/vehicle-selector.component';
 import { Vehicle } from '../../models/vehicle.model';
+import { IconComponent } from '../../components/shared/icon/icon.component';
 
 // Dedicated add/edit page for a garage vehicle, reached from a My Vehicles grid
 // cell (empty cell → add, filled cell → edit). Reuses the rich
@@ -14,7 +14,7 @@ import { Vehicle } from '../../models/vehicle.model';
 @Component({
   selector: 'app-vehicle-editor-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, VehicleSelectorComponent],
+  imports: [CommonModule, FormsModule, IconComponent, VehicleSelectorComponent],
   templateUrl: './vehicle-editor-page.component.html',
   styleUrl: './vehicle-editor-page.component.scss',
 })

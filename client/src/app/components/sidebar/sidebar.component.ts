@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { IconComponent } from '../shared/icon/icon.component';
 import { TierService } from '../../services/tier.service';
 import { Feature } from '../../models/tier.model';
 
@@ -21,7 +21,7 @@ interface NavItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, MatIconModule, MatTooltipModule],
+  imports: [CommonModule, RouterLink, RouterLinkActive, IconComponent, MatTooltipModule],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
 })

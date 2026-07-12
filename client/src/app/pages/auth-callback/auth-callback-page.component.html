@@ -7,12 +7,12 @@
         <p class="cb-sub">One moment while we finish setting up your account.</p>
       }
       @case ('ok') {
-        <mat-icon class="cb-icon cb-icon--ok">check_circle</mat-icon>
+        <app-icon class="cb-icon cb-icon--ok" name="check_circle" />
         <h1 class="cb-title">You're all set</h1>
         <p class="cb-sub">Your email is confirmed. Taking you to AuraLink…</p>
       }
       @case ('error') {
-        <mat-icon class="cb-icon cb-icon--err">error_outline</mat-icon>
+        <app-icon class="cb-icon cb-icon--err" name="error_outline" />
         <h1 class="cb-title">This link didn't work</h1>
         <p class="cb-sub">It may have expired or already been used. Try signing in — if your
           email isn't confirmed yet, you can request a new link.</p>

@@ -26,6 +26,15 @@
     overflow: visible;
     flex: 1;
   }
+
+  // On phones the app shell releases its viewport lock (see .app-shell @520px),
+  // so the whole document scrolls. Release the stage's fixed height + clip too,
+  // otherwise the hero (esp. the tall signed-in console) is trapped in a
+  // viewport-height box and can't scroll with the page.
+  @media (max-width: 520px) {
+    height: auto;
+    overflow: visible;
+  }
 }
 
 .form-track {
@@ -96,18 +105,26 @@
     justify-content: center;
     padding-top: max(32px, calc((100vh - var(--obd-header-height)) / 3 - 150px));
 
-    // On short/narrow phones the padding-top formula above leaves too little
-    // room for the authenticated hero's title + wrapping quick-action row —
-    // the page is intentionally not scrollable at the outer level (nav is via
-    // the buttons), so the hero itself gets a scroll escape hatch instead:
-    // invisible once the compressed layout fits, a safety net when it still
-    // doesn't (e.g. very short viewports).
+    // The authenticated console hero is tall (lede + Aura box + stat grid), so
+    // top-align it near the header instead of the centered guest-pitch offset.
+    &:has(.console-top) { padding-top: 40px; }
+    // Tablet band (521–900px): still a locked viewport, so the tall console
+    // gets an internal scroll escape hatch.
+    @media (min-width: 521px) and (max-width: 900px) {
+      &:has(.console-top) { padding-top: 28px; overflow-y: auto; }
+    }
+
+    // On phones the app shell + .form-stage release their viewport lock, so the
+    // whole document scrolls. Let the hero flow naturally into that page scroll
+    // (no nested internal scroll, no forced min-height).
     @media (max-width: 600px) {
-      padding-top: 72px;
-      padding-bottom: 24px;
+      padding-top: 32px;
+      padding-bottom: 32px;
       align-items: flex-start;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
+    }
+    @media (max-width: 520px) {
+      min-height: 0;
+      overflow: visible;
     }
   }
 
@@ -216,7 +233,7 @@
   text-transform: uppercase;
   color: var(--obd-text-dim);
 
-  mat-icon {
+  app-icon {
     font-size: 14px;
     width: 14px;
     height: 14px;
@@ -294,7 +311,7 @@
 
   &:active { transform: translateY(0); }
 
-  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  app-icon { font-size: 18px; width: 18px; height: 18px; }
 }
 
 .detect-live-btn {
@@ -329,7 +346,7 @@
 
   &:active { transform: translateY(0); }
 
-  mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--obd-blue); }
+  app-icon { font-size: 18px; width: 18px; height: 18px; color: var(--obd-blue); }
 }
 
 // ── Authenticated hero: quick-action row ──────────────────────────────────────
@@ -367,7 +384,7 @@
               background var(--obd-dur-fast) var(--obd-ease),
               transform var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 17px; width: 17px; height: 17px; color: var(--obd-blue); }
+  app-icon { font-size: 17px; width: 17px; height: 17px; color: var(--obd-blue); }
 
   &:hover {
     border-color: var(--obd-blue);
@@ -384,7 +401,7 @@
     font-size: 0.72rem;
     gap: 6px;
 
-    mat-icon { font-size: 15px; width: 15px; height: 15px; }
+    app-icon { font-size: 15px; width: 15px; height: 15px; }
   }
 }
 
@@ -396,7 +413,7 @@
   border-color: var(--obd-blue);
   color: var(--obd-blue);
 
-  mat-icon { color: var(--obd-blue); }
+  app-icon { color: var(--obd-blue); }
 
   &:hover {
     background: var(--obd-blue-glow);
@@ -407,6 +424,229 @@
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+// ── Authenticated console hero ────────────────────────────────────────────────
+// A report-style dashboard modeled on the reference: top-left welcome lede +
+// an Aura status terminal on the right, then a full-bleed hairline stat grid.
+// Compressed to fit one viewport (the hero never scrolls at the outer level).
+// When the hero holds this console, widen its inner container past the 680px
+// reading measure the guest pitch uses.
+.hero-inner:has(.console-top) {
+  max-width: 1100px;
+  gap: 30px;
+
+  @media (max-width: 900px) { gap: 22px; }
+}
+
+// Top row: lede (flexible) + Aura box (fixed-ish). Collapses to one column on
+// narrow screens.
+.console-top {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 40px;
+  align-items: start;
+
+  @media (max-width: 900px) { grid-template-columns: 1fr; gap: 22px; }
+}
+
+.console-lede {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  min-width: 0;
+
+  .hero-title { font-size: clamp(1.8rem, 4vw, 2.7rem); }
+
+  @media (max-width: 900px) { gap: 12px; }
+}
+
+.console-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+// ── Aura status terminal (replaces the reference "Download Report" box) ────────
+.aura-box {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  background: var(--obd-bg, var(--obd-surface));
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-sm);
+  overflow: hidden;
+  font-family: var(--obd-font-mono);
+}
+
+.aura-box-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 34px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--obd-border-strong);
+  background: var(--obd-surface);
+}
+.aura-box-dots {
+  display: inline-flex; gap: 5px;
+  i { width: 9px; height: 9px; border-radius: 50%; background: var(--obd-surface-4); }
+  i:nth-child(1) { background: color-mix(in srgb, var(--obd-red) 60%, transparent); }
+  i:nth-child(2) { background: color-mix(in srgb, var(--obd-yellow) 60%, transparent); }
+  i:nth-child(3) { background: color-mix(in srgb, var(--obd-green) 60%, transparent); }
+}
+.aura-box-title {
+  font-size: 0.72rem; letter-spacing: 0.02em; color: var(--obd-text-muted);
+}
+
+.aura-box-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 16px 16px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+.aura-box-line { color: var(--obd-text-dim); }
+.aura-mark { color: color-mix(in srgb, var(--obd-blue) 70%, var(--obd-text-muted)); font-weight: 700; }
+.aura-box-out {
+  color: var(--obd-blue);
+  .aura-arrow { color: color-mix(in srgb, var(--obd-blue) 60%, var(--obd-text-muted)); margin-right: 4px; }
+}
+.aura-box-cta {
+  margin-top: 6px;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: var(--obd-radius-sm);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--obd-blue) 55%, transparent);
+  color: var(--obd-blue);
+  font-family: var(--obd-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  transition: background var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
+  app-icon { font-size: 15px; width: 15px; height: 15px; }
+  &:hover { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 14%, transparent); }
+}
+
+// ── Performance Overview: full-bleed hairline stat grid ───────────────────────
+.console-overview {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.overview-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.overview-eyebrow {
+  font-family: var(--obd-font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--obd-blue);
+}
+.overview-title {
+  margin: 0;
+  font-family: var(--obd-font-display);
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--obd-text);
+}
+.overview-updated {
+  margin-left: auto;
+  font-family: var(--obd-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: var(--obd-text-muted);
+}
+
+// The stat grid: 4-across hairline cells (the instrument-console readout grid),
+// showing hairlines through 1px gaps over the border color.
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--obd-border);
+  border: 1px solid var(--obd-border-strong);
+
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 460px) { grid-template-columns: 1fr; }
+}
+
+.stat-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px 18px;
+  background: var(--obd-bg, var(--obd-surface));
+  min-width: 0;
+
+  &.warn { box-shadow: inset 3px 0 0 var(--obd-red); }
+}
+.stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+.stat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--obd-blue); }
+.stat-delta {
+  font-family: var(--obd-font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 2px 7px;
+  border-radius: var(--obd-radius-sm);
+  color: var(--obd-green);
+  background: color-mix(in srgb, var(--obd-green) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--obd-green) 34%, transparent);
+  white-space: nowrap;
+
+  &.warn {
+    color: var(--obd-red);
+    background: color-mix(in srgb, var(--obd-red) 14%, transparent);
+    border-color: color-mix(in srgb, var(--obd-red) 34%, transparent);
+  }
+}
+.stat-value {
+  font-family: var(--obd-font-display);
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 500;
+  line-height: 1.05;
+  color: var(--obd-text);
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &.warn { color: var(--obd-red); }
+}
+.stat-label {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--obd-text);
+}
+.stat-sub {
+  font-family: var(--obd-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  color: var(--obd-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -440,7 +680,7 @@
 
   &:hover { border-color: var(--obd-blue) !important; color: var(--obd-text) !important; }
 
-  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  app-icon { font-size: 18px; width: 18px; height: 18px; }
 }
 
 // ── Section card ──────────────────────────────────────────────────────────────
@@ -511,7 +751,7 @@
     opacity: 0.4;
   }
 
-  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  app-icon { font-size: 18px; width: 18px; height: 18px; }
 }
 
 .reset-btn {

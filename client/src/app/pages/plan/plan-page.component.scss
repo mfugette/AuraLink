@@ -13,7 +13,7 @@
   color: var(--obd-text);
   font-size: 0.92rem;
 
-  mat-icon { color: var(--obd-blue); flex-shrink: 0; }
+  app-icon { color: var(--obd-blue); flex-shrink: 0; }
   strong { font-weight: 650; }
 }
 
@@ -167,7 +167,7 @@
     color: var(--obd-text);
     line-height: 1.4;
 
-    mat-icon {
+    app-icon {
       font-size: 18px;
       width: 18px;
       height: 18px;
@@ -179,7 +179,7 @@
 
   .feature--off {
     color: var(--obd-text-muted);
-    mat-icon { color: var(--obd-text-muted); }
+    app-icon { color: var(--obd-text-muted); }
   }
 
   .feature-note {
@@ -217,7 +217,7 @@
     opacity: 0.65;
     cursor: default;
     color: var(--obd-green);
-    mat-icon { color: var(--obd-green); }
+    app-icon { color: var(--obd-green); }
   }
 }
 
@@ -252,7 +252,7 @@
   font-size: 0.78rem;
   font-weight: 600;
 
-  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+  app-icon { font-size: 15px; width: 15px; height: 15px; }
 }
 
 .adapter-name {
@@ -278,7 +278,7 @@
   color: var(--obd-text-muted);
   line-height: 1.45;
 
-  mat-icon { font-size: 15px; width: 15px; height: 15px; margin-top: 1px; flex-shrink: 0; }
+  app-icon { font-size: 15px; width: 15px; height: 15px; margin-top: 1px; flex-shrink: 0; }
 }
 
 .adapter-buy {
@@ -317,7 +317,7 @@
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--obd-text);
-  mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); }
+  app-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); }
 }
 
 .bundle-price { display: flex; align-items: baseline; gap: 8px; }
@@ -362,5 +362,5 @@
   font-size: 0.82rem;
   color: var(--obd-text-muted);
 
-  mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); opacity: 0.8; }
+  app-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); opacity: 0.8; }
 }

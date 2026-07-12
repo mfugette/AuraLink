@@ -32,7 +32,7 @@
 
   &:disabled { cursor: not-allowed; }
 
-  > mat-icon:first-child {
+  > app-icon:first-child {
     flex-shrink: 0;
     font-size: 20px;
     width: 20px;

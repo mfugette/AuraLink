@@ -8,17 +8,18 @@
   <!-- Console toolbar: search + category filters (left/middle), count + clear (right) -->
   <div class="parts-toolbar">
     <div class="toolbar-search">
-      <mat-icon>search</mat-icon>
+      <span class="ts-prompt">parts<span class="ts-caret">$</span></span>
       <input
         class="toolbar-search-input"
         [ngModel]="query()"
         (ngModelChange)="onQueryInput($event)"
-        placeholder="Search parts — “oxygen sensor”, “P0420”…"
+        placeholder="oxygen sensor, P0420…"
         autocomplete="off"
+        spellcheck="false"
       />
       @if (query()) {
         <button type="button" class="btn toolbar-search-clear" (click)="clearFilters()" aria-label="Clear search">
-          <mat-icon>close</mat-icon>
+          <app-icon name="close" />
         </button>
       }
     </div>
@@ -52,7 +53,7 @@
       @if (part) {
         <div class="part-cell">
           <div class="part-head">
-            <span class="part-eyebrow"><mat-icon>settings</mat-icon> {{ part.category }}</span>
+            <span class="part-eyebrow"><app-icon name="settings" /> {{ part.category }}</span>
             <span class="part-price">${{ part.priceLow }}–${{ part.priceHigh }}</span>
           </div>
 
@@ -81,7 +82,7 @@
     <!-- No results: message overlaid on the (blank) grid frame -->
     @if (results().length === 0) {
       <div class="empty-overlay">
-        <mat-icon>search_off</mat-icon>
+        <app-icon name="search_off" />
         <p>No parts match your search.</p>
         <button type="button" class="btn btn-action" (click)="clearFilters()">Clear filters</button>
       </div>

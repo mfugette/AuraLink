@@ -1,8 +1,7 @@
 import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { CatalogPart, PARTS_CATALOG, PART_CATEGORIES } from '../../data/parts-catalog';
+import { FormsModule } from '@angular/forms';import { CatalogPart, PARTS_CATALOG, PART_CATEGORIES } from '../../data/parts-catalog';
+import { IconComponent } from '../../components/shared/icon/icon.component';
 
 // Dedicated parts-catalog search page. Backed by the local seed catalog for
 // now (see data/parts-catalog.ts) — the search/filter logic is source-agnostic
@@ -10,7 +9,7 @@ import { CatalogPart, PARTS_CATALOG, PART_CATEGORIES } from '../../data/parts-ca
 @Component({
   selector: 'app-part-lookup-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, IconComponent],
   templateUrl: './part-lookup-page.component.html',
   styleUrl: './part-lookup-page.component.scss',
 })

@@ -1,11 +1,10 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
-import { AccountService } from '../../services/account.service';
+import { Router, RouterLink } from '@angular/router';import { AccountService } from '../../services/account.service';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
+import { IconComponent } from '../../components/shared/icon/icon.component';
 
 // Account settings page: profile (display name + email), a link into plan/billing,
 // and a Danger Zone with data export (GDPR right of access) and account deletion
@@ -14,7 +13,7 @@ import { ToastService } from '../../services/toast.service';
 @Component({
   selector: 'app-account-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, MatIconModule],
+  imports: [CommonModule, FormsModule, RouterLink, IconComponent],
   templateUrl: './account-page.component.html',
   styleUrl: './account-page.component.scss',
 })

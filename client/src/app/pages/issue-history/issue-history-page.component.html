@@ -9,9 +9,12 @@
   <!-- Filters -->
   <div class="ht-filters">
     <div class="ht-search">
-      <mat-icon>search</mat-icon>
-      <input type="search" placeholder="Search issues…"
-             [ngModel]="query()" (ngModelChange)="query.set($event)" autocomplete="off" />
+      <span class="ts-prompt">issues<span class="ts-caret">$</span></span>
+      <input type="search" placeholder="filter…"
+             [ngModel]="query()" (ngModelChange)="query.set($event)" autocomplete="off" spellcheck="false" />
+      @if (query()) {
+        <button type="button" class="ts-clear" (click)="query.set('')" aria-label="Clear search"><app-icon name="close" /></button>
+      }
     </div>
     <div class="ht-controls">
       <app-custom-select class="ht-vehicle-select"
@@ -34,14 +37,14 @@
       <thead>
         <tr>
           <th class="sortable" (click)="sortBy('date')">Date
-            @if (arrow('date')) { <mat-icon class="ht-arr">{{ arrow('date') }}</mat-icon> }</th>
+            @if (arrow('date')) { <app-icon class="ht-arr" [name]="arrow('date')" /> }</th>
           <th>Code</th>
           <th>Issue</th>
           <th>Vehicle</th>
           <th class="sortable" (click)="sortBy('severity')">Severity
-            @if (arrow('severity')) { <mat-icon class="ht-arr">{{ arrow('severity') }}</mat-icon> }</th>
+            @if (arrow('severity')) { <app-icon class="ht-arr" [name]="arrow('severity')" /> }</th>
           <th class="sortable" (click)="sortBy('status')">Status
-            @if (arrow('status')) { <mat-icon class="ht-arr">{{ arrow('status') }}</mat-icon> }</th>
+            @if (arrow('status')) { <app-icon class="ht-arr" [name]="arrow('status')" /> }</th>
         </tr>
       </thead>
       <tbody>
@@ -61,7 +64,7 @@
     <div class="ht-cards">
       @for (i of filtered(); track trackId($index, i)) {
         <button type="button" class="ht-card" [class.warn]="severeWarn(i)" (click)="openDetail(i)">
-          <span class="ht-card-badge"><mat-icon>report_problem</mat-icon></span>
+          <span class="ht-card-badge"><app-icon name="report_problem" /></span>
           <div class="ht-card-top">
             <span class="ht-card-title">{{ i.code }}</span>
             <span class="ht-chip" [class]="statusChip(i.status)">{{ statusLabel(i.status) }}</span>
@@ -76,7 +79,7 @@
 
     @if (filtered().length === 0) {
       <div class="ht-empty">
-        <mat-icon>check_circle</mat-icon>
+        <app-icon name="check_circle" />
         <p>No issues logged for this vehicle.</p>
       </div>
     }
@@ -96,7 +99,7 @@
           </h3>
           <p class="ht-dialog-when">{{ dateLabel(i.date) }} · {{ i.vehicleLabel }}</p>
         </div>
-        <button type="button" class="ht-x" (click)="closeDetail()" aria-label="Close"><mat-icon>close</mat-icon></button>
+        <button type="button" class="ht-x" (click)="closeDetail()" aria-label="Close"><app-icon name="close" /></button>
       </div>
 
       <div class="ht-tiles">

@@ -2,9 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterOutlet, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, startWith } from 'rxjs';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { filter, map, startWith } from 'rxjs';import { MatTooltipModule } from '@angular/material/tooltip';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { AiSearchComponent } from './components/ai-search/ai-search.component';
 import { AccountMenuComponent } from './components/account-menu/account-menu.component';
@@ -12,6 +10,15 @@ import { NotificationsComponent } from './components/notifications/notifications
 import { ToastHostComponent } from './components/toast-host/toast-host.component';
 import { ThemeService } from './services/theme.service';
 import { AuthService } from './services/auth.service';
+import { IconComponent } from './components/shared/icon/icon.component';
+
+// Header wordmark drawn in the same half-block figlet vocabulary as the Aura
+// terminal boot banner. Two pieces so each keeps its own color: AURA (white,
+// glyphs verbatim from the banner) + LINK (blue accent).
+const LOGO_AURA = String.raw`▄▀█ █░█ █▀█ ▄▀█
+█▀█ █▄█ █▀▄ █▀█`;
+const LOGO_LINK = String.raw`█░░ █ █▄░█ █▄▀
+█▄▄ █ █░▀█ █░█`;
 
 // App shell: persistent chrome (top bar with AI search + account menu, a
 // collapsible left sidebar) around a <router-outlet>. Full-width, YouTube-style
@@ -22,7 +29,7 @@ import { AuthService } from './services/auth.service';
   imports: [
     CommonModule,
     RouterOutlet, RouterLink,
-    MatIconModule, MatTooltipModule,
+    IconComponent, MatTooltipModule,
     SidebarComponent,
     AiSearchComponent,
     AccountMenuComponent,
@@ -33,6 +40,9 @@ import { AuthService } from './services/auth.service';
   styleUrl: './app.scss',
 })
 export class App {
+  readonly logoAura = LOGO_AURA;
+  readonly logoLink = LOGO_LINK;
+
   private readonly router = inject(Router);
   // Injected so it's constructed at app start: applies the theme and wires the
   // account-settings sync. Also exposed to the template for the header toggle.

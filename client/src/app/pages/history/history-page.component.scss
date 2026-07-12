@@ -41,7 +41,7 @@
   margin-bottom: -1px;
   transition: color var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  app-icon { font-size: 18px; width: 18px; height: 18px; }
 
   &:hover { color: var(--obd-text); }
   &.active { color: var(--obd-blue); border-bottom-color: var(--obd-blue); }
@@ -125,7 +125,7 @@ $pad: 40px;
   border-radius: var(--obd-radius);
   color: var(--obd-text-dim);
 
-  mat-icon { font-size: 40px; width: 40px; height: 40px; color: var(--obd-blue); opacity: 0.8; }
+  app-icon { font-size: 40px; width: 40px; height: 40px; color: var(--obd-blue); opacity: 0.8; }
   h2 { margin: 6px 0 0; font-size: 1.1rem; color: var(--obd-text); }
   p { margin: 0; max-width: 400px; font-size: 0.9rem; line-height: 1.55; }
 }

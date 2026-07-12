@@ -11,15 +11,15 @@
     [attr.aria-expanded]="open()"
   >
     @if (icon) {
-      <mat-icon>{{ icon }}</mat-icon>
+      <app-icon [name]="icon" />
     }
     <span class="select-value" [class.placeholder]="!selectedLabel()">
       {{ selectedLabel() ?? placeholder }}
     </span>
     @if (loading) {
-      <mat-icon class="spin">progress_activity</mat-icon>
+      <app-icon class="spin" name="progress_activity" />
     } @else {
-      <mat-icon class="chevron">expand_more</mat-icon>
+      <app-icon class="chevron" name="expand_more" />
     }
   </button>
 

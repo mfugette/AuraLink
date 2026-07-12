@@ -9,20 +9,22 @@
     <!-- Location controls: header action slot (compact console styling) -->
     <div class="locate-bar">
       <button type="button" class="btn locate-gps" [disabled]="locating()" (click)="useMyLocation()">
-        <mat-icon>my_location</mat-icon>
+        <app-icon name="my_location" />
         {{ locating() ? 'Locating…' : 'Use my location' }}
       </button>
       <div class="locate-zip">
+        <span class="ts-prompt">location<span class="ts-caret">$</span></span>
         <input
           class="locate-zip-input"
           [ngModel]="zip()"
           (ngModelChange)="zip.set($event)"
           (keydown.enter)="searchZip()"
-          placeholder="Zip code or address"
+          placeholder="zip or address…"
           autocomplete="postal-code"
+          spellcheck="false"
         />
         <button type="button" class="btn locate-search" [disabled]="loading()" (click)="searchZip()" aria-label="Search">
-          <mat-icon>search</mat-icon>
+          <app-icon name="search" />
         </button>
       </div>
     </div>
@@ -40,7 +42,7 @@
           [attr.aria-selected]="category() === cat.key"
           (click)="selectCategory(cat.key)"
         >
-          <mat-icon>{{ cat.icon }}</mat-icon> {{ cat.label }}
+          <app-icon [name]="cat.icon" /> {{ cat.label }}
         </button>
       }
     </div>
@@ -57,16 +59,16 @@
       <div class="services-list">
         @if (loading()) {
           <div class="services-loading">
-            <mat-icon class="spin">progress_activity</mat-icon> Searching nearby…
+            <app-icon class="spin" name="progress_activity" /> Searching nearby…
           </div>
         } @else if (hasSearched() && results().length === 0) {
           <div class="services-empty">
-            <mat-icon>search_off</mat-icon>
+            <app-icon name="search_off" />
             <p>No results found nearby. Try a different category or a wider area.</p>
           </div>
         } @else if (!hasSearched()) {
           <div class="services-empty">
-            <mat-icon>near_me</mat-icon>
+            <app-icon name="near_me" />
             <p>Share your location above to find nearby help.</p>
           </div>
         } @else {
@@ -88,18 +90,18 @@
                     {{ p.rating }} ({{ p.ratingCount }})
                   </span>
                 }
-                <span class="service-distance"><mat-icon>directions_car</mat-icon> {{ p.distanceMiles }} mi</span>
+                <span class="service-distance"><app-icon name="directions_car" /> {{ p.distanceMiles }} mi</span>
               </div>
 
               <p class="service-address">{{ p.address }}</p>
 
               <div class="service-actions">
                 <a class="btn service-action" [href]="directionsUrl(p)" target="_blank" rel="noopener">
-                  <mat-icon>map</mat-icon> Open in Maps
+                  <app-icon name="map" /> Open in Maps
                 </a>
                 @if (p.phone) {
                   <a class="btn service-action" [href]="callUrl(p)">
-                    <mat-icon>call</mat-icon> {{ p.phone }}
+                    <app-icon name="call" /> {{ p.phone }}
                   </a>
                 }
               </div>
@@ -113,7 +115,7 @@
       <div class="services-map" #mapEl></div>
       @if (!hasSearched()) {
         <div class="map-placeholder">
-          <mat-icon>map</mat-icon>
+          <app-icon name="map" />
           <p>Local services will appear here once you share a location.</p>
         </div>
       }

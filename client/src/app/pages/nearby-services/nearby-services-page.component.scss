@@ -57,25 +57,38 @@
               border-color var(--obd-dur-fast) var(--obd-ease),
               opacity var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 17px; width: 17px; height: 17px; }
+  app-icon { font-size: 17px; width: 17px; height: 17px; }
   &:hover:not(:disabled) { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 14%, transparent); }
   &:disabled { opacity: 0.6; }
 }
 
+// Terminal-style location field: green "location$" prompt + mono input, with a
+// submit-search button (this triggers a lookup rather than live-filtering).
 .locate-zip {
   display: flex;
   align-items: center;
-  gap: 6px;
-  width: 260px;
+  gap: 7px;
+  width: 280px;
   max-width: 100%;
   height: 34px;
-  padding: 0 4px 0 12px;
-  background: var(--obd-surface-2);
+  padding: 0 4px 0 10px;
+  background: var(--obd-bg, var(--obd-surface));
   border: 1px solid var(--obd-border-strong);
   border-radius: var(--obd-radius-sm);
   transition: border-color var(--obd-dur-fast) var(--obd-ease);
 
   &:focus-within { border-color: var(--obd-blue); }
+
+  .ts-prompt {
+    flex-shrink: 0;
+    font-family: var(--obd-font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--obd-green);
+    user-select: none;
+    white-space: nowrap;
+  }
+  .ts-caret { color: var(--obd-text-dim); margin-left: 1px; font-weight: 400; }
 }
 
 .locate-zip-input {
@@ -85,7 +98,8 @@
   background: transparent;
   height: 100%;
   color: var(--obd-text);
-  font-size: 0.82rem;
+  font-family: var(--obd-font-mono);
+  font-size: 0.8rem;
   outline: none;
   &::placeholder { color: var(--obd-text-muted); }
 }
@@ -101,7 +115,7 @@
   color: var(--obd-blue);
   transition: background var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 17px; width: 17px; height: 17px; }
+  app-icon { font-size: 17px; width: 17px; height: 17px; }
   &:hover:not(:disabled) { background: color-mix(in srgb, var(--obd-blue) 18%, transparent); }
   &:disabled { opacity: 0.5; }
 }
@@ -141,7 +155,7 @@
   margin-bottom: -1px;
   transition: color var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 17px; width: 17px; height: 17px; }
+  app-icon { font-size: 17px; width: 17px; height: 17px; }
 
   &:hover { color: var(--obd-text); }
   &.active { color: var(--obd-blue); border-bottom-color: var(--obd-blue); }
@@ -268,7 +282,7 @@
   gap: 4px;
   font-family: var(--obd-font-mono);
   font-size: 0.74rem;
-  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+  app-icon { font-size: 15px; width: 15px; height: 15px; }
 }
 
 .service-address {
@@ -302,7 +316,7 @@
   text-decoration: none;
   transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+  app-icon { font-size: 15px; width: 15px; height: 15px; }
   &:hover { background: var(--obd-surface-2); color: var(--obd-blue); }
 }
 
@@ -346,7 +360,7 @@
   background: var(--obd-bg, var(--obd-surface));
   pointer-events: none;
 
-  mat-icon { font-size: 38px; width: 38px; height: 38px; opacity: 0.45; }
+  app-icon { font-size: 38px; width: 38px; height: 38px; opacity: 0.45; }
   p { margin: 0; font-size: 0.88rem; max-width: 240px; }
 }
 
@@ -363,7 +377,7 @@
   color: var(--obd-text-muted);
   text-align: center;
 
-  mat-icon { font-size: 36px; width: 36px; height: 36px; opacity: 0.5; }
+  app-icon { font-size: 36px; width: 36px; height: 36px; opacity: 0.5; }
   p { margin: 0; font-size: 0.9rem; }
 }
 

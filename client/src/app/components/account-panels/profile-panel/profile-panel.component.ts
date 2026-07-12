@@ -1,13 +1,12 @@
 import { Component, EventEmitter, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { AccountService } from '../../../services/account.service';
+import { FormsModule } from '@angular/forms';import { AccountService } from '../../../services/account.service';
+import { IconComponent } from '../../shared/icon/icon.component';
 
 @Component({
   selector: 'app-profile-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, IconComponent],
   templateUrl: './profile-panel.component.html',
   styleUrl: './profile-panel.component.scss',
 })

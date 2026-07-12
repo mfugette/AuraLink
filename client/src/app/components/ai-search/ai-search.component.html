@@ -1,54 +1,60 @@
-<!-- Compact top-bar trigger -->
+<!-- Compact top-bar trigger — styled as a shell prompt to echo the Aura terminal. -->
 <button type="button" class="ai-trigger" (click)="activate()" aria-label="Ask Aura">
-  <mat-icon>auto_awesome</mat-icon>
-  <span class="ai-trigger-text">Chat with Aura...</span>
-  <kbd class="ai-trigger-kbd">Enter</kbd>
+  <span class="ai-trigger-prompt">aura<span class="ai-trigger-caret">$</span></span>
+  <span class="ai-trigger-text">chat with aura…</span>
+  <kbd class="ai-trigger-kbd">↵</kbd>
 </button>
 
-<!-- Activated AI-focused overlay. Submitting hands off to the /assistant page. -->
+<!-- Activated overlay — a compact terminal window echoing the /assistant page.
+     Submitting hands off to the /assistant page. -->
 @if (active()) {
   <div class="ai-overlay" (click)="close()">
     <div class="ai-panel" (click)="$event.stopPropagation()">
-      <button type="button" class="btn ai-close" (click)="close()" aria-label="Close Aura">
-        <mat-icon>close</mat-icon>
-      </button>
-
-      <div class="ai-hero">
-        <div class="ai-badge"><mat-icon>auto_awesome</mat-icon> Aura</div>
-        <h2 class="ai-heading">How can I help?</h2>
-        <p class="ai-sub">Describe a symptom, ask about a code, or pick a common question below.</p>
+      <!-- Window chrome (matches the Aura terminal's title bar) -->
+      <div class="ai-bar">
+        <span class="ai-dots"><i></i><i></i><i></i></span>
+        <span class="ai-bar-title">aura — quick chat</span>
+        <button type="button" class="btn ai-close" (click)="close()" aria-label="Close Aura">
+          <app-icon name="close" />
+        </button>
       </div>
 
-      <!-- Suggestion chips -->
-      <div class="ai-chips">
-        @for (s of suggestions; track s) {
-          <button type="button" class="btn ai-chip" (click)="useSuggestion(s)">
-            <mat-icon>bolt</mat-icon> {{ s }}
-          </button>
-        }
-      </div>
+      <!-- Console body: boot banner + suggestions, printed like shell output -->
+      <div class="ai-body">
+        <div class="ai-boot">
+          <span class="ai-mark">▸</span> aura diagnostic shell — how can i help?<br />
+          <span class="ai-mark">▸</span> describe a symptom, ask about a code, or run a suggestion below.
+        </div>
 
-      <!-- Input -->
-      <div class="ai-input-row">
-        <div class="ai-input-control">
-          <mat-icon>auto_awesome</mat-icon>
+        <!-- Suggestion chips (runnable commands) -->
+        <div class="ai-chips">
+          @for (s of suggestions; track s) {
+            <button type="button" class="btn ai-chip" (click)="useSuggestion(s)">{{ s }}</button>
+          }
+        </div>
+
+        <!-- Live prompt line -->
+        <div class="ai-input-row">
+          <span class="ai-prompt">aura<span class="ai-caret">$</span></span>
           <input
             #overlayInput
             class="ai-input"
             [(ngModel)]="input"
             (keydown.enter)="send()"
-            placeholder="Ask Aura anything about your car…"
+            spellcheck="false"
             autocomplete="off"
+            placeholder="type a command…"
           />
           <button type="button" class="btn ai-send" [disabled]="!input.trim()" (click)="send()" aria-label="Send">
-            <mat-icon>arrow_upward</mat-icon>
+            <kbd class="ai-trigger-kbd">↵</kbd>
           </button>
         </div>
-        <p class="ai-disclaimer">
-          <mat-icon>info</mat-icon>
-          Demo preview — Aura isn’t connected yet. Responses are placeholders.
-        </p>
       </div>
+
+      <!-- Status footer -->
+      <p class="ai-disclaimer">
+        demo preview — aura isn’t connected yet. responses are placeholders.
+      </p>
     </div>
   </div>
 }

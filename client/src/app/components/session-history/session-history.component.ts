@@ -1,12 +1,11 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { SessionService } from '../../services/session.service';
+import { FormsModule } from '@angular/forms';import { SessionService } from '../../services/session.service';
 import { TelemetryService } from '../../services/telemetry.service';
 import { CustomSelectComponent, SelectOption } from '../shared/custom-select/custom-select.component';
 import { DriveSession } from '../../models/session.model';
 import { MetricDef, MetricKey } from '../../models/telemetry.model';
+import { IconComponent } from '../shared/icon/icon.component';
 
 type SortKey = 'date' | 'duration' | 'distance' | 'rpm' | 'coolant';
 
@@ -34,7 +33,7 @@ interface SummaryTile {
 @Component({
   selector: 'app-session-history',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, CustomSelectComponent],
+  imports: [CommonModule, FormsModule, IconComponent, CustomSelectComponent],
   templateUrl: './session-history.component.html',
   styleUrl: './session-history.component.scss',
 })

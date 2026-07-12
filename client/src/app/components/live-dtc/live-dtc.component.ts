@@ -1,17 +1,16 @@
 import { Component, EventEmitter, Output, signal, computed, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { CommonModule } from '@angular/common';import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DtcService } from '../../services/dtc.service';
 import { DtcCode, SEVERITY_RANK } from '../../models/dtc-code.model';
 import { Vehicle } from '../../models/vehicle.model';
+import { IconComponent } from '../shared/icon/icon.component';
 
 @Component({
   selector: 'app-live-dtc',
   standalone: true,
   imports: [
     CommonModule,
-    MatIconModule, MatProgressSpinnerModule,
+    IconComponent, MatProgressSpinnerModule,
   ],
   templateUrl: './live-dtc.component.html',
   styleUrl: './live-dtc.component.scss',

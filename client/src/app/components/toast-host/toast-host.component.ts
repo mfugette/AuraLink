@@ -1,7 +1,6 @@
 import { Component, HostListener, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { ToastService, ToastKind } from '../../services/toast.service';
+import { CommonModule } from '@angular/common';import { ToastService, ToastKind } from '../../services/toast.service';
+import { IconComponent } from '../shared/icon/icon.component';
 
 // App-wide toast + offline surface. Mounted once in the app shell. Reads the
 // ToastService signal to render transient messages, and keeps the offline banner
@@ -9,7 +8,7 @@ import { ToastService, ToastKind } from '../../services/toast.service';
 @Component({
   selector: 'app-toast-host',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, IconComponent],
   templateUrl: './toast-host.component.html',
   styleUrl: './toast-host.component.scss',
 })

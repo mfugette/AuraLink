@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
-
-// Public Privacy Policy page. Static, trusted content. Plain-English TEMPLATE
+import { IconComponent } from '../../components/shared/icon/icon.component';// Public Privacy Policy page. Static, trusted content. Plain-English TEMPLATE
 // naming AuraLink's real data flows (Supabase, Gemini, Google Maps, Stripe-later)
 // as GDPR/CCPA require. NOT lawyer-reviewed — inline .legal-flag blocks mark what
 // an attorney must confirm (legal basis, data-processing agreements, retention,
@@ -10,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-privacy-page',
   standalone: true,
-  imports: [RouterLink, MatIconModule],
+  imports: [RouterLink, IconComponent],
   templateUrl: './privacy-page.component.html',
   styleUrl: './legal-page.component.scss',
 })

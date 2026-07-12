@@ -27,7 +27,7 @@
 
     @if (sub() && tier.tier() !== 'free') {
       <p class="plan-renewal">
-        <mat-icon>{{ sub()!.canceled ? 'event_busy' : 'autorenew' }}</mat-icon>
+        <app-icon [name]="sub()!.canceled ? 'event_busy' : 'autorenew'" />
         @if (sub()!.canceled) {
           Your plan ends on {{ sub()!.renewsAt | date:'longDate' }}. You'll move to Free after that.
         } @else {
@@ -39,7 +39,7 @@
     <!-- Usage snapshot -->
     <div class="plan-usage">
       <div class="usage-item">
-        <mat-icon>auto_awesome</mat-icon>
+        <app-icon name="auto_awesome" />
         <div>
           <span class="usage-label">Aura messages today</span>
           <span class="usage-value">
@@ -49,7 +49,7 @@
         </div>
       </div>
       <div class="usage-item">
-        <mat-icon>directions_car</mat-icon>
+        <app-icon name="directions_car" />
         <div>
           <span class="usage-label">Saved vehicles</span>
           <span class="usage-value">
@@ -63,18 +63,18 @@
     <div class="plan-actions">
       @if (tier.tier() !== 'pro') {
         <a class="btn plan-btn plan-btn--primary" routerLink="/plan">
-          <mat-icon>upgrade</mat-icon> {{ tier.tier() === 'free' ? 'Choose a plan' : 'Upgrade' }}
+          <app-icon name="upgrade" /> {{ tier.tier() === 'free' ? 'Choose a plan' : 'Upgrade' }}
         </a>
       } @else {
         <a class="btn plan-btn" routerLink="/plan">
-          <mat-icon>tune</mat-icon> Change plan
+          <app-icon name="tune" /> Change plan
         </a>
       }
 
       @if (tier.tier() !== 'free') {
         @if (sub()?.canceled) {
           <button type="button" class="btn plan-btn" (click)="resume()">
-            <mat-icon>replay</mat-icon> Resume plan
+            <app-icon name="replay" /> Resume plan
           </button>
         } @else {
           <button type="button" class="btn plan-btn plan-btn--ghost" (click)="openCancelDialog()">
@@ -90,7 +90,7 @@
     <div class="dialog-scrim" (click)="closeCancelDialog()">
       <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="cancel-title"
            (click)="$event.stopPropagation()">
-        <div class="dialog-icon"><mat-icon>warning</mat-icon></div>
+        <div class="dialog-icon"><app-icon name="warning" /></div>
         <h2 class="dialog-title" id="cancel-title">Cancel your {{ def().name }} plan?</h2>
         <p class="dialog-body">
           You'll keep your {{ def().name }} features until
@@ -108,7 +108,7 @@
           </label>
 
           @if (cancelError()) {
-            <p class="dialog-error"><mat-icon>error</mat-icon> {{ cancelError() }}</p>
+            <p class="dialog-error"><app-icon name="error" /> {{ cancelError() }}</p>
           }
 
           <div class="dialog-actions">
@@ -135,7 +135,7 @@
 
     @if (history().length === 0) {
       <div class="history-empty">
-        <mat-icon>receipt_long</mat-icon>
+        <app-icon name="receipt_long" />
         <p>No purchases yet. Your receipts and orders will show up here.</p>
       </div>
     } @else {
@@ -143,7 +143,7 @@
         @for (r of history(); track r.id) {
           <div class="history-row">
             <div class="history-main">
-              <mat-icon class="history-icon">{{ r.kind === 'plan' ? 'subscriptions' : 'memory' }}</mat-icon>
+              <app-icon class="history-icon" [name]="r.kind === 'plan' ? 'subscriptions' : 'memory'" />
               <div class="history-copy">
                 <span class="history-label">{{ r.label }}</span>
                 <span class="history-meta">
@@ -153,13 +153,11 @@
             </div>
             <div class="history-right">
               <span class="history-status" [attr.data-status]="r.status">
-                <mat-icon>{{
-                  r.status === 'delivered' ? 'check_circle'
+                <app-icon [name]="r.status === 'delivered' ? 'check_circle'
                   : r.status === 'shipped' ? 'local_shipping'
                   : r.status === 'processing' ? 'schedule'
                   : r.status === 'refunded' ? 'undo'
-                  : 'check_circle'
-                }}</mat-icon>
+                  : 'check_circle'" />
                 {{ r.status }}
               </span>
               <span class="history-amount">${{ r.amount }}</span>

@@ -1,10 +1,9 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { RepairLogService } from '../../services/repair-log.service';
+import { FormsModule } from '@angular/forms';import { RepairLogService } from '../../services/repair-log.service';
 import { AccountService } from '../../services/account.service';
 import { CustomSelectComponent, SelectOption } from '../shared/custom-select/custom-select.component';
+import { IconComponent } from '../shared/icon/icon.component';
 import {
   RepairCategory, RepairRecord, REPAIR_CATEGORY_META,
 } from '../../models/repair.model';
@@ -17,7 +16,7 @@ type SortKey = 'date' | 'mileage' | 'cost';
 @Component({
   selector: 'app-repair-log',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, CustomSelectComponent],
+  imports: [CommonModule, FormsModule, IconComponent, CustomSelectComponent],
   templateUrl: './repair-log.component.html',
   styleUrl: './repair-log.component.scss',
 })

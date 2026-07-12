@@ -2,11 +2,11 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
 import { TierService } from '../../services/tier.service';
 import { SubscriptionService } from '../../services/subscription.service';
 import { AuthService } from '../../services/auth.service';
 import { tierDef } from '../../models/tier.model';
+import { IconComponent } from '../../components/shared/icon/icon.component';
 
 // My Plan — the account's subscription hub: current plan + usage, billing
 // history, hardware order status, and cancellation. Reads SubscriptionService
@@ -14,7 +14,7 @@ import { tierDef } from '../../models/tier.model';
 @Component({
   selector: 'app-my-plan-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, MatIconModule],
+  imports: [CommonModule, FormsModule, RouterLink, IconComponent],
   templateUrl: './my-plan-page.component.html',
   styleUrl: './my-plan-page.component.scss',
 })

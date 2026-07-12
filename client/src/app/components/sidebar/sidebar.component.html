@@ -14,7 +14,7 @@
       matTooltipPosition="right"
       [attr.aria-label]="collapsed ? 'Expand menu' : 'Collapse menu'"
     >
-      <mat-icon>{{ collapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+      <app-icon [name]="collapsed ? 'chevron_right' : 'chevron_left'" [size]="20" />
     </button>
   </div>
 
@@ -29,10 +29,10 @@
       matTooltipPosition="right"
       (click)="navigate.emit()"
     >
-      <mat-icon>{{ item.icon }}</mat-icon>
+      <app-icon [name]="item.icon" [size]="18" />
       <span class="nav-label">{{ item.label }}</span>
       @if (locked(item)) {
-        <mat-icon class="nav-lock" [matTooltip]="collapsed ? '' : 'Upgrade to unlock'">lock</mat-icon>
+        <app-icon class="nav-lock" name="lock" [size]="15" [matTooltip]="collapsed ? '' : 'Upgrade to unlock'" />
       }
     </a>
   }

@@ -9,7 +9,7 @@
   color: var(--obd-text-muted);
   text-align: center;
 
-  mat-icon { font-size: 32px; width: 32px; height: 32px; opacity: 0.4; }
+  app-icon { font-size: 32px; width: 32px; height: 32px; opacity: 0.4; }
   p { margin: 0; font-size: 0.875rem; }
 }
 
@@ -55,7 +55,7 @@
   text-transform: uppercase;
   letter-spacing: 0.3px;
 
-  mat-icon { font-size: 11px; width: 11px; height: 11px; }
+  app-icon { font-size: 11px; width: 11px; height: 11px; }
 }
 
 .vehicle-card-sub {
@@ -76,7 +76,7 @@
   color: var(--obd-text-muted);
   transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  app-icon { font-size: 18px; width: 18px; height: 18px; }
 
   &:hover { background: var(--obd-surface-4); color: var(--obd-blue); }
 
@@ -116,7 +116,7 @@
   font-size: 0.8rem;
   margin: 0;
 
-  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  app-icon { font-size: 16px; width: 16px; height: 16px; }
 }
 
 .panel-cancel-btn {
@@ -168,5 +168,5 @@
 
   &:hover { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 20%, transparent); }
 
-  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  app-icon { font-size: 18px; width: 18px; height: 18px; }
 }

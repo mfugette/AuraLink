@@ -3,9 +3,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-
-export interface SelectOption {
+import { IconComponent } from '../icon/icon.component';export interface SelectOption {
   value: unknown;
   label: string;
 }
@@ -19,7 +17,7 @@ export interface SelectOption {
 @Component({
   selector: 'app-custom-select',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, IconComponent],
   templateUrl: './custom-select.component.html',
   styleUrl: './custom-select.component.scss',
   providers: [{

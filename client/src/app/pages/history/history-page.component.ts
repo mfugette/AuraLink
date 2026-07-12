@@ -1,9 +1,8 @@
 import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { SessionHistoryComponent } from '../../components/session-history/session-history.component';
+import { CommonModule } from '@angular/common';import { SessionHistoryComponent } from '../../components/session-history/session-history.component';
 import { RepairLogComponent } from '../../components/repair-log/repair-log.component';
 import { IssueHistoryPageComponent } from '../issue-history/issue-history-page.component';
+import { IconComponent } from '../../components/shared/icon/icon.component';
 
 type HistoryTab = 'drives' | 'issues' | 'repairs' | 'chats' | 'vehicle';
 
@@ -22,7 +21,7 @@ interface TabDef {
   selector: 'app-history-page',
   standalone: true,
   imports: [
-    CommonModule, MatIconModule,
+    CommonModule, IconComponent,
     SessionHistoryComponent, RepairLogComponent, IssueHistoryPageComponent,
   ],
   templateUrl: './history-page.component.html',

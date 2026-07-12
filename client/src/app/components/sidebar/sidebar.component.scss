@@ -45,7 +45,7 @@
 // "NAVIGATION" eyebrow — monospace, tracked-out, expanded rail only.
 .sidebar-nav-label {
   font-family: var(--obd-font-mono);
-  font-size: 0.64rem;
+  font-size: 0.80rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -68,7 +68,7 @@
               color var(--obd-dur-fast) var(--obd-ease),
               border-color var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon {
+  app-icon {
     font-size: 20px;
     width: 20px;
     height: 20px;
@@ -117,16 +117,17 @@
   border-radius: var(--obd-radius-sm);
   color: var(--obd-text-dim);
   text-decoration: none;
-  font-size: 0.76rem;
+  font-family: var(--obd-font-mono);
+  font-size: 0.74rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   white-space: nowrap;
   overflow: hidden;
   transition: background var(--obd-dur-fast) var(--obd-ease),
               color var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon {
+  app-icon {
     flex-shrink: 0;
     font-size: 18px;
     width: 18px;
@@ -144,7 +145,7 @@
     background: var(--obd-blue);
     color: #fff;
 
-    mat-icon { color: #fff; }
+    app-icon { color: #fff; }
 
     &:hover { background: var(--obd-blue); }
   }

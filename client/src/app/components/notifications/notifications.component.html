@@ -1,7 +1,7 @@
 <!-- Bell trigger (lives in the header) -->
 <button type="button" class="btn notif-bell" [class.active]="open()" (click)="toggle()"
         aria-label="Notifications" [attr.aria-expanded]="open()">
-  <mat-icon>notifications</mat-icon>
+  <app-icon name="notifications" />
   @if (unreadCount() > 0) {
     <span class="notif-badge">{{ unreadCount() > 9 ? '9+' : unreadCount() }}</span>
   }
@@ -16,17 +16,17 @@
       <div class="notif-head">
         <div class="notif-head-title">
           <button type="button" class="notif-collapse" (click)="close()" aria-label="Close panel">
-            <mat-icon>chevron_right</mat-icon>
+            <app-icon name="chevron_right" />
           </button>
           <h2>Notifications</h2>
         </div>
         <div class="notif-head-actions">
           <button type="button" class="notif-icon-btn" (click)="setTab('settings')"
                   aria-label="Notification settings" matTooltip="Settings">
-            <mat-icon>settings</mat-icon>
+            <app-icon name="settings" />
           </button>
           <button type="button" class="notif-x" (click)="close()" aria-label="Close">
-            <mat-icon>close</mat-icon>
+            <app-icon name="close" />
           </button>
         </div>
       </div>
@@ -35,7 +35,7 @@
         <!-- Settings: per-category SMS opt-in -->
         <div class="notif-tabs">
           <button type="button" class="notif-tab" (click)="setTab('all')">
-            <mat-icon>chevron_left</mat-icon> Back
+            <app-icon name="chevron_left" /> Back
           </button>
         </div>
 
@@ -47,7 +47,7 @@
 
           @for (cat of categories; track cat) {
             <div class="notif-setrow">
-              <span class="notif-setic" [attr.data-cat]="cat"><mat-icon>{{ meta[cat].icon }}</mat-icon></span>
+              <span class="notif-setic" [attr.data-cat]="cat"><app-icon [name]="meta[cat].icon" /></span>
               <span class="notif-setl">{{ meta[cat].label }}</span>
               <label class="notif-switch">
                 <input type="checkbox" [checked]="smsPrefs()[cat]" [disabled]="!isPro()"
@@ -60,7 +60,7 @@
 
           @if (!isPro()) {
             <p class="notif-locked">
-              <mat-icon>lock</mat-icon>
+              <app-icon name="lock" />
               SMS alerts are a Pro feature. <a routerLink="/plan" (click)="close()">Upgrade</a>
             </p>
           }
@@ -68,18 +68,19 @@
       } @else {
         <!-- Search (filters title/body) -->
         <div class="notif-search">
-          <mat-icon>search</mat-icon>
+          <span class="ts-prompt">notifs<span class="ts-caret">$</span></span>
           <input
             type="text"
             class="notif-search-input"
-            placeholder="Search notifications ..."
+            placeholder="filter…"
             [value]="query()"
             (input)="onSearch($event)"
+            spellcheck="false"
             aria-label="Search notifications"
           />
           @if (query()) {
-            <button type="button" class="notif-search-clear" (click)="query.set('')" aria-label="Clear search">
-              <mat-icon>close</mat-icon>
+            <button type="button" class="ts-clear" (click)="query.set('')" aria-label="Clear search">
+              <app-icon name="close" />
             </button>
           }
         </div>
@@ -100,7 +101,7 @@
         <div class="notif-body">
           @if (items().length === 0) {
             <div class="notif-empty">
-              <mat-icon>{{ query() ? 'search_off' : 'done_all' }}</mat-icon>
+              <app-icon [name]="query() ? 'search_off' : 'done_all'" />
               {{ query() ? 'No matching notifications.' : "You're all caught up." }}
             </div>
           } @else {
@@ -108,7 +109,7 @@
               <button type="button" class="notif-item" [class.unread]="!n.read" (click)="markRead(n)">
                 <!-- Checkbox-style mark (read = empty, unread = filled) -->
                 <span class="notif-item-check" [class.on]="!n.read" aria-hidden="true">
-                  @if (!n.read) { <mat-icon>check</mat-icon> }
+                  @if (!n.read) { <app-icon name="check" /> }
                 </span>
 
                 <!-- Title + category descriptor underneath (reference layout) -->
@@ -135,7 +136,7 @@
             [disabled]="unreadCount() === 0"
             (click)="markAllRead()"
           >
-            <mat-icon>done_all</mat-icon>
+            <app-icon name="done_all" />
             Mark all read
           </button>
         </div>

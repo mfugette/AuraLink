@@ -2,10 +2,9 @@ import {
   Component, ElementRef, OnDestroy, computed, effect, HostListener, inject, signal, viewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
-import { InboxService } from '../../services/inbox.service';
+import { RouterLink } from '@angular/router';import { InboxService } from '../../services/inbox.service';
 import { TierService } from '../../services/tier.service';
+import { IconComponent } from '../shared/icon/icon.component';
 import {
   AppNotification, CATEGORY_META, NotificationCategory,
 } from '../../models/notification.model';
@@ -47,7 +46,7 @@ const CATEGORY_TAG: Record<NotificationCategory, string> = {
 @Component({
   selector: 'app-notifications',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatIconModule],
+  imports: [CommonModule, RouterLink, IconComponent],
   templateUrl: './notifications.component.html',
   styleUrl: './notifications.component.scss',
 })

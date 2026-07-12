@@ -7,14 +7,14 @@
            lives in the sidebar's own toggle section). Signed-in only. -->
       @if (auth.isSignedIn()) {
         <button type="button" class="btn hamburger" (click)="toggleSidebar()" aria-label="Toggle menu">
-          <mat-icon>menu</mat-icon>
+          <app-icon name="menu" />
         </button>
       }
       <!-- Logo: its icon is centered over the collapsed rail's width and stays
            fixed there whether the rail is expanded or collapsed. -->
-      <a class="logo" [class.logo--railed]="auth.isSignedIn()" routerLink="/home">
-        <mat-icon class="logo-icon">bluetooth_drive</mat-icon>
-        <span class="logo-text">Aura<span class="logo-text-accent">Link</span></span>
+      <a class="logo" [class.logo--railed]="auth.isSignedIn()" routerLink="/home" aria-label="AuraLink home">
+        <app-icon class="logo-icon" name="bluetooth_drive" />
+        <span class="logo-figlet" aria-hidden="true"><span class="logo-figlet-aura">{{ logoAura }}</span><span class="logo-figlet-link">{{ logoLink }}</span></span>
       </a>
     </div>
 
@@ -25,10 +25,10 @@
       <button type="button" class="btn header-link theme-toggle" (click)="theme.toggle()"
               [matTooltip]="theme.isLight() ? 'Switch to dark' : 'Switch to light'"
               [attr.aria-label]="theme.isLight() ? 'Switch to dark theme' : 'Switch to light theme'">
-        <mat-icon>{{ theme.isLight() ? 'dark_mode' : 'light_mode' }}</mat-icon>
+        <app-icon [name]="theme.isLight() ? 'dark_mode' : 'light_mode'" />
       </button>
       <a class="header-link" routerLink="/faq" matTooltip="Help & FAQ" aria-label="Help & FAQ">
-        <mat-icon>help_outline</mat-icon>
+        <app-icon name="help_outline" />
       </a>
 
       <!-- Notifications bell (signed-in only) -->

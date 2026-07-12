@@ -1,9 +1,8 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { CommonModule } from '@angular/common';import { MatTooltipModule } from '@angular/material/tooltip';
 import { TelemetryService } from '../../services/telemetry.service';
 import { MetricDef, MetricKey, Sample } from '../../models/telemetry.model';
+import { IconComponent } from '../../components/shared/icon/icon.component';
 type DashView = 'gauges' | 'charts';
 
 // A horizontal gridline with its value, drawn as a dotted rule + axis label.
@@ -52,7 +51,7 @@ interface ChartVm {
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatTooltipModule],
+  imports: [CommonModule, IconComponent, MatTooltipModule],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.scss',
 })

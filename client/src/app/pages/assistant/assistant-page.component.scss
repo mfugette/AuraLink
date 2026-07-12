@@ -67,7 +67,7 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   transition: border-color var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
-  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+  app-icon { font-size: 15px; width: 15px; height: 15px; }
   &:hover { border-color: var(--obd-text-muted); color: var(--obd-text); }
 }
 

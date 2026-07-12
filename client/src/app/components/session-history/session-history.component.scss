@@ -8,8 +8,6 @@
 // Everything else (console look, 38px controls, prominent date, row rhythm,
 // centered numeric headers) is shared via the history-table mixin so all tabs
 // match. Drives-specific: fixed column widths + title ellipsis.
-.ht-title { font-size: 1.15rem; }
-
 .ht-table {
   .td-title {
     overflow: hidden; text-overflow: ellipsis;
@@ -19,14 +17,17 @@
 
 // Fixed column widths on wide screens; below 820px the mixin switches the table
 // to auto layout + horizontal scroll, so the widths are scoped to wide only.
+// Widths sum to exactly 100% so the table fills edge-to-edge with no dead space;
+// Session absorbs the slack. Status right-aligns so its chip meets the far edge.
 @media (min-width: 821px) {
   .ht-table {
     table-layout: fixed;
-    // Keep the numeric readouts compact and let Session/Status absorb the slack.
-    colgroup col.c-date    { width: 9%; }
-    colgroup col.c-session { width: 26%; }
+    colgroup col.c-date    { width: 8%; }
+    colgroup col.c-session { width: 30%; }
     colgroup col.c-num     { width: 11%; }
-    colgroup col.c-status  { width: 14%; }
+    colgroup col.c-status  { width: 18%; }
+
+    th:last-child, td:last-child { text-align: right; }
   }
 }
 
@@ -43,7 +44,7 @@
 .sh-trace-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .sh-trace-title {
   display: flex; align-items: center; gap: 7px; font-size: 0.86rem; font-weight: 600; color: var(--obd-text);
-  mat-icon { font-size: 17px; width: 17px; height: 17px; }
+  app-icon { font-size: 17px; width: 17px; height: 17px; }
 }
 .sh-trace-peak {
   font-size: 0.84rem; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--obd-text);

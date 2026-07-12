@@ -33,7 +33,7 @@
   border: 1px solid color-mix(in srgb, var(--obd-red) 40%, transparent);
   border-radius: var(--obd-radius-sm);
 
-  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  app-icon { font-size: 16px; width: 16px; height: 16px; }
 }
 
 .primary-toggle {

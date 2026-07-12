@@ -1,13 +1,12 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
-import { CheckoutService } from '../../services/checkout.service';
+import { Router, RouterLink } from '@angular/router';import { CheckoutService } from '../../services/checkout.service';
 import { TierService } from '../../services/tier.service';
 import { SubscriptionService } from '../../services/subscription.service';
 import { AccountService } from '../../services/account.service';
 import { ADAPTER } from '../../models/tier.model';
+import { IconComponent } from '../../components/shared/icon/icon.component';
 
 type Stage = 'form' | 'processing' | 'done';
 
@@ -20,7 +19,7 @@ type Stage = 'form' | 'processing' | 'done';
 @Component({
   selector: 'app-checkout-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, MatIconModule],
+  imports: [CommonModule, FormsModule, RouterLink, IconComponent],
   templateUrl: './checkout-page.component.html',
   styleUrl: './checkout-page.component.scss',
 })

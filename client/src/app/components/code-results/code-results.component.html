@@ -3,7 +3,7 @@
   <!-- Unknown codes warning -->
   @if (unknownCodes().length > 0) {
     <div class="unknown-banner">
-      <mat-icon>help_outline</mat-icon>
+      <app-icon name="help_outline" />
       <div>
         <strong>Unrecognized code{{ unknownCodes().length > 1 ? 's' : '' }}:</strong>
         {{ unknownCodes().join(', ') }} — not found in our database. These may be manufacturer-specific codes.
@@ -26,11 +26,11 @@
             <span class="code-badge">{{ result.code }}</span>
             <span class="code-name">{{ result.name }}</span>
             <span class="severity-badge {{ result.severity }}">
-              <mat-icon>{{ severityIcon(result.severity) }}</mat-icon>
+              <app-icon [name]="severityIcon(result.severity)" />
               {{ result.severity }}
             </span>
           </div>
-          <mat-icon class="panel-chevron">expand_more</mat-icon>
+          <app-icon class="panel-chevron" name="expand_more" />
         </button>
 
         <!-- Expanded content (CSS grid height animation) -->
@@ -43,7 +43,7 @@
                 <!-- Symptoms -->
                 <div class="detail-section">
                   <div class="detail-heading">
-                    <mat-icon>visibility</mat-icon>
+                    <app-icon name="visibility" />
                     Symptoms
                   </div>
                   <ul class="detail-list">
@@ -56,7 +56,7 @@
                 <!-- Possible causes -->
                 <div class="detail-section">
                   <div class="detail-heading">
-                    <mat-icon>build</mat-icon>
+                    <app-icon name="build" />
                     Possible Causes
                   </div>
                   <ul class="detail-list">
@@ -70,11 +70,11 @@
                 @if (result.relatedParts.length > 0) {
                   <div class="detail-section">
                     <div class="detail-heading">
-                      <mat-icon>shopping_cart</mat-icon>
+                      <app-icon name="shopping_cart" />
                       Parts That May Be Needed
                     </div>
                     <p class="parts-hint">
-                      <mat-icon>touch_app</mat-icon>
+                      <app-icon name="touch_app" />
                       Select parts to add them to your shopping list in Step 4.
                     </p>
                     <div class="parts-chips">
@@ -85,7 +85,7 @@
                           [class.part-chip--selected]="selectedParts().has(part)"
                           (click)="togglePart(part)"
                         >
-                          <mat-icon>{{ selectedParts().has(part) ? 'check' : 'add' }}</mat-icon>
+                          <app-icon [name]="selectedParts().has(part) ? 'check' : 'add'" />
                           {{ part }}
                         </button>
                       }
@@ -104,7 +104,7 @@
   <!-- Selected parts summary -->
   @if (selectedParts().size > 0) {
     <div class="parts-summary">
-      <mat-icon>inventory_2</mat-icon>
+      <app-icon name="inventory_2" />
       <div>
         <strong>{{ selectedParts().size }} part{{ selectedParts().size !== 1 ? 's' : '' }} added to your list:</strong>
         <span class="summary-parts">{{ selectedPartsArray.join(' · ') }}</span>

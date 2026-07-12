@@ -1,52 +1,15 @@
 @use '../page-shell' as *;
+@use '../../components/terminal-search' as ts;
 
 .faq-page { max-width: 800px; }
 
-// ── Search ────────────────────────────────────────────────────────────────────
+// ── Search: shared terminal-style field (help$ prompt) ────────────────────────
 .faq-search {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  height: 48px;
-  padding: 0 14px;
+  @include ts.field;
+  height: 46px;
   margin-bottom: 28px;
-  border-radius: var(--obd-radius-sm);
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border-strong);
-  transition: border-color var(--obd-dur-fast) var(--obd-ease),
-              box-shadow var(--obd-dur-fast) var(--obd-ease);
 
-  &:focus-within {
-    border-color: var(--obd-blue);
-    box-shadow: 0 0 0 3px var(--obd-blue-dim);
-  }
-
-  > mat-icon { color: var(--obd-text-muted); flex-shrink: 0; }
-}
-
-.faq-search-input {
-  flex: 1;
-  min-width: 0;
-  border: none;
-  background: none;
-  color: var(--obd-text);
-  font-size: 0.95rem;
-
-  &:focus { outline: none; }
-  &::placeholder { color: var(--obd-text-muted); }
-}
-
-.faq-search-clear {
-  display: flex;
-  border: none;
-  background: none;
-  cursor: pointer;
-  color: var(--obd-text-muted);
-  padding: 4px;
-  border-radius: 50%;
-
-  &:hover { color: var(--obd-text); background: var(--obd-surface-3); }
-  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  .ts-prompt, input { font-size: 0.92rem; }
 }
 
 // ── Sections ──────────────────────────────────────────────────────────────────
@@ -61,7 +24,7 @@
   font-weight: 700;
   color: var(--obd-text);
 
-  mat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--obd-blue); }
+  app-icon { font-size: 20px; width: 20px; height: 20px; color: var(--obd-blue); }
 }
 
 .faq-list {
@@ -134,7 +97,7 @@
   padding: 40px 20px;
   color: var(--obd-text-dim);
 
-  mat-icon { font-size: 36px; width: 36px; height: 36px; color: var(--obd-text-muted); }
+  app-icon { font-size: 36px; width: 36px; height: 36px; color: var(--obd-text-muted); }
   p { margin: 8px 0 0; }
   .faq-empty-sub { font-size: 0.88rem; color: var(--obd-text-muted); }
   a { color: var(--obd-blue); text-decoration: none; &:hover { text-decoration: underline; } }
@@ -151,7 +114,7 @@
   background: linear-gradient(135deg, var(--obd-blue-dim), transparent 75%), var(--obd-surface-2);
   border: 1px solid var(--obd-border);
 
-  > mat-icon {
+  > app-icon {
     font-size: 26px;
     width: 26px;
     height: 26px;

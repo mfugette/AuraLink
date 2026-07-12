@@ -51,7 +51,7 @@
   color: var(--obd-text-muted);
   text-align: center;
 
-  mat-icon {
+  app-icon {
     font-size: 26px;
     width: 26px;
     height: 26px;
@@ -69,7 +69,7 @@
 
   &:hover {
     color: var(--obd-blue);
-    mat-icon { color: var(--obd-blue); }
+    app-icon { color: var(--obd-blue); }
   }
 }
 
@@ -95,7 +95,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 
-  mat-icon { flex-shrink: 0; font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); }
+  app-icon { flex-shrink: 0; font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); }
 }
 
 .vehicle-name {
@@ -133,8 +133,8 @@
 }
 
 // Specs as a compact mono key/value readout. Takes the slot's free vertical
-// space (scrolls if a vehicle has many fields) so every slot keeps a uniform
-// height and the CTA row stays pinned to the bottom.
+// space so the CTA row stays pinned to the bottom. Content fits without
+// scrolling — a slot is always tall enough for the full spec set.
 .vehicle-specs {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -142,7 +142,6 @@
   gap: 10px 18px;
   margin: 4px 0 2px;
   flex: 1 1 auto;
-  overflow-y: auto;
   min-height: 0;
 
   div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -185,7 +184,7 @@
   color: var(--obd-text-muted);
   transition: color var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+  app-icon { font-size: 15px; width: 15px; height: 15px; }
 
   .vehicle-cell:hover & { color: var(--obd-blue); }
 }
