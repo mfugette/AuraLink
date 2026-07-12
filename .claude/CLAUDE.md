@@ -3,7 +3,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## The Project
-**AuraLink** — a vehicle diagnostics and management app (domain `auralink.vin`). Angular 20 client + Express API server, two separate npm workspaces (`client/`, `server/`) with no shared package, run together from the repo root. Supabase (Postgres + Auth) is the backend datastore; Google Gemini powers the "Aura" AI assistant; Google Maps Platform powers nearby-services search (an empty `server/src/routes/open-street-map.route.ts` stub exists as groundwork for a possible OpenStreetMap alternative — not registered or implemented yet).
+**AuraLink** — a vehicle diagnostics and management app (domain `auralink.vin`). Angular 21 client + Express API server, two separate npm workspaces (`client/`, `server/`) with no shared package, run together from the repo root. Supabase (Postgres + Auth) is the backend datastore; Google Gemini powers the "Aura" AI assistant; Google Maps Platform powers nearby-services search (an empty `server/src/routes/open-street-map.route.ts` stub exists as groundwork for a possible OpenStreetMap alternative — not registered or implemented yet).
 
 **Product direction:** AuraLink is an all-encompassing vehicle management service, not just a DTC lookup. Two hardware-facing tracks exist: (1) a proprietary Bluetooth "AuraLink Adapter" — **on hold** pending a physical prototype; don't build new adapter-dependent work without confirming. (2) A **standalone desktop terminal** product (Electron, lives in its own repo outside this one) that talks to stock ELM327 adapters and reuses this server's `/api/assistant/chat` endpoint — keep that endpoint's contract (stateless, plain-text streaming, Bearer JWT) stable, as an external client depends on it.
 
@@ -23,7 +23,7 @@ Client (`client/`):
 npm start       # ng serve — dev server only
 npm run build   # ng build
 npm run watch   # ng build --watch --configuration development
-npm test        # ng test (Karma/Jasmine) — note: almost no real specs exist yet, just the generated app.spec.ts
+npm test        # ng test (Karma/Jasmine). Real suite exists (~262 tests, 47 spec files) covering services, guards, interceptors, pipes, components, and pages. Headless needs CHROME_BIN set to a Chrome/Brave path: `CHROME_BIN=... ng test --watch=false --browsers=ChromeHeadless`. Shared test helpers: `client/src/testing/test-utils.ts` (createMockAuth, provideMockAuth, clearAppStorage).
 ```
 Server (`server/`):
 ```bash
@@ -40,7 +40,9 @@ Both `server/.env` and `client/src/environments/environment.ts` need real keys b
 - **Google Maps**: a server-restricted key (`GOOGLE_MAPS_API_KEY` in `server/.env`, Places + Geocoding APIs) and a separate browser-restricted key (`googleMapsBrowserKey` in the client environment, Maps JavaScript API, HTTP-referrer restricted).
 - **Gemini**: `GEMINI_API_KEY` in `server/.env` for the Aura assistant (`server/src/routes/assistant.route.ts`, model `gemini-3.1-flash-lite`). Note: a depleted-quota 429 from Gemini surfaces to users as "Aura is unavailable right now" — check the server console for `Assistant chat error:` and the key's billing in AI Studio before debugging code.
 - **CORS**: `CLIENT_ORIGIN` in `server/.env` — comma-separated list of allowed origins. Defaults to `http://localhost:4200` only; a tunnel/prod origin (e.g. `https://auralink.vin`) must be added explicitly or every cross-origin request fails.
-DB schema lives in `server/db/migrations/*.sql`, applied manually via the Supabase SQL editor (no migration runner). Apply in numeric order.
+DB schema lives in `server/db/migrations/*.sql`, applied manually via the Supabase SQL editor (no migration runner). Apply in numeric order. **Symptom of a skipped migration:** an insert/update 500s with `{"error":"Internal server error."}` and the server console logs `Unhandled error: … column "…" does not exist` — the code references a column a later migration adds. Run the missing migration.
+
+Reference docs in `docs/`: `AUTH_SETUP.md`, `MAPS_SETUP.md`, `ICON_MAPPING.md` (Material→pixelarticons icon map), `CLIENT_AUDIT.md` (test/security/SOLID review), `ARCHITECTURE_UML.md` (client + server class diagrams).
 
 ## Architecture
 
@@ -72,17 +74,21 @@ Because header + toolbar heights are identical everywhere, every console page's 
 
 ### Design language
 Dark automotive theme via Angular Material's `mat.theme()` mixin plus a large `--obd-*` CSS custom-property system (both at the top of `client/src/styles.scss`). Key conventions:
-- **Headers are terminal mono**: `--obd-font-display` (mono stack, weight 500–600) for all page titles and the hero; **no icons in page headers**. Body text is Inter. `--obd-font-mono` for eyebrows, data readouts, chips, hints.
+- **Terminal mono is the app-wide default face** — `--obd-font-mono` / `--obd-font-display` (JetBrains Mono, loaded in `index.html`; Material typography families synced to match). The old Inter body face was retired. Page titles/hero use `--obd-font-display` (weight 500–600); **no icons in page headers**.
 - Flat, squared, hairline-ruled surfaces — no rounded SaaS cards, shadows, or pill buttons on console pages. Status chips are squared, mono, tinted (`color-mix` with the status color).
 - Buttons are outline+accent-text (`.btn-action` in `styles.scss`), not solid-filled.
+- **Search fields are terminal-style** — a green `<context>$` prompt + mono input (e.g. `sessions$`, `issues$`, `parts$`, `notifs$`). Shared mixin: `client/src/app/components/_terminal-search.scss`. The top-bar Aura trigger + its popout also use this terminal aesthetic (`components/ai-search/`).
 - `client/src/app/services/theme.service.ts` owns light/dark switching.
 - For UI/UX and styling tasks, strictly follow the guidelines in `.claude/frontend-design-SKILL.md`.
+
+### Icons — pixel-art via `<app-icon>` (Material icons retired)
+All icons render through the shared `<app-icon name="…" [size]="N">` component (`client/src/app/components/shared/icon/`), which inlines **pixelarticons** SVG path data from `icon-registry.ts` (keyed by the old Material names, so `<app-icon name="directions_car">` == the former `<mat-icon>directions_car</mat-icon>`). `currentColor` + CSS-sized like mat-icon. `@angular/material/icon` and the Material icon webfonts are **gone** — never reintroduce `<mat-icon>`. To add a glyph: copy the `<path d="…">` from `node_modules/pixelarticons/svg/<name>.svg` into the registry (a spec enforces every name the app uses is present). Full Material→pixelarticons map: `docs/ICON_MAPPING.md`.
 
 ### My Vehicles / vehicle editing
 `/my-vehicles` is a grid-only "garage" (fixed 4×3 slot grid; empty slots are add tiles). Add/edit lives on dedicated routes — `/my-vehicles/add` and `/my-vehicles/:id/edit` (`pages/vehicle-editor/`), which reuse the shared `VehicleSelectorComponent` (VIN scan + NHTSA decode + CarAPI trims). That selector is also used by Home's guest pipeline — changes to it affect both.
 
-### PrimeNG is installed and themed, but not adopted
-`primeng` + `@primeng/themes` are dependencies and `app.config.ts` wires `providePrimeNG` with a custom preset (`client/src/app/primeng-preset.ts`) seeded from the `--obd-*` colors. **No component currently imports any PrimeNG module** — treat it as available-but-dormant infrastructure; don't assume a component is on PrimeNG without checking its imports.
+### PrimeNG was removed
+PrimeNG (`primeng`, `@primeng/themes`, `primeicons`, the `providePrimeNG` wiring, and `primeng-preset.ts`) was **removed entirely** — it was installed-but-dormant and blocked the Angular 21 upgrade (PrimeNG 21 needs Angular 21; removing it kept the upgrade minimal). Don't reach for PrimeNG components; the app is plain Angular + Material (theme/tooltip/overlay only) + the custom `<app-icon>` and shared SCSS mixins. (Older memory files may still reference a "PrimeNG rebuild" — that path is closed.)
 
 ### Rate limiting tiers (server)
 `server/src/index.ts` applies two `express-rate-limit` tiers: a baseline `globalLimiter` (120 req/min/IP) on all of `/api`, and a tighter `expensiveLimiter` (20 req/min/IP) layered on routes that cost money per call or send messages (`notify`, `parts`, `vehicle`, `places`, `assistant`). New routes that hit a paid third-party API or send a notification should use the expensive limiter too. Security posture is deliberate (helmet, rate limits, input validation, HTML-escaping model output) — make secure decisions by default and preserve these patterns.
