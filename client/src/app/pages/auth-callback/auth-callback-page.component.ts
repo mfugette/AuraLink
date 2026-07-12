@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';import { supabase } from '../../services/supabase-client';
+import { Router, RouterLink } from '@angular/router';
+import { supabase } from '../../services/supabase-client';
 import { IconComponent } from '../../components/shared/icon/icon.component';
 
 // Landing page for email links (signup confirmation, magic links). Supabase's

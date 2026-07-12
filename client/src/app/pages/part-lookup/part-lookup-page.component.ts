@@ -1,6 +1,7 @@
 import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';import { CatalogPart, PARTS_CATALOG, PART_CATEGORIES } from '../../data/parts-catalog';
+import { FormsModule } from '@angular/forms';
+import { CatalogPart, PARTS_CATALOG, PART_CATEGORIES } from '../../data/parts-catalog';
 import { IconComponent } from '../../components/shared/icon/icon.component';
 
 // Dedicated parts-catalog search page. Backed by the local seed catalog for

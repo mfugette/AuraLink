@@ -3,7 +3,8 @@ import {
   ViewContainerRef, ComponentRef, effect, inject, signal, Type,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';import { AccountService } from '../../services/account.service';
+import { Router } from '@angular/router';
+import { AccountService } from '../../services/account.service';
 import { AuthService } from '../../services/auth.service';
 import { TierService } from '../../services/tier.service';
 import { Tier } from '../../models/tier.model';

@@ -349,21 +349,7 @@
   app-icon { font-size: 18px; width: 18px; height: 18px; color: var(--obd-blue); }
 }
 
-// ── Authenticated hero: quick-action row ──────────────────────────────────────
-.hero-actions {
-  margin-top: 20px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-
-  // Fade in just after the primary CTAs (which animate at 0.7s).
-  opacity: 0;
-  animation: fadeInUp 0.6s ease forwards;
-  animation-delay: 0.85s;
-
-  @media (max-width: 600px) { margin-top: 12px; gap: 8px; }
-}
-
+// ── Authenticated hero: quick-action buttons (used inside .console-actions) ───
 .hero-action {
   display: inline-flex;
   align-items: center;

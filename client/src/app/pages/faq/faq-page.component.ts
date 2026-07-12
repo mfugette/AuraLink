@@ -2,7 +2,8 @@ import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { IconComponent } from '../../components/shared/icon/icon.component';interface FaqItem {
+import { IconComponent } from '../../components/shared/icon/icon.component';
+interface FaqItem {
   q: string;
   a: string; // may contain simple inline HTML (links) — authored here, trusted.
 }

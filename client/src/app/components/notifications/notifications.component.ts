@@ -2,7 +2,8 @@ import {
   Component, ElementRef, OnDestroy, computed, effect, HostListener, inject, signal, viewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';import { InboxService } from '../../services/inbox.service';
+import { RouterLink } from '@angular/router';
+import { InboxService } from '../../services/inbox.service';
 import { TierService } from '../../services/tier.service';
 import { IconComponent } from '../shared/icon/icon.component';
 import {

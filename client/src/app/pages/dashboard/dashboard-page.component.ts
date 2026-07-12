@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';import { MatTooltipModule } from '@angular/material/tooltip';
+import { CommonModule } from '@angular/common';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TelemetryService } from '../../services/telemetry.service';
 import { MetricDef, MetricKey, Sample } from '../../models/telemetry.model';
 import { IconComponent } from '../../components/shared/icon/icon.component';

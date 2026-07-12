@@ -2,7 +2,8 @@ import {
   Component, ElementRef, ViewChild, effect, inject, signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';import { ServicesService } from '../../services/services.service';
+import { FormsModule } from '@angular/forms';
+import { ServicesService } from '../../services/services.service';
 import { GoogleMapsLoader } from '../../services/google-maps-loader';
 import { ServiceCategory, ServicePlace } from '../../models/service-place.model';
 import { IconComponent } from '../../components/shared/icon/icon.component';

@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';import { AccountService } from '../../../services/account.service';
+import { CommonModule } from '@angular/common';
+import { AccountService } from '../../../services/account.service';
 import { ThemeService, Theme } from '../../../services/theme.service';
 import { IconComponent } from '../../shared/icon/icon.component';
 

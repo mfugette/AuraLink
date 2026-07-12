@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';import { SessionService } from '../../services/session.service';
+import { FormsModule } from '@angular/forms';
+import { SessionService } from '../../services/session.service';
 import { TelemetryService } from '../../services/telemetry.service';
 import { CustomSelectComponent, SelectOption } from '../shared/custom-select/custom-select.component';
 import { DriveSession } from '../../models/session.model';

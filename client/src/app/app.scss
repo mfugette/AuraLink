@@ -136,26 +136,6 @@
 .logo-figlet-aura { color: var(--obd-text); }
 .logo-figlet-link { color: var(--obd-blue); }
 
-// (retired plain-text wordmark styles kept out; the figlet above replaces them)
-.logo-text {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--obd-text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0;
-
-  @media (max-width: 600px) { font-size: 16px; }
-  @media (max-width: 340px) { font-size: 14px; }
-}
-
-.logo-text-accent {
-  color: var(--obd-blue);
-}
-
 .header-right {
   display: flex;
   align-items: center;

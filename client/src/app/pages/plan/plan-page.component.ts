@@ -2,7 +2,8 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';import { TierService } from '../../services/tier.service';
+import { map } from 'rxjs';
+import { TierService } from '../../services/tier.service';
 import { CheckoutService } from '../../services/checkout.service';
 import { IconComponent } from '../../components/shared/icon/icon.component';
 import {

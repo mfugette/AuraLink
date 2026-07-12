@@ -1,7 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 import { supabase } from '../../services/supabase-client';
 import { IconComponent } from '../../components/shared/icon/icon.component';
 

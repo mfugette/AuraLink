@@ -1,7 +1,8 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';import { CheckoutService } from '../../services/checkout.service';
+import { Router, RouterLink } from '@angular/router';
+import { CheckoutService } from '../../services/checkout.service';
 import { TierService } from '../../services/tier.service';
 import { SubscriptionService } from '../../services/subscription.service';
 import { AccountService } from '../../services/account.service';

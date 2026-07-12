@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';import { DtcService } from '../../services/dtc.service';
+import { CommonModule } from '@angular/common';
+import { DtcService } from '../../services/dtc.service';
 import { DtcCode, Severity, SEVERITY_RANK } from '../../models/dtc-code.model';
 import { IconComponent } from '../shared/icon/icon.component';
 

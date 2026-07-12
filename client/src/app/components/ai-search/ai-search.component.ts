@@ -3,7 +3,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';import { AssistantService } from '../../services/assistant.service';
+import { Router } from '@angular/router';
+import { AssistantService } from '../../services/assistant.service';
 import { IconComponent } from '../shared/icon/icon.component';
 
 // Compact top-bar entry point for the AI assistant. Clicking it opens a centered,

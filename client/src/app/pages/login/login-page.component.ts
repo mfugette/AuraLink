@@ -1,7 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute, RouterLink } from '@angular/router';import { AuthService } from '../../services/auth.service';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 import { IconComponent } from '../../components/shared/icon/icon.component';
 
 // Email/password sign-in and sign-up. Supabase Auth handles the credentials;

@@ -2,12 +2,12 @@ import { Pipe, PipeTransform, inject } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 // Renders Aura's reply as TERMINAL OUTPUT for the assistant page's console view.
-// Unlike AuraMarkdownPipe (which wraps lines in <p>/<ul> for the chat bubble),
-// this keeps the raw line structure — the container is white-space: pre-wrap, so
+// Keeps the raw line structure — the container is white-space: pre-wrap, so
 // indentation and Aura's "▸"/"  →" markers land exactly as written, like real
 // console output. It only transforms **bold** and highlights a leading
 // "[ safety ]" tag. Input is HTML-escaped FIRST so model output can't inject
-// markup; only the spans we generate here are ever produced.
+// markup; only the spans we generate here are ever produced. This is the XSS
+// boundary for model output — pinned down by aura-terminal.pipe.spec.ts.
 @Pipe({ name: 'auraTerminal', standalone: true })
 export class AuraTerminalPipe implements PipeTransform {
   private readonly sanitizer = inject(DomSanitizer);

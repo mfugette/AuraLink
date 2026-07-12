@@ -3,7 +3,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { IconComponent } from '../icon/icon.component';export interface SelectOption {
+import { IconComponent } from '../icon/icon.component';
+export interface SelectOption {
   value: unknown;
   label: string;
 }

@@ -2,7 +2,8 @@ import {
   Component, ElementRef, EventEmitter, Input, Output, ViewChild, signal, computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';import { MatTooltipModule } from '@angular/material/tooltip';
+import { FormsModule } from '@angular/forms';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { DtcService } from '../../services/dtc.service';
 import { DtcCode } from '../../models/dtc-code.model';
 import { IconComponent } from '../shared/icon/icon.component';

@@ -1,7 +1,8 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';import { AccountService } from '../../services/account.service';
+import { Router, RouterLink } from '@angular/router';
+import { AccountService } from '../../services/account.service';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { IconComponent } from '../../components/shared/icon/icon.component';

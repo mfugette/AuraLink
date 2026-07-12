@@ -6,10 +6,9 @@ import { Account, AccountSettings, NewSavedVehicle, SavedVehicle } from '../mode
 import { environment } from '../../environments/environment';
 import { SKIP_ERROR_TOAST } from '../interceptors/error.interceptor';
 
-// TODO(auth): this service assumes a single logged-in account and carries no
-// token/session handling. Once real auth exists, HttpClient calls here should
-// attach the session (e.g. an auth interceptor) and `account`/`isSignedIn`
-// should reset to null/false on sign-out instead of always being populated.
+// Account/profile/vehicles/settings state, backed by the Express API. Auth is
+// handled by the HTTP interceptor (Bearer token) and `clear()` resets all
+// signals on sign-out — see AuthService/authInterceptor.
 @Injectable({ providedIn: 'root' })
 export class AccountService {
   private readonly base = environment.apiUrl;

@@ -1,5 +1,6 @@
 import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';import { SessionHistoryComponent } from '../../components/session-history/session-history.component';
+import { CommonModule } from '@angular/common';
+import { SessionHistoryComponent } from '../../components/session-history/session-history.component';
 import { RepairLogComponent } from '../../components/repair-log/repair-log.component';
 import { IssueHistoryPageComponent } from '../issue-history/issue-history-page.component';
 import { IconComponent } from '../../components/shared/icon/icon.component';

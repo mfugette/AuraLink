@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';import { CodeEntryComponent } from '../../components/code-entry/code-entry.component';
+import { Router } from '@angular/router';
+import { CodeEntryComponent } from '../../components/code-entry/code-entry.component';
 import { VehicleSelectorComponent } from '../../components/vehicle-selector/vehicle-selector.component';
 import { CodeResultsComponent } from '../../components/code-results/code-results.component';
 import { PartsLocatorComponent } from '../../components/parts-locator/parts-locator.component';
