@@ -11,7 +11,16 @@ The three blockers below are cleared and the tester caps are runtime-verified:
    - Vehicles: POST #1–3 → 201, **#4 → 403** `"You can save up to 3 vehicles on your current plan."` Delete-at-cap frees a slot (live count, not high-water mark).
    - Aura: chat #1–15 → 200, **#16 → 429** `"You've reached today's Aura limit (15 messages). It resets tomorrow."` Cap persists across a **fresh session token for the same user** → confirmed DB-backed per-user/day, not per-session (a client can't reset it by re-authenticating).
 
-Remaining: step 5 (optional test-row seeding) and step 6 (real billing + wire `notify` sending). Nothing committed yet — all changes still in the working tree.
+## ✅ Progress update (2026-07-15, later) — SMS sending wired (part of step 6)
+`notify.route.ts` SMS is now wired to **real Twilio** (was a `console.log` stub), committed on this branch as `a3b5ab8`:
+- Added **`requireAuth`** — the route was an open guest relay (spam/cost-abuse risk); every send is now attributable to a signed-in user (`req.userId`).
+- Real `twilio.messages.create` for SMS; **every attempt logged** to `notification_deliveries` (0004) via `notificationsStore.logDelivery()` with status `sent`/`failed`. Missing creds → 503, provider failure → 502.
+- Client: `parts-locator.component.ts` guests get a "sign in to send" prompt; the **mobile native-SMS-link** path still works signed-out (no server involved). Client suite **271 passing** (added guest-gate + signed-in-POST specs).
+- **Verified end-to-end against the live server** (throwaway user + real JWT): auth accepted → Twilio called → failure caught → clean 502 → `failed` audit row written. The success path is the identical code with `status: 'sent'`.
+- **⚠️ Remaining blocker is Twilio account state, NOT code:** the trial account returns **`572006`** on REST-API `messages.create` — the Console "Try out SMS" UI can send, but the programmatic API can't until the trial is **upgraded/credited**. Once upgraded, the same code path returns `sent` with no code change. Creds in `server/.env` (`TWILIO_ACCOUNT_SID`/`_AUTH_TOKEN`/`_FROM`).
+- **Email is still a stub** (SendGrid/Nodemailer — `SMTP_FROM` slot exists, nothing sends yet).
+
+Remaining: step 5 (optional test-row seeding) and the rest of step 6 (real billing; email sending). The DB-backing pass + Twilio SMS are committed on `feat/db-backing-pass` (`8e4df70`, `a3b5ab8`) — not pushed.
 
 ## Goal of this pass
 Wire the features that were mocked (localStorage / in-memory seed) to real Postgres tables, so everything except hardware-dependent telemetry is testable end-to-end. Schema-first, then routes, then client swaps.
@@ -61,12 +70,14 @@ The **read path is DB-backed** (`load()` → `GET /api/account/subscription`). T
 3. ✅ Run the Karma suite (`CHROME_BIN=… ng test --watch=false --browsers=ChromeHeadless`); fix any runtime spec failures the typecheck didn't catch. → 269 passing, 0 failing.
 4. ✅ Verify the tester caps: 4th vehicle → 403, 16th Aura message/day → 429. Verified directly against the live API (see Progress update above). A browser click-through would be belt-and-suspenders, but the server boundary — the real enforcement — is confirmed.
 5. Optionally: seed a few `notifications`/`maintenance_intervals` rows for a test user so the inbox/maintenance UIs show real data (the old seed content is gone from the client now).
-6. Later / separate pass: real billing (Stripe checkout + webhook → server writes tier), then flip `config/access.ts` to honor per-tier limits; wire `notify.route.ts` real sending (add `requireAuth` first).
+6. Later / separate pass: real billing (Stripe checkout + webhook → server writes tier), then flip `config/access.ts` to honor per-tier limits. ✅ SMS sending is now wired (Twilio + `requireAuth` + delivery-logging — see the 2026-07-15 progress update; blocked only on a Twilio trial upgrade). Still TODO: **email** sending (SendGrid/Nodemailer).
 
 ## Files touched (for review)
 New: 5 migrations, `server/src/config/access.ts`, 5 `*.store.ts`.
 Modified: `account.route.ts`, `account.store.ts`, `assistant.route.ts`, `notify.route.ts`, 3 client services + 3 client specs, `account-menu.component.ts`.
-Committed on branch `feat/db-backing-pass` (commit `8e4df70`, off `main`) as one self-consistent unit — 26 files, 269 client tests passing. Not pushed.
+Committed on branch `feat/db-backing-pass` (off `main`), not pushed — two commits:
+- `8e4df70` — DB-backing pass (26 files, 269 client tests).
+- `a3b5ab8` — Twilio SMS wiring: `notify.route.ts` + `parts-locator.component.{ts,spec.ts}` + this doc (271 client tests).
 
 ---
 
