@@ -9,6 +9,12 @@ import { Router, Request, Response } from 'express';
 // strict per-recipient/day cap** — an open send endpoint is a spam-relay and
 // cost-abuse vector. For now it's protected by strict input validation below +
 // the expensiveLimiter rate limit applied in index.ts.
+//
+// DELIVERY LOG: a notification_deliveries table exists (0004) to audit outbound
+// sends, but it requires a user_id and this route is intentionally guest/
+// unauthenticated — so we do NOT log here yet. When this route gains requireAuth
+// (a prerequisite for real sending, per above), record each send via
+// notificationsStore.logDelivery(req.userId, { channel, recipient, body }).
 
 export const notifyRouter = Router();
 

@@ -7,6 +7,9 @@ import { Router } from '@angular/router';
 import { AccountService } from '../../services/account.service';
 import { AuthService } from '../../services/auth.service';
 import { TierService } from '../../services/tier.service';
+import { InboxService } from '../../services/inbox.service';
+import { RepairLogService } from '../../services/repair-log.service';
+import { SubscriptionService } from '../../services/subscription.service';
 import { Tier } from '../../models/tier.model';
 import { ProfilePanelComponent } from '../account-panels/profile-panel/profile-panel.component';
 import { VehiclesPanelComponent } from '../account-panels/vehicles-panel/vehicles-panel.component';
@@ -53,6 +56,13 @@ export class AccountMenuComponent implements OnDestroy {
   // everything from scratch.
   private accountLoaded = false;
 
+  // Per-user data services that follow the same sign-in load / sign-out clear
+  // lifecycle as AccountService (inbox, repair log, subscription — all now
+  // DB-backed via the API).
+  private readonly inbox = inject(InboxService);
+  private readonly repairLog = inject(RepairLogService);
+  private readonly subscription = inject(SubscriptionService);
+
   constructor(protected accountService: AccountService, private vcr: ViewContainerRef) {
     // Load account data on sign-in (once); clear it on sign-out.
     effect(() => {
@@ -60,10 +70,16 @@ export class AccountMenuComponent implements OnDestroy {
         if (!this.accountLoaded) {
           this.accountLoaded = true;
           this.accountService.loadAll();
+          this.inbox.load();
+          this.repairLog.load();
+          this.subscription.load();
         }
       } else {
         this.accountLoaded = false;
         this.accountService.clear();
+        this.inbox.clear();
+        this.repairLog.clear();
+        this.subscription.clear();
         this.open.set(false);
         this.closePanel();
       }

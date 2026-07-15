@@ -33,8 +33,8 @@ describe('HomePageComponent', () => {
   it('derives hero stats from the recent drives', () => {
     create();
     const stats = component.heroStats();
-    expect(stats.length).toBe(4);
-    expect(stats.map(s => s.label)).toEqual(['Last drive', 'Avg speed', 'Distance logged', 'Peak coolant']);
+    expect(stats.length).toBe(5);
+    expect(stats.map(s => s.label)).toEqual(['Last drive', 'Avg speed', 'Distance logged', 'Peak coolant', 'Open issues']);
 
     const drives = TestBed.inject(SessionService).sessions();
     const newest = [...drives].sort((a, b) => +new Date(b.startedAt) - +new Date(a.startedAt))[0];

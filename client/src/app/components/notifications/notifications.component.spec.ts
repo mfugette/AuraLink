@@ -1,31 +1,66 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { NotificationsComponent } from './notifications.component';
 import { InboxService } from '../../services/inbox.service';
 import { TierService } from '../../services/tier.service';
+import { AppNotification, SmsPrefs } from '../../models/notification.model';
+import { environment } from '../../../environments/environment';
 import { clearAppStorage } from '../../../testing/test-utils';
+
+const API = environment.apiUrl;
+
+const NOTIFS: AppNotification[] = [
+  { id: 'n1', category: 'health', title: 'Coolant temperature high', body: 'Engine ran hot on your last drive.', createdAt: '2026-07-14T10:00:00Z', read: false },
+  { id: 'n2', category: 'billing', title: 'Receipt for Plus plan', body: 'Your monthly charge went through.', createdAt: '2026-07-10T10:00:00Z', read: true },
+];
+
+const PREFS: SmsPrefs = { health: true, maintenance: true, billing: false, aura: false };
 
 describe('NotificationsComponent', () => {
   let fixture: ComponentFixture<NotificationsComponent>;
   let component: NotificationsComponent;
   let inbox: InboxService;
+  let httpMock: HttpTestingController;
 
   beforeEach(() => {
     clearAppStorage();
     TestBed.configureTestingModule({
       imports: [NotificationsComponent],
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     });
     fixture = TestBed.createComponent(NotificationsComponent);
     component = fixture.componentInstance;
     inbox = TestBed.inject(InboxService);
+    httpMock = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
   });
 
-  afterEach(() => clearAppStorage());
+  afterEach(() => {
+    httpMock.verify();
+    clearAppStorage();
+  });
+
+  // Drive DB-backed notifications + prefs into the service the way sign-in does.
+  function loadInbox(): void {
+    inbox.load();
+    httpMock.expectOne(`${API}/api/account/notifications`).flush({ notifications: NOTIFS });
+    httpMock.expectOne(`${API}/api/account/notifications/sms-prefs`).flush({ smsPrefs: PREFS });
+    fixture.detectChanges();
+  }
+
+  it('shows no badge when the inbox is empty', () => {
+    // Before load() there are no notifications, so the unread badge is absent.
+    const badge = fixture.nativeElement.querySelector('.notif-badge');
+    expect(badge).toBeNull();
+    expect(inbox.unreadCount()).toBe(0);
+  });
 
   it('shows the unread badge count on the bell', () => {
+    loadInbox();
     const badge = fixture.nativeElement.querySelector('.notif-badge');
+    expect(inbox.unreadCount()).toBe(1);
     expect(badge?.textContent?.trim()).toBe(String(inbox.unreadCount()));
   });
 
@@ -37,11 +72,14 @@ describe('NotificationsComponent', () => {
   });
 
   it('the unread tab filters to unread items only', () => {
+    loadInbox();
     component.setTab('unread');
     expect(component.items().every(n => !n.read)).toBeTrue();
+    expect(component.items().length).toBe(1);
   });
 
   it('search filters by title/body text', () => {
+    loadInbox();
     const target = inbox.notifications()[0];
     component.query.set(target.title.slice(0, 8));
     expect(component.items().some(n => n.id === target.id)).toBeTrue();
@@ -50,7 +88,10 @@ describe('NotificationsComponent', () => {
   });
 
   it('markAllRead clears the unread state through the service', () => {
+    loadInbox();
     component.markAllRead();
+    // Optimistic local update; the POST is fired and flushed.
+    httpMock.expectOne(`${API}/api/account/notifications/read-all`).flush(null);
     expect(inbox.unreadCount()).toBe(0);
   });
 

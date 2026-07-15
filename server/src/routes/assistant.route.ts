@@ -1,6 +1,8 @@
 import { Router, Request, Response } from 'express';
 import { GoogleGenAI } from '@google/genai';
 import { requireAuth } from '../middleware/auth';
+import { limitsForUser } from '../config/access';
+import { auraUsageStore } from '../data/aura-usage.store';
 
 // Aura, the AuraLink AI assistant. Signed-in only (mirrors the client route
 // guard — see client/src/app/app.routes.ts). Stateless: the client resends
@@ -100,6 +102,24 @@ assistantRouter.post('/chat', async (req: Request, res: Response) => {
   if (latest && latest.text.length > MAX_INPUT_CHARS) {
     res.status(413).json({ error: `Message is too long (max ${MAX_INPUT_CHARS} characters).` });
     return;
+  }
+
+  // Daily message cap (testing-phase tester limit — see config/access.ts). The
+  // server is the real enforcement; the client's counter is UX only. We increment
+  // ATOMICALLY and enforce on the returned count so concurrent requests can't
+  // race past the cap. Fail OPEN on a counter error (don't block a user because
+  // the tally DB hiccuped) but log it.
+  const dailyLimit = limitsForUser(req.userId!).aiMessagesPerDay;
+  try {
+    const used = await auraUsageStore.increment(req.userId!);
+    if (used > dailyLimit) {
+      res.status(429).json({
+        error: `You've reached today's Aura limit (${dailyLimit} messages). It resets tomorrow.`,
+      });
+      return;
+    }
+  } catch (err) {
+    console.error('Aura usage counter error (allowing request):', err);
   }
 
   // Only resend the most recent turns — full-history resends grow cost every

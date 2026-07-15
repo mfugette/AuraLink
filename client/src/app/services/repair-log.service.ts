@@ -1,76 +1,51 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs';
 import { RepairRecord } from '../models/repair.model';
+import { environment } from '../../environments/environment';
 
-// The user's repair / service log. Seed records + any the user adds, persisted to
-// localStorage for now (survives reloads without a backend). Later this moves
-// behind /api/account/repairs — the RepairRecord shape stays the same. User-added
-// records are kept separate from seeds so we don't duplicate seeds on every load.
+// The user's repair / service log, backed by the Express API (was seed data +
+// localStorage). Same `records` signal + add/remove methods as before so
+// RepairLogComponent doesn't change; the methods now persist via
+// /api/account/repairs and update the signal optimistically. load() on sign-in,
+// clear() on sign-out (mirrors AccountService).
 @Injectable({ providedIn: 'root' })
 export class RepairLogService {
-  private readonly KEY = 'auralink-repairs';
+  private readonly base = environment.apiUrl;
+  private readonly http = inject(HttpClient);
 
-  readonly records = signal<RepairRecord[]>(this.load());
+  readonly records = signal<RepairRecord[]>([]);
+
+  // Fetch the log. Called on sign-in. Errors leave the list empty rather than
+  // throwing into the UI.
+  load(): void {
+    this.http
+      .get<{ repairs: RepairRecord[] }>(`${this.base}/api/account/repairs`)
+      .pipe(map(r => r.repairs))
+      .subscribe({ next: rs => this.records.set(rs), error: () => {} });
+  }
+
+  clear(): void {
+    this.records.set([]);
+  }
 
   add(record: Omit<RepairRecord, 'id'>): void {
-    const full: RepairRecord = { ...record, id: `rep-${Date.now()}` };
-    this.records.update(list => {
-      const next = [full, ...list];
-      this.persistUserRecords(next);
-      return next;
-    });
+    this.http
+      .post<{ repair: RepairRecord }>(`${this.base}/api/account/repairs`, record)
+      .pipe(map(r => r.repair))
+      .subscribe({
+        // Prepend the server-created record (has the real id + normalized fields).
+        next: rep => this.records.update(list => [rep, ...list]),
+        error: () => {},
+      });
   }
 
   remove(id: string): void {
-    this.records.update(list => {
-      const next = list.filter(r => r.id !== id);
-      this.persistUserRecords(next);
-      return next;
-    });
-  }
-
-  private load(): RepairRecord[] {
-    const user = this.loadUserRecords();
-    // Merge seeds + user records, newest first.
-    return [...user, ...SEED_REPAIRS].sort((a, b) => b.date.localeCompare(a.date));
-  }
-
-  private loadUserRecords(): RepairRecord[] {
-    try {
-      const raw = localStorage.getItem(this.KEY);
-      return raw ? (JSON.parse(raw) as RepairRecord[]) : [];
-    } catch {
-      return [];
-    }
-  }
-
-  // Persist only the user-added records (those not in the seed set).
-  private persistUserRecords(all: RepairRecord[]): void {
-    const seedIds = new Set(SEED_REPAIRS.map(r => r.id));
-    const user = all.filter(r => !seedIds.has(r.id));
-    try { localStorage.setItem(this.KEY, JSON.stringify(user)); } catch { /* ignore */ }
+    // Optimistic removal; reload to resync if the delete fails.
+    const prev = this.records();
+    this.records.update(list => list.filter(r => r.id !== id));
+    this.http
+      .delete<void>(`${this.base}/api/account/repairs/${id}`)
+      .subscribe({ error: () => this.records.set(prev) });
   }
 }
-
-// Seed records — vehicleIds match the seeded saved vehicles (veh-1).
-const SEED_REPAIRS: RepairRecord[] = [
-  {
-    id: 'rep-seed-1', vehicleId: 'veh-1', vehicleLabel: '2018 Honda Civic',
-    category: 'oil', title: 'Oil & filter change', date: '2026-06-02',
-    mileage: 48200, cost: 62.5, shop: 'Jiffy Lube', notes: 'Full synthetic 0W-20.',
-  },
-  {
-    id: 'rep-seed-2', vehicleId: 'veh-1', vehicleLabel: '2018 Honda Civic',
-    category: 'brakes', title: 'Front brake pads', date: '2026-04-18',
-    mileage: 46100, cost: 210, shop: "Mike's Auto", notes: 'Replaced front pads + resurfaced rotors.',
-  },
-  {
-    id: 'rep-seed-3', vehicleId: 'veh-1', vehicleLabel: '2018 Honda Civic',
-    category: 'tires', title: 'Tire rotation', date: '2026-03-05',
-    mileage: 44000, cost: 0, shop: 'DIY', notes: 'Rotated front-to-back.',
-  },
-  {
-    id: 'rep-seed-4', vehicleId: 'veh-1', vehicleLabel: '2018 Honda Civic',
-    category: 'inspection', title: 'State safety inspection', date: '2026-01-20',
-    mileage: 42500, cost: 35, shop: 'County Inspection Station', notes: 'Passed.',
-  },
-];

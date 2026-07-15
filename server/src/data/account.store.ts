@@ -276,16 +276,31 @@ export const accountStore = {
    * are returned as stored (snake_case) so the export reflects the actual data.
    */
   async exportData(userId: string): Promise<Record<string, unknown>> {
-    const [account, vehicles, settings, issues] = await Promise.all([
+    const [
+      account, vehicles, settings, issues,
+      repairs, notifications, smsPrefs, subscription, billing, maintenance,
+    ] = await Promise.all([
       this.getAccount(userId),
       supabaseAdmin.from('vehicles').select('*').eq('user_id', userId).order('created_at', { ascending: true }),
       supabaseAdmin.from('user_settings').select('*').eq('user_id', userId).maybeSingle(),
       supabaseAdmin.from('issues').select('*').eq('user_id', userId).order('created_at', { ascending: true }),
+      supabaseAdmin.from('repairs').select('*').eq('user_id', userId).order('service_date', { ascending: false }),
+      supabaseAdmin.from('notifications').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+      supabaseAdmin.from('notification_sms_prefs').select('*').eq('user_id', userId).maybeSingle(),
+      supabaseAdmin.from('subscriptions').select('*').eq('user_id', userId).maybeSingle(),
+      supabaseAdmin.from('billing_history').select('*').eq('user_id', userId).order('charged_at', { ascending: false }),
+      supabaseAdmin.from('maintenance_intervals').select('*').eq('user_id', userId).order('created_at', { ascending: true }),
     ]);
 
     if (vehicles.error) throw vehicles.error;
     if (settings.error) throw settings.error;
     if (issues.error) throw issues.error;
+    if (repairs.error) throw repairs.error;
+    if (notifications.error) throw notifications.error;
+    if (smsPrefs.error) throw smsPrefs.error;
+    if (subscription.error) throw subscription.error;
+    if (billing.error) throw billing.error;
+    if (maintenance.error) throw maintenance.error;
 
     return {
       exportedAt: new Date().toISOString(),
@@ -293,6 +308,12 @@ export const accountStore = {
       vehicles: vehicles.data ?? [],
       settings: settings.data ?? null,
       issues: issues.data ?? [],
+      repairs: repairs.data ?? [],
+      notifications: notifications.data ?? [],
+      notificationSmsPrefs: smsPrefs.data ?? null,
+      subscription: subscription.data ?? null,
+      billingHistory: billing.data ?? [],
+      maintenanceIntervals: maintenance.data ?? [],
     };
   },
 

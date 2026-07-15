@@ -1,7 +1,12 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { SubscriptionService } from './subscription.service';
 import { CheckoutOrder } from './checkout.service';
 import { clearAppStorage } from '../../testing/test-utils';
+import { environment } from '../../environments/environment';
+
+const API = environment.apiUrl;
 
 const PLAN_ORDER: CheckoutOrder = {
   kind: 'plan', tier: 'pro', interval: 'annual', planPrice: 49.99, adapterPrice: 0, label: 'Pro plan',
@@ -9,14 +14,21 @@ const PLAN_ORDER: CheckoutOrder = {
 
 describe('SubscriptionService', () => {
   let service: SubscriptionService;
+  let httpMock: HttpTestingController;
 
   beforeEach(() => {
     clearAppStorage();
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
     service = TestBed.inject(SubscriptionService);
+    httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => clearAppStorage());
+  afterEach(() => {
+    httpMock.verify();
+    clearAppStorage();
+  });
 
   it('starts with no subscription and empty history', () => {
     expect(service.subscription()).toBeNull();
@@ -64,11 +76,36 @@ describe('SubscriptionService', () => {
     expect(service.isActive()).toBeTrue();
   });
 
-  it('persists subscription + history across instances', () => {
+  it('persists subscription + history across instances via the localStorage overlay', () => {
     service.recordPurchase(PLAN_ORDER, '4242');
-    // A new instance (fresh DI context) must rehydrate from localStorage.
+    // A new instance (fresh DI context) rehydrates from the localStorage overlay
+    // (the mock write path — see the service note). No HTTP until load() is called.
     const fresh = TestBed.runInInjectionContext(() => new SubscriptionService());
     expect(fresh.subscription()?.tier).toBe('pro');
     expect(fresh.history().length).toBe(1);
+  });
+
+  it('load() GETs the subscription and prefers a real (non-free) server sub over the local mock', () => {
+    service.load();
+    const req = httpMock.expectOne(`${API}/api/account/subscription`);
+    expect(req.request.method).toBe('GET');
+    req.flush({
+      subscription: { tier: 'plus', interval: 'monthly', startedAt: '2026-01-01', renewsAt: '2026-02-01', canceled: false },
+      billing: [{ id: 'b1', date: '2026-01-01', label: 'Plus plan (monthly)', amount: 0.99, kind: 'plan', status: 'active', cardLast4: '4242' }],
+    });
+    expect(service.subscription()?.tier).toBe('plus');
+    expect(service.history().length).toBe(1);
+  });
+
+  it('load() keeps a local mock when the server returns only a default free sub', () => {
+    service.recordPurchase(PLAN_ORDER, '4242'); // local mock: pro
+    service.load();
+    httpMock.expectOne(`${API}/api/account/subscription`).flush({
+      subscription: { tier: 'free', interval: 'monthly', startedAt: '2026-01-01', renewsAt: '2026-02-01', canceled: false },
+      billing: [],
+    });
+    // Server 'free' + empty billing must not clobber the local pro mock.
+    expect(service.subscription()?.tier).toBe('pro');
+    expect(service.history().length).toBe(1);
   });
 });

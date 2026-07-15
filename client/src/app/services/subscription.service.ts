@@ -1,7 +1,10 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs';
 import { BillingInterval, Tier } from '../models/tier.model';
 import { CheckoutOrder } from './checkout.service';
 import { TierService } from './tier.service';
+import { environment } from '../../environments/environment';
 
 // A completed purchase — a row in the billing history / order list. Covers both
 // recurring plan charges and one-time adapter/hardware orders.
@@ -27,17 +30,30 @@ export interface Subscription {
   canceled: boolean;         // canceled but active until renewsAt
 }
 
-// Owns subscription + billing history. Persisted to localStorage for now (no
-// backend billing yet) — the checkout flow records purchases here, and the My
-// Plan page reads them. When real billing lands, back these with the account's
-// subscription + invoices; the signals/shape stay the same.
+// Owns subscription + billing history.
+//
+// READ path is DB-backed: load() fetches the user's subscription + billing
+// history from GET /api/account/subscription (0006 tables).
+//
+// WRITE path is STILL A CLIENT-SIDE MOCK. There is intentionally NO server
+// endpoint to set your own tier or append a charge — that would let a client
+// grant itself Pro or forge a receipt (the 0006 tables are read-your-own,
+// service-role-write-only). Real writes will come from a payment processor
+// (Stripe) via a server webhook that updates the tier. Until then,
+// recordPurchase/cancel/resume mutate the local signals + a localStorage overlay
+// so the checkout demo still works. The signals/method shapes stay identical, so
+// consumers (CheckoutPage, MyPlanPage) don't change when real billing lands.
 @Injectable({ providedIn: 'root' })
 export class SubscriptionService {
   private static readonly SUB_KEY = 'auralink-subscription';
   private static readonly HIST_KEY = 'auralink-billing-history';
 
+  private readonly base = environment.apiUrl;
+  private readonly http = inject(HttpClient);
   private readonly tierService = inject(TierService);
 
+  // Seed from the localStorage overlay so a page reload keeps a mock purchase;
+  // load() then reconciles with the server on sign-in.
   readonly subscription = signal<Subscription | null>(this.readSub());
   readonly history = signal<BillingRecord[]>(this.readHistory());
 
@@ -47,8 +63,40 @@ export class SubscriptionService {
     return !!s && s.tier !== 'free' && !s.canceled;
   });
 
-  // Record a completed checkout: update the subscription (for plans/bundles)
-  // and append billing-history rows. `cardLast4` comes from the payment form.
+  // Fetch the server's view of the subscription + billing history. Called on
+  // sign-in. A server subscription (once real billing writes it) wins over the
+  // local mock overlay; until then the server returns a default 'free' row and
+  // an empty history, so we only overwrite when the server actually has data.
+  load(): void {
+    this.http
+      .get<{ subscription: Subscription | null; billing: BillingRecord[] }>(
+        `${this.base}/api/account/subscription`,
+      )
+      .subscribe({
+        next: ({ subscription, billing }) => {
+          // Prefer a real (non-free) server subscription; otherwise keep any
+          // local mock so the checkout demo survives a reload.
+          if (subscription && subscription.tier !== 'free') {
+            this.subscription.set(subscription);
+            this.writeSub();
+          }
+          if (billing.length) {
+            this.history.set(billing);
+            this.writeHistory();
+          }
+        },
+        error: () => {},
+      });
+  }
+
+  clear(): void {
+    this.subscription.set(null);
+    this.history.set([]);
+  }
+
+  // Record a completed checkout (MOCK — see class note). Updates the subscription
+  // (for plans/bundles) and appends billing-history rows. `cardLast4` from the
+  // payment form.
   recordPurchase(order: CheckoutOrder, cardLast4: string): void {
     const now = new Date();
     const records: BillingRecord[] = [];

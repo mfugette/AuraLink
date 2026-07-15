@@ -40,7 +40,13 @@ describe('TelemetryService', () => {
     const after = service.series();
     expect(after).not.toBe(before);
     for (const def of service.metrics) {
-      expect(after[def.key].history.length).toBeGreaterThanOrEqual(before[def.key].history.length);
+      const b = before[def.key].history;
+      const a = after[def.key].history;
+      // A tick appends the freshest sample and drops anything outside the 5-min
+      // window, so the newest timestamp advances (count itself can hold steady at
+      // the window cap — don't assert monotonic growth, that's boundary-fragile).
+      expect(a[a.length - 1].t).toBeGreaterThan(b[b.length - 1].t);
+      expect(a.length).toBeGreaterThan(0);
     }
     service.stop();
   }));
