@@ -1,11 +1,15 @@
 <div class="vehicle-selector" [formGroup]="form">
 
-  <!-- VIN Row -->
+  <!-- Row 1: Nickname (projected by host) · VIN -->
   <div class="vin-row">
+    <!-- Optional leading field projected by the host (e.g. Nickname on the editor),
+         so it sits on the same line as the VIN. Guest flow projects nothing. -->
+    <ng-content select="[vinRowLead]"></ng-content>
+
     <div class="field vin-field">
-      <label class="field-label" for="vin-input">VIN (auto-fills year/make/model)</label>
-      <div class="field-control">
-        <app-icon name="directions_car" />
+      <span class="vs-panel-sub">vin</span>
+      <div class="field-control ts-field">
+        <span class="ts-prompt">vin<span class="ts-caret">$</span></span>
         <input
           id="vin-input"
           class="field-input"
@@ -15,21 +19,24 @@
           autocapitalize="characters"
           (input)="vinError.set(null)"
         />
+        <!-- Decode-from-VIN lives on the field's trailing icon; enabled once a
+             17-char VIN is present. -->
         @if (loadingVin()) {
           <mat-spinner diameter="18" />
+        } @else {
+          <button
+            type="button"
+            class="field-suffix vin-decode-icon"
+            (click)="decodeVin()"
+            [disabled]="!hasVin()"
+            aria-label="Decode VIN"
+            matTooltip="Decode VIN"
+          >
+            <app-icon name="qr_code_scanner" />
+          </button>
         }
       </div>
     </div>
-
-    <button
-      type="button"
-      class="btn vin-decode-btn"
-      (click)="decodeVin()"
-      [disabled]="loadingVin()"
-    >
-      <app-icon name="search" />
-      Decode VIN
-    </button>
 
     @if (isMobile()) {
       <button
@@ -69,32 +76,25 @@
     </div>
   }
 
-  <!-- Manual entry hint -->
-  <div class="divider-row">
-    <hr class="divider" />
-    <span class="divider-label">or select manually</span>
-    <hr class="divider" />
-  </div>
-
-  <!-- Year / Make / Model / Sub-model / Engine — always visible -->
-  <div class="ymm-grid">
-    <!-- Year -->
+  <!-- Row 2: Year · Make · Model · Trim -->
+  <div class="vs-grid vs-grid-4">
     <div class="field">
-      <label class="field-label" for="year-input">Year <span class="req">*</span></label>
+      <span class="vs-panel-sub">year<span class="req">*</span></span>
       <app-custom-select
         formControlName="year"
+        prompt="year"
         [options]="yearOptions()"
         placeholder="Year"
       />
     </div>
 
-    <!-- Make -->
     <div class="field">
-      <label class="field-label">
-        @if (loadingMakes()) { Loading makes… } @else { Make <span class="req">*</span> }
-      </label>
+      <span class="vs-panel-sub">
+        @if (loadingMakes()) { make · loading… } @else { make<span class="req">*</span> }
+      </span>
       <app-custom-select
         formControlName="make"
+        prompt="make"
         [options]="makeOptions()"
         placeholder="Make"
         searchPlaceholder="Type to search makes…"
@@ -103,13 +103,13 @@
       />
     </div>
 
-    <!-- Model -->
     <div class="field">
-      <label class="field-label">
-        @if (loadingModels()) { Loading models… } @else { Model <span class="req">*</span> }
-      </label>
+      <span class="vs-panel-sub">
+        @if (loadingModels()) { model · loading… } @else { model<span class="req">*</span> }
+      </span>
       <app-custom-select
         formControlName="model"
+        prompt="model"
         [options]="modelOptions()"
         placeholder="Model"
         searchPlaceholder="Type to search models…"
@@ -118,11 +118,11 @@
       />
     </div>
 
-    <!-- Trim / Sub-model -->
     @if (trims().length > 0) {
       <div class="field">
-        <label class="field-label">Trim / Sub-model</label>
+        <span class="vs-panel-sub">trim</span>
         <app-custom-select
+          prompt="trim"
           [options]="trimOptions()"
           placeholder="Select trim…"
           [value]="selectedTrimIndex()"
@@ -131,10 +131,11 @@
       </div>
     } @else {
       <div class="field">
-        <label class="field-label">
-          @if (loadingTrims()) { Looking up trims… } @else { Trim / Sub-model }
-        </label>
-        <div class="field-control">
+        <span class="vs-panel-sub">
+          @if (loadingTrims()) { trim · loading… } @else { trim }
+        </span>
+        <div class="field-control ts-field">
+          <span class="ts-prompt">trim<span class="ts-caret">$</span></span>
           <input class="field-input" formControlName="subModel" placeholder="EX, Sport, Limited..." />
           @if (loadingTrims()) {
             <mat-spinner diameter="18" />
@@ -142,95 +143,46 @@
         </div>
       </div>
     }
+  </div>
 
-    <!-- Engine -->
+  <!-- Row 3: Engine · Drive Type · Transmission -->
+  <div class="vs-grid vs-grid-3">
     <div class="field">
-      <label class="field-label" for="engine-input">Engine</label>
-      <div class="field-control">
-        <app-icon name="settings" />
+      <span class="vs-panel-sub">
+        @if (loadingEngines()) { engine · loading… } @else { engine }
+      </span>
+      <div class="field-control ts-field">
+        <span class="ts-prompt">engine<span class="ts-caret">$</span></span>
         <input id="engine-input" class="field-input" formControlName="engine" placeholder="3.5L V6" />
       </div>
     </div>
+
+    <div class="field">
+      <span class="vs-panel-sub">drive type</span>
+      <app-custom-select formControlName="driveType" prompt="drive" [options]="driveTypeOptions" placeholder="Select…" />
+    </div>
+
+    <div class="field">
+      <span class="vs-panel-sub">transmission</span>
+      <app-custom-select formControlName="transmission" prompt="trans" [options]="transmissionOptions" placeholder="Select…" />
+    </div>
   </div>
 
-  <!-- Additional details — shown after model is selected -->
-  @if (modelSelected()) {
-    @if (vinFilledDetails()) {
-      <!-- VIN decode populated extra fields — show them automatically -->
-      <div class="details-header">
-        <app-icon name="verified" />
-        <span>Additional details filled from VIN</span>
+  <!-- Row 4: Fuel Type · Mileage -->
+  <div class="vs-grid vs-grid-2">
+    <div class="field">
+      <span class="vs-panel-sub">fuel type</span>
+      <app-custom-select formControlName="fuelType" prompt="fuel" [options]="fuelTypeOptions" placeholder="Select…" />
+    </div>
+
+    <div class="field">
+      <span class="vs-panel-sub">mileage</span>
+      <div class="field-control ts-field">
+        <span class="ts-prompt">odo<span class="ts-caret">$</span></span>
+        <input class="field-input" type="number" formControlName="mileage" placeholder="85000" min="0" />
+        <span class="field-suffix">mi</span>
       </div>
-      <div class="details-grid">
-        <div class="field">
-          <label class="field-label">Drive Type</label>
-          <app-custom-select formControlName="driveType" [options]="driveTypeOptions" placeholder="Select…" />
-        </div>
-
-        <div class="field">
-          <label class="field-label">Transmission</label>
-          <app-custom-select formControlName="transmission" [options]="transmissionOptions" placeholder="Select…" />
-        </div>
-
-        <div class="field">
-          <label class="field-label">Fuel Type</label>
-          <app-custom-select formControlName="fuelType" [options]="fuelTypeOptions" placeholder="Select…" />
-        </div>
-
-        <div class="field">
-          <label class="field-label">Body Style</label>
-          <app-custom-select formControlName="bodyStyle" [options]="bodyStyleOptions" placeholder="Select…" />
-        </div>
-
-        <div class="field">
-          <label class="field-label">Mileage (optional)</label>
-          <div class="field-control">
-            <app-icon name="speed" />
-            <input class="field-input" type="number" formControlName="mileage" placeholder="85000" min="0" />
-            <span class="field-suffix">mi</span>
-          </div>
-        </div>
-      </div>
-    } @else {
-      <!-- No VIN decode — offer an expandable section -->
-      <button type="button" class="btn details-toggle" (click)="toggleDetails()">
-        <app-icon [name]="detailsExpanded() ? 'expand_less' : 'expand_more'" />
-        Additional info (optional)
-      </button>
-
-      @if (detailsExpanded()) {
-        <div class="details-grid">
-          <div class="field">
-            <label class="field-label">Drive Type</label>
-            <app-custom-select formControlName="driveType" [options]="driveTypeOptions" placeholder="Select…" />
-          </div>
-
-          <div class="field">
-            <label class="field-label">Transmission</label>
-            <app-custom-select formControlName="transmission" [options]="transmissionOptions" placeholder="Select…" />
-          </div>
-
-          <div class="field">
-            <label class="field-label">Fuel Type</label>
-            <app-custom-select formControlName="fuelType" [options]="fuelTypeOptions" placeholder="Select…" />
-          </div>
-
-          <div class="field">
-            <label class="field-label">Body Style</label>
-            <app-custom-select formControlName="bodyStyle" [options]="bodyStyleOptions" placeholder="Select…" />
-          </div>
-
-          <div class="field">
-            <label class="field-label">Mileage (optional)</label>
-            <div class="field-control">
-              <app-icon name="speed" />
-              <input class="field-input" type="number" formControlName="mileage" placeholder="85000" min="0" />
-              <span class="field-suffix">mi</span>
-            </div>
-          </div>
-        </div>
-      }
-    }
-  }
+    </div>
+  </div>
 
 </div>

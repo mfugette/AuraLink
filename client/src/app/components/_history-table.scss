@@ -40,14 +40,10 @@
   // the filters row; on narrow screens (below) this becomes its own flex row.
   .ht-controls { display: contents; }
 
-  // The shared custom-select defaults to 48px tall + a rounded radius; pin it to
-  // the 38px row height and squared radius so it matches the search box/buttons.
+  // The shared custom-select is already terminal-styled (squared, mono, page-base
+  // frame); just pin it to the 38px toolbar row height to match the search box.
   .ht-vehicle-select { min-width: 190px; display: inline-block;
-    ::ng-deep .select-trigger {
-      min-height: 38px; height: 38px; padding: 0 12px;
-      border-radius: var(--obd-radius-sm); border-color: var(--obd-border);
-      background: var(--obd-surface); font-size: 0.88rem;
-    }
+    ::ng-deep .select-trigger { min-height: 38px; height: 38px; }
   }
 
   // Terminal-style search (shared): green "<context>$" prompt + mono input.

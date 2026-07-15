@@ -1,33 +1,32 @@
-// Shared terminal-style search field — one look for every search across the app,
-// echoing the top-bar Aura prompt (green `<context>$` prefix + mono input, squared
-// hairline frame on the page base). Each search sets its own prompt word via a
-// leading `.ts-prompt` span (sessions$, issues$, repairs$, parts$, …).
+// Shared terminal-field system — the single source of truth for the app's
+// terminal-style form controls: search boxes, text inputs, custom-select
+// triggers, and their mono captions. Everything echoes the top-bar Aura prompt:
+// a green `<context>$` prefix + mono text in a squared hairline frame on the page
+// base, with a hairline-only focus (no rounded surface / blue glow).
 //
-// Usage in a component SCSS:
 //   @use '../terminal-search' as ts;   // adjust path
-//   .my-search { @include ts.field; }
-// with markup:
-//   <div class="my-search">
-//     <span class="ts-prompt">sessions<span class="ts-caret">$</span></span>
-//     <input … />
-//     <button class="ts-clear">…</button>   (optional)
-//   </div>
+//   .my-search      { @include ts.field; }          // search / text input frame
+//   .select-trigger { @include ts.select-trigger; }  // custom-select trigger
+//   .my-label       { @include ts.label; }           // mono caption ("name$")
+//
+// The prompt + frame primitives are factored out so `field` and `select-trigger`
+// stay identical; each usage sets its own prompt word via a leading `.ts-prompt`.
 
-@mixin field {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 38px;
-  padding: 0 8px 0 12px;
+// The squared hairline frame on the page base (shared by field + select-trigger).
+@mixin frame {
   background: var(--obd-bg, var(--obd-surface));
   border: 1px solid var(--obd-border-strong);
   border-radius: var(--obd-radius-sm);
   transition: border-color var(--obd-dur-fast) var(--obd-ease);
 
-  &:focus-within { border-color: var(--obd-blue); }
+  // Hairline-only focus — no blue glow (matches the instrument-console look).
+  &:focus-within,
+  &:focus,
+  &.open { border-color: var(--obd-blue); box-shadow: none; }
+}
 
-  // Green shell prompt: "<context>$"
+// Green shell prompt: "<context>$".
+@mixin prompt {
   .ts-prompt {
     flex-shrink: 0;
     font-family: var(--obd-font-mono);
@@ -38,6 +37,50 @@
     white-space: nowrap;
   }
   .ts-caret { color: var(--obd-text-dim); margin-left: 1px; font-weight: 400; }
+}
+
+// Mono caption above a field (the "name$"/"year"-style label). Lowercase mono,
+// muted — the terminal counterpart to the old .field-label.
+@mixin label {
+  display: block;
+  font-family: var(--obd-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--obd-text-muted);
+
+  .req { color: var(--obd-blue); }
+}
+
+// Custom-select trigger styled as a terminal field: same frame + prompt as the
+// text input, mono value, chevron on the right.
+@mixin select-trigger {
+  @include frame;
+  @include prompt;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 10px 0 12px;
+  color: var(--obd-text);
+  font-family: var(--obd-font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  text-align: left;
+
+  &:disabled { cursor: not-allowed; }
+}
+
+@mixin field {
+  @include frame;
+  @include prompt;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 8px 0 12px;
 
   input {
     flex: 1;

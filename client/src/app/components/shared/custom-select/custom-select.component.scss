@@ -1,3 +1,5 @@
+@use '../../terminal-search' as ts;
+
 .custom-select {
   position: relative;
   width: 100%;
@@ -5,38 +7,19 @@
   &.disabled { opacity: 0.5; pointer-events: none; }
 }
 
+// Terminal-field trigger (shared source: _terminal-search.scss) — squared
+// hairline frame on the page base, mono value, green "<prompt>$" prefix.
 .select-trigger {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  min-height: 48px;
-  padding: 0 14px;
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border-strong);
-  border-radius: var(--obd-radius);
-  color: var(--obd-text);
-  font: inherit;
-  font-size: 0.9rem;
-  cursor: pointer;
-  text-align: left;
-  transition: border-color var(--obd-dur-fast) var(--obd-ease),
-              box-shadow var(--obd-dur-fast) var(--obd-ease);
+  @include ts.select-trigger;
 
-  &:hover { border-color: var(--obd-text-muted); }
+  &:hover:not(:disabled) { border-color: var(--obd-text-muted); }
 
-  &.open {
-    border-color: var(--obd-blue);
-    box-shadow: 0 0 0 3px var(--obd-blue-dim);
-  }
-
-  &:disabled { cursor: not-allowed; }
-
-  > app-icon:first-child {
+  // Leading glyph icon (when an [icon] is used instead of a text prompt).
+  > app-icon:not(.chevron):not(.spin) {
     flex-shrink: 0;
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
     color: var(--obd-text-muted);
   }
 }
@@ -48,14 +31,16 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 
+  // Value inherits the trigger's mono face; ellipsize long labels.
   &.placeholder { color: var(--obd-text-muted); }
 }
 
 .chevron {
   flex-shrink: 0;
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
+  margin-left: auto;   // pin to the right edge past the value
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
   color: var(--obd-text-muted);
 }
 
@@ -88,21 +73,34 @@
   overflow: hidden;
 }
 
-.select-search {
+// Search box styled as a mini terminal prompt: green "$" + block caret, mono.
+.select-search-row {
+  @include ts.frame;
+  @include ts.prompt;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   height: 40px;
-  padding: 0 12px;
   margin: 6px 6px 0;
+  padding: 0 10px 0 12px;
   background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border);
-  border-radius: var(--obd-radius-sm);
-  color: var(--obd-text);
-  font: inherit;
-  font-size: 0.85rem;
+}
+
+.select-search {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  background: transparent;
+  border: none;
   outline: none;
+  color: var(--obd-text);
+  font-family: var(--obd-font-mono);
+  font-size: 0.82rem;
+  caret-color: var(--obd-text-dim);
+  caret-shape: block;
 
   &::placeholder { color: var(--obd-text-muted); }
-  &:focus { border-color: var(--obd-blue); }
 }
 
 .select-list {
@@ -116,7 +114,8 @@
 .select-option {
   padding: 9px 12px;
   border-radius: var(--obd-radius-sm);
-  font-size: 0.875rem;
+  font-family: var(--obd-font-mono);
+  font-size: 0.82rem;
   color: var(--obd-text-dim);
   cursor: pointer;
   transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);

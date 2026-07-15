@@ -61,6 +61,16 @@
   // Flat ground with a faint hairline grid — an instrument-panel backdrop
   // rather than the previous soft blue/indigo glow. Lives on a pseudo-element
   // (behind the content) so its bottom fade-out mask doesn't dim the hero text.
+  //
+  // The grid is ANCHORED to the console content column (via --grid-x / --grid-y
+  // custom properties the console hero sets to its own top-left), and its cell
+  // size is --grid-cell. With the console laid out on the same 64px rhythm, every
+  // box border lands exactly on a grid line — no thin slivers. The vars fall back
+  // to a plain viewport-anchored grid for the guest hero.
+  --grid-cell: 64px;
+  --grid-x: 0px;
+  --grid-y: 0px;
+
   &::before {
     content: '';
     position: absolute;
@@ -70,13 +80,17 @@
     background-image:
       linear-gradient(to right, var(--obd-border) 1px, transparent 1px),
       linear-gradient(to bottom, var(--obd-border) 1px, transparent 1px);
-    background-size: 64px 64px;
+    background-size: var(--grid-cell) var(--grid-cell);
+    background-position: var(--grid-x) var(--grid-y);
     -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 35%, transparent 85%);
     mask-image: linear-gradient(to bottom, #000 0%, #000 35%, transparent 85%);
   }
 
   // Keep the sliding track (and its content) above the grid backdrop.
   .stage-track { position: relative; z-index: 1; }
+
+  // Background grid is disabled for the authenticated console hero (for now).
+  &:has(.console-top)::before { display: none; }
 
   &.hero--gone {
     display: none;
@@ -105,13 +119,18 @@
     justify-content: center;
     padding-top: max(32px, calc((100vh - var(--obd-header-height)) / 3 - 150px));
 
-    // The authenticated console hero is tall (lede + Aura box + stat grid), so
-    // top-align it near the header instead of the centered guest-pitch offset.
-    &:has(.console-top) { padding-top: 40px; }
+    // The authenticated console hero fills the viewport edge-to-edge with no top
+    // padding — content starts right under the header and the boxes stretch to
+    // the bottom of the window.
+    &:has(.console-top) {
+      padding-top: 0;
+      align-items: stretch;
+      min-height: calc(100vh - var(--obd-header-height));
+    }
     // Tablet band (521–900px): still a locked viewport, so the tall console
     // gets an internal scroll escape hatch.
     @media (min-width: 521px) and (max-width: 900px) {
-      &:has(.console-top) { padding-top: 28px; overflow-y: auto; }
+      &:has(.console-top) { overflow-y: auto; }
     }
 
     // On phones the app shell + .form-stage release their viewport lock, so the
@@ -155,6 +174,58 @@
   text-rendering: optimizeLegibility;
 
   @media (max-width: 600px) { gap: 14px; }
+}
+
+// Guest hero: pitch copy on the left, spinnable point cloud on the right. The
+// copy column keeps the original 680px reading measure; the cloud takes the
+// remaining space. Stacks below the copy on narrow screens.
+.guest-hero {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+
+  @media (max-width: 860px) { flex-direction: column; align-items: flex-start; gap: 24px; }
+}
+
+.guest-copy {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+
+  @media (max-width: 600px) { gap: 14px; }
+}
+
+.guest-cloud {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  align-self: stretch;
+  min-height: 340px;
+  border: 1px solid var(--obd-border);
+  background:
+    radial-gradient(ellipse at 50% 120%, color-mix(in srgb, var(--obd-blue) 10%, transparent), transparent 70%),
+    var(--obd-surface);
+  overflow: hidden;
+
+  app-vehicle-cloud { position: absolute; inset: 0; }
+
+  @media (max-width: 860px) { width: 100%; flex: none; min-height: 300px; }
+}
+
+.guest-cloud-tag {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-family: var(--obd-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: var(--obd-text-muted);
+  pointer-events: none;
 }
 
 .hero-eyebrow {
@@ -349,62 +420,28 @@
   app-icon { font-size: 18px; width: 18px; height: 18px; color: var(--obd-blue); }
 }
 
-// ── Authenticated hero: quick-action buttons (used inside .console-actions) ───
-.hero-action {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 42px;
-  padding: 0 16px;
-  border-radius: var(--obd-radius);
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border-strong);
+// ── Authenticated hero: terminal-style [ACTION] buttons (in .console-actions) ──
+// Borderless bracketed mono text, no icons — matching the vehicle editor's
+// [ cancel ]/[ save ] actions. Primary actions (enter codes / sync) are blue;
+// the rest are muted until hovered.
+.term-btn {
+  background: transparent;
+  border: 0;
+  padding: 2px 4px;
+  font-family: var(--obd-font-mono);
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
   color: var(--obd-text-dim);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  cursor: pointer;
   white-space: nowrap;
-  transition: border-color var(--obd-dur-fast) var(--obd-ease),
-              color var(--obd-dur-fast) var(--obd-ease),
-              background var(--obd-dur-fast) var(--obd-ease),
-              transform var(--obd-dur-fast) var(--obd-ease);
+  transition: color var(--obd-dur-fast) var(--obd-ease);
 
-  app-icon { font-size: 17px; width: 17px; height: 17px; color: var(--obd-blue); }
+  &.is-primary { color: var(--obd-blue); }
 
-  &:hover {
-    border-color: var(--obd-blue);
-    color: var(--obd-text);
-    background: var(--obd-surface-3);
-    transform: translateY(-1px);
-  }
-
-  &:active { transform: translateY(0); }
-
-  @media (max-width: 600px) {
-    height: 36px;
-    padding: 0 12px;
-    font-size: 0.72rem;
-    gap: 6px;
-
-    app-icon { font-size: 15px; width: 15px; height: 15px; }
-  }
-}
-
-// "Enter Codes" and "Sync" are the two primary diagnostic entry points, so
-// they share one accent treatment to stand apart from the other (secondary)
-// quick actions in the same row.
-.hero-action--primary {
-  background: var(--obd-blue-dim);
-  border-color: var(--obd-blue);
-  color: var(--obd-blue);
-
-  app-icon { color: var(--obd-blue); }
-
-  &:hover {
-    background: var(--obd-blue-glow);
-    color: var(--obd-text);
-  }
+  &:hover { color: color-mix(in srgb, currentColor 65%, var(--obd-text)); }
+  &:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 }
 
 @keyframes fadeInUp {
@@ -413,57 +450,112 @@
 }
 
 // ── Authenticated console hero ────────────────────────────────────────────────
-// A report-style dashboard modeled on the reference: top-left welcome lede +
-// an Aura status terminal on the right, then a full-bleed hairline stat grid.
-// Compressed to fit one viewport (the hero never scrolls at the outer level).
-// When the hero holds this console, widen its inner container past the 680px
-// reading measure the guest pitch uses.
+// A report-style dashboard modeled on the reference: a top row split evenly
+// between the welcome lede and the Aura status terminal, then the full-width
+// vehicle-cloud panel, then a full-bleed hairline stat grid. Laid out on a 64px
+// rhythm (--rhythm) for even gaps and consistent block heights.
 .hero-inner:has(.console-top) {
-  max-width: 1100px;
-  gap: 30px;
+  --rhythm: 64px;
+  // --aura-h is the shared band height for BOTH the top row (welcome + aura) and
+  // the bottom stat grid, and drives the vehicle panel (1.5×) in between. Sized
+  // to fit the top row's tallest content (the 4-line aura terminal) so the two
+  // bands render at an identical height.
+  --aura-h: calc(var(--rhythm) * 5);   // 320px
+  --gap: 40px;                           // uniform gap between/within sections
 
-  @media (max-width: 900px) { gap: 22px; }
+  // The console hero runs fully edge-to-edge: no page gutter, no gaps between
+  // sections — every block is flush with the window and with its neighbours,
+  // separated only by hairline seams (added per-section below). Fills the full
+  // viewport height so the vehicle box + metric grid stretch to the bottom.
+  max-width: none;
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+  // Stretch every section full-width. Without this the inherited flex-start
+  // (from .hero-inner) sizes children to their content, so the metric grid stops
+  // short of the right edge instead of spanning the row.
+  align-items: stretch;
+  gap: 0;
 }
 
-// Top row: lede (flexible) + Aura box (fixed-ish). Collapses to one column on
-// narrow screens.
+// Each hero section is flush; a hairline seam separates it from the one above.
+.console-cloud,
+.overview-grid { border-top: 1px solid var(--obd-border); }
+
+// Guest hero holds two columns (copy + cloud); widen past the 680px measure.
+.hero-inner:has(.guest-hero) {
+  max-width: 1100px;
+}
+
+// Top row: welcome lede + Aura box, flush with a hairline seam between them.
 .console-top {
   width: 100%;
+  height: var(--aura-h);                  // fixed band height — matched by .overview-grid
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 40px;
-  align-items: start;
+  // Lede track widened to fit the pixel-block welcome wordmark (up to ~12 chars);
+  // the Aura box fills the rest of the now-full-bleed row.
+  grid-template-columns: minmax(520px, 0.9fr) minmax(0, 1fr);
+  gap: 0;
+  align-items: stretch;
 
-  @media (max-width: 900px) { grid-template-columns: 1fr; gap: 22px; }
+  .aura-box { border-left: 1px solid var(--obd-border); }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr; height: auto; min-height: 0;
+    .aura-box { border-left: 0; border-top: 1px solid var(--obd-border); }
+  }
 }
+
+// ── Welcome greeting: "WELCOME BACK" stacked over the name, both block text at
+// the same size. No horizontal scrollbar on the wordmark (it's sized to fit). ──
+.hero-greeting {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.hero-figlet ::ng-deep .pt-figlet {
+  font-size: 0.82rem;
+  overflow: hidden;          // never show a scrollbar under the wordmark
+}
+.hero-figlet--greet ::ng-deep .pt-figlet { color: var(--obd-text-muted); }
+.hero-figlet--name  ::ng-deep .pt-figlet { color: var(--obd-blue); }
 
 .console-lede {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  justify-content: flex-start;
   gap: 16px;
   min-width: 0;
+  // Flush to the window's left edge now — pad the content in so it isn't jammed
+  // against the corner (mirrors the vehicle terminal's inset). Top pad matches
+  // the aura box's title-bar height so the welcome lines up with it.
+  padding: 14px 28px 24px;
 
   .hero-title { font-size: clamp(1.8rem, 4vw, 2.7rem); }
 
-  @media (max-width: 900px) { gap: 12px; }
+  @media (max-width: 900px) { gap: 12px; padding: 20px 24px; }
+  @media (max-width: 600px) { padding: 18px 16px; }
 }
 
 .console-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 20px;
   margin-top: 4px;
 }
 
 // ── Aura status terminal (replaces the reference "Download Report" box) ────────
+// Flush cell in the top row: its left seam comes from .console-top; no own border
+// or radius so it sits edge-to-edge with the window on the right.
 .aura-box {
   align-self: stretch;
   display: flex;
   flex-direction: column;
   background: var(--obd-bg, var(--obd-surface));
-  border: 1px solid var(--obd-border-strong);
-  border-radius: var(--obd-radius-sm);
   overflow: hidden;
   font-family: var(--obd-font-mono);
 }
@@ -522,62 +614,203 @@
   &:hover { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 14%, transparent); }
 }
 
-// ── Performance Overview: full-bleed hairline stat grid ───────────────────────
-.console-overview {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+// ── Vehicle cloud panel: metrics · point cloud · maintenance ──────────────────
+// One hairline-framed box, three columns (fixed side rails + flexible center),
+// matching the instrument-console language of the rest of the hero. Collapses to
+// a single stacked column on narrow screens (cloud first, then the two rails).
+.console-cloud {
+  width: 100%;                            // full width of its row
+  display: grid;
+  grid-template-columns: 256px minmax(0, 1fr) 256px;
+  background: var(--obd-bg, var(--obd-surface));
+  // 1.5× the Aura box's height (384px vs 256px).
+  // Grows to fill the space between the top row and the metric grid so the
+  // vehicle box reaches down the window.
+  flex: 1 1 auto;
+  min-height: calc(var(--aura-h) * 1.5);
+
+  @media (max-width: 980px) { flex: 0 0 auto; height: auto; }
+
+  // Column seams as hairlines.
+  .cloud-side + .cloud-stage,
+  .cloud-stage + .cloud-side { border-left: 1px solid var(--obd-border); }
+
+  @media (max-width: 980px) {
+    grid-template-columns: 1fr 1fr;
+    .cloud-stage { grid-column: 1 / -1; order: -1; min-height: 240px; border-bottom: 1px solid var(--obd-border); }
+    .cloud-stage + .cloud-side { border-left: 0; }
+    .cloud-metrics { border-right: 1px solid var(--obd-border); }
+  }
+  @media (max-width: 560px) {
+    grid-template-columns: 1fr;
+    .cloud-metrics { border-right: 0; border-bottom: 1px solid var(--obd-border); }
+  }
 }
 
-.overview-head {
+.cloud-side {
   display: flex;
-  align-items: baseline;
+  flex-direction: column;
   gap: 12px;
-  flex-wrap: wrap;
+  padding: 16px 18px;
+  min-width: 0;
 }
-.overview-eyebrow {
+
+.cloud-side-eyebrow {
   font-family: var(--obd-font-mono);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--obd-blue);
-}
-.overview-title {
-  margin: 0;
-  font-family: var(--obd-font-display);
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: var(--obd-text);
-}
-.overview-updated {
-  margin-left: auto;
-  font-family: var(--obd-font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.12em;
   color: var(--obd-text-muted);
 }
 
-// The stat grid: 4-across hairline cells (the instrument-console readout grid),
-// showing hairlines through 1px gaps over the border color.
+// Left column — vehicle readouts.
+.cloud-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cloud-metric-label {
+  font-family: var(--obd-font-mono);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--obd-text-muted);
+}
+.cloud-metric-value {
+  font-family: var(--obd-font-display);
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--obd-text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Center column — the spinnable point cloud.
+.cloud-stage {
+  position: relative;
+  min-height: inherit;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 120%, color-mix(in srgb, var(--obd-blue) 9%, transparent), transparent 70%);
+
+  app-vehicle-cloud { position: absolute; inset: 0; }
+}
+// Spec caption (top-left): Year · Make · Model · Trim · Engine, each a small
+// mono label + value pair, wrapping if the stage is narrow.
+.cloud-stage-specs {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-family: var(--obd-font-mono);
+  pointer-events: none;
+}
+.cloud-spec {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+}
+.cloud-spec-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--obd-text-muted);
+}
+.cloud-spec-value {
+  color: var(--obd-text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+// VIN (bottom-right corner).
+.cloud-stage-vin {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  font-family: var(--obd-font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: var(--obd-text-dim);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+
+  .cloud-vin-label {
+    color: var(--obd-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-right: 4px;
+  }
+}
+
+// Right column — routine-maintenance status rows.
+.maint-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--obd-font-mono);
+  font-size: 0.74rem;
+
+  .maint-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-text-muted); }
+  .maint-label { color: var(--obd-text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .maint-status {
+    display: inline-flex; align-items: center; gap: 5px;
+    color: var(--obd-green); letter-spacing: 0.02em; white-space: nowrap;
+  }
+  .maint-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--obd-green); }
+
+  &.soon {
+    .maint-status { color: var(--obd-yellow); }
+    .maint-dot { background: var(--obd-yellow); }
+  }
+  &.due {
+    .maint-icon { color: var(--obd-red); }
+    .maint-status { color: var(--obd-red); }
+    .maint-dot { background: var(--obd-red); }
+  }
+}
+
+// ── Metric grid: 4-across hairline stat cells, flush beneath the vehicle box ───
+// No header row — the cells sit directly against the vehicle box (a hairline
+// seam between). Fixed height so the vehicle box above takes the slack and the
+// grid stays pinned at the bottom of the window. Internal 1px hairlines only.
 .overview-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 1px;
   background: var(--obd-border);
-  border: 1px solid var(--obd-border-strong);
+  flex: 0 0 auto;
+  // Exactly the top row's height (welcome + aura status) so the two bands match.
+  // Cells stretch to fill it and space their content out (see .stat-cell).
+  height: var(--aura-h);                 // same as .console-top
 
-  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); height: auto; }
   @media (max-width: 460px) { grid-template-columns: 1fr; }
 }
 
 .stat-cell {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 16px 18px 18px;
+  padding: 18px;
   background: var(--obd-bg, var(--obd-surface));
   min-width: 0;
+
+  // Icon/delta row pinned to the top; the value + label + sub follow directly
+  // beneath it (top-aligned) so the headline number sits high in the cell rather
+  // than floating in the vertical center.
+  .stat-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 4px;
+  }
 
   &.warn { box-shadow: inset 3px 0 0 var(--obd-red); }
 }
@@ -586,7 +819,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 2px;
+  margin-bottom: 8px;
 }
 .stat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--obd-blue); }
 .stat-delta {
@@ -617,6 +850,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin-bottom: 6px;   // separate the headline number from the label/sub caption
 
   &.warn { color: var(--obd-red); }
 }

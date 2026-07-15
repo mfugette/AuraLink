@@ -10,6 +10,9 @@
     aria-haspopup="listbox"
     [attr.aria-expanded]="open()"
   >
+    @if (prompt) {
+      <span class="ts-prompt">{{ prompt }}<span class="ts-caret">$</span></span>
+    }
     @if (icon) {
       <app-icon [name]="icon" />
     }
@@ -26,15 +29,18 @@
   @if (open()) {
     <div class="select-panel">
       @if (searchable) {
-        <input
-          #searchInput
-          class="select-search"
-          [ngModel]="searchText()"
-          (ngModelChange)="onSearchInput($event)"
-          (keydown)="handleListKeydown($event)"
-          [placeholder]="searchPlaceholder"
-          autocomplete="off"
-        />
+        <div class="select-search-row">
+          <span class="ts-prompt"><span class="ts-caret">$</span></span>
+          <input
+            #searchInput
+            class="select-search"
+            [ngModel]="searchText()"
+            (ngModelChange)="onSearchInput($event)"
+            (keydown)="handleListKeydown($event)"
+            [placeholder]="searchPlaceholder"
+            autocomplete="off"
+          />
+        </div>
       }
       <ul class="select-list" role="listbox">
         @for (opt of filteredOptions(); track opt.value; let i = $index) {

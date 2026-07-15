@@ -1,0 +1,32 @@
+// Shared pixel-block page-title wordmark. Lifted verbatim from the vehicle
+// terminal's original .vt-head banner so both surfaces stay identical.
+:host {
+  display: block;
+}
+
+.pt-head {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+.pt-figlet {
+  margin: 0;
+  color: var(--obd-blue);
+  font-size: 0.62rem;
+  line-height: 1.05;
+  white-space: pre;
+  overflow-x: auto;
+  letter-spacing: 1px;
+}
+
+.pt-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.82rem;
+}
+.pt-tagline { color: var(--obd-text); }
+.pt-mark { color: var(--obd-blue); font-weight: 700; margin-right: 4px; }
+.pt-sub { color: var(--obd-text-muted); letter-spacing: 0.02em; }

@@ -7,6 +7,7 @@ import { ServicesService } from '../../services/services.service';
 import { GoogleMapsLoader } from '../../services/google-maps-loader';
 import { ServiceCategory, ServicePlace } from '../../models/service-place.model';
 import { IconComponent } from '../../components/shared/icon/icon.component';
+import { PixelTitleComponent } from '../../components/shared/pixel-title/pixel-title.component';
 
 interface CategoryTab {
   key: ServiceCategory;
@@ -20,7 +21,7 @@ interface CategoryTab {
 @Component({
   selector: 'app-nearby-services-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [CommonModule, FormsModule, IconComponent, PixelTitleComponent],
   templateUrl: './nearby-services-page.component.html',
   styleUrl: './nearby-services-page.component.scss',
 })

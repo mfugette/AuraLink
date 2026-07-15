@@ -1,0 +1,50 @@
+// Viewer chrome for the vehicle point cloud. The host is a plain flat surface
+// (no rounded SaaS card) matching the console aesthetic; the canvas fills it and
+// carries the theme accent via --obd-blue (read in TS). A faint hairline frame
+// and a mono status line keep it in the instrument-terminal language.
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+}
+
+.vc-host {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  // Inherit the app accent so getComputedStyle(--obd-blue) resolves here.
+  color: var(--obd-blue);
+  cursor: grab;
+  overflow: hidden;
+  touch-action: none; // let pointer drag rotate rather than scroll the page
+  user-select: none;
+
+  &:active { cursor: grabbing; }
+}
+
+.vc-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.vc-status {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  font-family: var(--obd-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  color: var(--obd-text-muted);
+  pointer-events: none;
+
+  &--err { color: var(--obd-red); }
+}
+
+.vc-prompt {
+  color: var(--obd-green);
+  margin-right: 4px;
+}

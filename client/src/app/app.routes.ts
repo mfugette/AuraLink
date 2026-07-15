@@ -18,6 +18,7 @@ import { TermsPageComponent } from './pages/legal/terms-page.component';
 import { PrivacyPageComponent } from './pages/legal/privacy-page.component';
 import { ResetPasswordPageComponent } from './pages/reset-password/reset-password-page.component';
 import { AuthCallbackPageComponent } from './pages/auth-callback/auth-callback-page.component';
+import { BootPageComponent } from './pages/boot/boot-page.component';
 import { authGuard } from './guards/auth.guard';
 import { requireTier } from './guards/tier.guard';
 
@@ -29,6 +30,14 @@ export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'home' },
   { path: 'home', component: HomePageComponent, title: 'AuraLink — Your driving partner' },
   { path: 'login', component: LoginPageComponent, title: 'Sign in — AuraLink' },
+  {
+    // Post-sign-in loading screen: a themed terminal boot log, then routes on to
+    // ?redirect= (default /home). Behind authGuard — only reached with a session.
+    path: 'booting',
+    component: BootPageComponent,
+    title: 'Booting — AuraLink',
+    canActivate: [authGuard],
+  },
   { path: 'reset-password', component: ResetPasswordPageComponent, title: 'Reset password — AuraLink' },
   { path: 'auth/callback', component: AuthCallbackPageComponent, title: 'Confirming — AuraLink' },
   { path: 'faq', component: FaqPageComponent, title: 'Help & FAQ — AuraLink' },

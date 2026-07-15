@@ -1,4 +1,5 @@
 @use '@angular/material' as mat;
+@use 'app/components/terminal-search' as ts;   // shared terminal-field system
 
 // Global box model: ensure width:100% + padding never overflows the parent.
 *, *::before, *::after {
@@ -406,12 +407,28 @@ h1, h2, h3, .obd-section-title {
   border: none;
   outline: none;
   color: var(--obd-text);
-  font: inherit;
-  font-size: 0.9rem;
+  // Terminal-readout face app-wide (was Inter via `font: inherit`).
+  font-family: var(--obd-font-mono);
+  font-size: 0.88rem;
+  letter-spacing: 0.01em;
 
   &::placeholder { color: var(--obd-text-muted); }
 
   &:disabled { color: var(--obd-text-muted); cursor: not-allowed; }
+}
+
+// Terminal-style variant of .field-control: the shared terminal-field frame +
+// green "<context>$" prompt (single source: _terminal-search.scss). Add
+// `.ts-field` to a `.field-control` and prefix the input with
+// `<span class="ts-prompt">word<span class="ts-caret">$</span></span>`.
+.field-control.ts-field {
+  @include ts.frame;
+  @include ts.prompt;
+  min-height: 44px;
+  gap: 8px;
+  padding: 0 12px;
+
+  .field-input { height: 42px; }
 }
 
 // Trailing static text (units, etc.)

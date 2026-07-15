@@ -69,45 +69,50 @@
 
 // ── Panel ─────────────────────────────────────────────────────────────────────
 // Fills the remaining height (like the metric grids) and scrolls internally, so
-// the panel's top edge sits at the shared seam and the footer never moves. The
-// full-bleed table margins (below) overflow horizontally by design — clip that
-// axis, scroll only vertically.
+// the panel's top edge sits at the shared seam and the footer never moves.
+//
+// Full-bleed model: the panel is pulled out to BOTH window edges with a negative
+// margin equal to the page gutter (`margin: 0 -$pad`) and carries NO horizontal
+// padding — so the table inside fills the panel edge-to-edge and its row
+// hairlines touch the sidebar on the left and the window on the right. The
+// reading gutter (text alignment under the page header) is restored per-element
+// below: the table's outer *cells* get $pad side-padding, and the non-table rows
+// (header/filters/summary/retention) get $pad side-padding. The `!important` is
+// required because these rules pierce into child components with `::ng-deep`, and
+// the child's own attribute-scoped cell padding otherwise out-specifies them.
+$pad: 40px;
 .hist-panel {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 20px 0 48px;
-
-  // Mobile: unlock, let the page scroll naturally (matches the metric grids).
-  @media (max-width: 720px) { flex: 0 0 auto; overflow: visible; }
+  margin: 0 -#{$pad};
 }
 
-// Full-bleed the data table (in every tab) out to both edges of the content
-// area — flush against the sidebar on the left and the viewport on the right —
-// while the tab's own header/filters keep the page gutter. The table lives
-// inside child components, so reach into it.
-$pad: 40px;
-.hist-panel ::ng-deep .ht-wrap,
-.hist-panel ::ng-deep .ht-retention {
-  margin-left: -#{$pad};
-  margin-right: -#{$pad};
-}
-.hist-panel ::ng-deep .ht-table td:first-child,
-.hist-panel ::ng-deep .ht-table th:first-child { padding-left: $pad; }
-.hist-panel ::ng-deep .ht-table td:last-child,
-.hist-panel ::ng-deep .ht-table th:last-child { padding-right: $pad; }
-.hist-panel ::ng-deep .ht-retention { padding-left: $pad; padding-right: $pad; }
-
-@media (max-width: 900px) {
-  $pad: 24px;
-  .hist-panel ::ng-deep .ht-wrap,
-  .hist-panel ::ng-deep .ht-retention { margin-left: -#{$pad}; margin-right: -#{$pad}; }
+@mixin bleed-gutter($pad) {
+  // Outer table cells: pad the reading text in from the edge (row borders stay
+  // full-bleed since they're on the row/cell box, not the padding).
   .hist-panel ::ng-deep .ht-table td:first-child,
-  .hist-panel ::ng-deep .ht-table th:first-child { padding-left: $pad; }
+  .hist-panel ::ng-deep .ht-table th:first-child { padding-left: $pad !important; }
   .hist-panel ::ng-deep .ht-table td:last-child,
-  .hist-panel ::ng-deep .ht-table th:last-child { padding-right: $pad; }
-  .hist-panel ::ng-deep .ht-retention { padding-left: $pad; padding-right: $pad; }
+  .hist-panel ::ng-deep .ht-table th:last-child { padding-right: $pad !important; }
+  // Non-table rows keep the same reading gutter as the page header.
+  .hist-panel ::ng-deep .ht-head,
+  .hist-panel ::ng-deep .ht-filters,
+  .hist-panel ::ng-deep .ht-summary,
+  .hist-panel ::ng-deep .ht-retention { padding-left: $pad !important; padding-right: $pad !important; }
+}
+
+@include bleed-gutter(40px);
+@media (max-width: 900px) {
+  .hist-panel { margin: 0 -24px; }
+  @include bleed-gutter(24px);
+}
+// Mobile: unlock, let the page scroll naturally (matches the metric grids).
+// Comes last so it wins over the ≤900px negative margin at ≤720px.
+@media (max-width: 720px) {
+  .hist-panel { flex: 0 0 auto; overflow: visible; margin: 0; }
 }
 // Note: the table stays full-bleed and horizontally scrollable at every width
 // (the card fallback was retired), so the narrow-screen overrides above at 900px

@@ -1,0 +1,327 @@
+// Terminal-style vehicle form. A monospace console readout: a pixel-wordmark of
+// the vehicle's name, then one `field$ ……… value` line per attribute. Editing a
+// line reveals a live prompt with inline ghost completion + a quiet match list.
+// Mirrors the Aura terminal's look (mono, green prompt, block caret, leader dots).
+
+:host {
+  display: block;
+  font-family: var(--obd-font-mono);
+  color: var(--obd-text);
+}
+
+.vt {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+// ── Banner ──────────────────────────────────────────────────────────────────────
+// The wordmark banner (name + tagline + vin) now lives in the shared
+// <app-pixel-title> component — see components/shared/pixel-title.
+
+// ── Field lines ──────────────────────────────────────────────────────────────────
+// While editing a select field (make/model) the rows below it hide and the option
+// chips print into that freed space; reserving the full stacked height keeps the
+// block from resizing during that swap. 12 rows × (26px min-height + 2px vertical
+// padding) = 336px. When NOT editing, the lines size to their content so there's
+// no dead space beneath the last field (e.g. between `primary` and page actions).
+.vt-lines {
+  display: flex;
+  flex-direction: column;
+
+  &.editing { min-height: 336px; }
+}
+
+.vt-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 26px;
+  padding: 1px 0;
+  font-size: 0.86rem;
+  cursor: pointer;
+
+  &.disabled {
+    cursor: default;
+    .vt-prompt { color: var(--obd-text-muted); }
+  }
+
+  // A committed line highlights subtly on hover to signal it's re-editable.
+  &:not(.editing):not(.disabled):hover {
+    .vt-value:not(.vt-empty):not(.vt-locked) { color: var(--obd-blue); }
+    .vt-prompt { color: color-mix(in srgb, var(--obd-green) 80%, var(--obd-text)); }
+  }
+}
+
+.vt-prompt {
+  flex-shrink: 0;
+  color: var(--obd-green);
+  font-weight: 700;
+  white-space: nowrap;
+  user-select: none;
+}
+.vt-caret { color: var(--obd-text-dim); font-weight: 400; margin-left: 1px; }
+
+// Leader dots: a dotted rule that stretches to fill the row between prompt & value.
+.vt-dots {
+  flex: 1;
+  min-width: 12px;
+  height: 1em;
+  border-bottom: 2px dotted var(--obd-border-strong);
+  transform: translateY(-3px);
+}
+
+.vt-value {
+  flex-shrink: 0;
+  color: var(--obd-text);
+  white-space: nowrap;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+
+  &.vt-empty { color: var(--obd-text-muted); }
+  &.vt-locked { color: var(--obd-text-muted); }
+  &.vt-loading { color: var(--obd-text-muted); font-style: italic; }
+
+  // make/model/trim — bracketed to signal a select, tinted aura blue to match
+  // the chip fields.
+  &.vt-select-value { color: var(--obd-blue); font-weight: 700; }
+}
+
+// primary Y/n line.
+.vt-primary { display: inline-flex; align-items: baseline; gap: 8px; }
+.vt-yes { color: var(--obd-green); }
+.vt-no { color: var(--obd-text-dim); }
+.vt-hint { color: var(--obd-text-muted); font-size: 0.78rem; }
+
+// ── Inline option chips (drive / transmission / fuel) ────────────────────────────
+// Not a dropdown — options are printed inline as [OPT] and directly clickable.
+// Unselected: every option floats right (wrapping if needed). Selected: only the
+// chosen [OPT] shows on the right, exactly like the other committed values.
+.vt-line.chips { cursor: default; align-items: center; }
+
+.vt-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+// Unselected — fill the row and right-align all the options.
+.vt-chips-open {
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-end;
+  padding-left: 12px;
+}
+
+// Selected — a single [OPT] sitting at the right like any value (dots precede it).
+.vt-chips-picked {
+  flex-shrink: 0;
+}
+
+.vt-chip {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 0.84rem;
+  color: var(--obd-blue);           // aura blue
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { color: color-mix(in srgb, var(--obd-blue) 70%, var(--obd-text)); }
+
+  // The committed pick is weighted so it reads as the settled value.
+  &.selected { color: var(--obd-blue); font-weight: 700; }
+
+  // When a set chip field is reopened, the non-selected options grey out.
+  &.dim { color: var(--obd-text-muted); font-weight: 400; }
+  &.dim:hover { color: var(--obd-blue); }
+}
+
+// ── VIN line: inline [SCAN] action (only while empty) ────────────────────────────
+// SCAN is deliberately green — a distinct action colour, not the aura-blue of the
+// select [OPT] chips — and shows on desktop + mobile.
+.vt-chip.vt-scan {
+  flex-shrink: 0;
+  color: var(--obd-green);
+  font-weight: 700;
+
+  &:hover { color: color-mix(in srgb, var(--obd-green) 70%, var(--obd-text)); }
+}
+
+// ── VIN camera scanner overlay ───────────────────────────────────────────────────
+.vt-scan-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.vt-scan-frame {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.vt-scan-video {
+  width: 100%;
+  border: 1px solid var(--obd-border);
+  display: block;
+}
+
+.vt-scan-guide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 48px;
+  pointer-events: none;
+
+  .vt-guide-line {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-color: var(--obd-green);
+    border-style: solid;
+    border-width: 0;
+
+    &.top-left    { top: 12px; left: 12px;  border-top-width: 3px; border-left-width: 3px; }
+    &.top-right   { top: 12px; right: 12px; border-top-width: 3px; border-right-width: 3px; }
+    &.bottom-left { bottom: 12px; left: 12px;  border-bottom-width: 3px; border-left-width: 3px; }
+    &.bottom-right{ bottom: 12px; right: 12px; border-bottom-width: 3px; border-right-width: 3px; }
+  }
+}
+
+.vt-scan-hint {
+  font-family: var(--obd-font-mono);
+  font-size: 0.8rem;
+  color: var(--obd-text-dim);
+  text-align: center;
+  margin: 0;
+}
+
+.vt-scan-close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--obd-border-strong);
+  background: var(--obd-surface-3);
+  color: var(--obd-text);
+  cursor: pointer;
+  transition: background var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { background: var(--obd-surface-4); }
+}
+
+// ── Active editing line ──────────────────────────────────────────────────────────
+// Stays vertically centered like every other line — the line must NOT grow or
+// jump when editing starts. The completion list is an absolute overlay below.
+.vt-line.editing {
+  cursor: text;
+  position: relative;
+}
+
+.vt-entry {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+// The typed text + ghost share one box; the ghost is painted underneath, its
+// leading (typed) portion transparent so only the completion remainder shows.
+.vt-typed-wrap {
+  position: relative;
+  display: inline-flex;
+  min-height: 1.4em;
+  align-items: center;
+}
+
+.vt-input {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 80px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--obd-text);
+  font: inherit;
+  caret-color: var(--obd-text-dim);   // same as the Aura terminal caret
+  caret-shape: block;                 // block cursor where supported
+  padding: 0;
+}
+
+// Ghost completion sits exactly under the input; the typed prefix is invisible
+// (spacing only), the remainder shows in dim grey.
+.vt-ghost {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 0;
+  white-space: pre;
+  pointer-events: none;
+  color: var(--obd-text-muted);
+  font: inherit;
+}
+.vt-ghost-typed { color: transparent; }
+
+// ── Inline edit-options ──────────────────────────────────────────────────────────
+// While editing a select field (make/model/trim), its filtered options are printed
+// here as bracketed [OPT] chips, taking over the space where the lines below are
+// hidden. In-flow (not a dropdown) — this is the field's completion, inline.
+.vt-edit-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 6px 12px;
+  padding: 8px 0 4px 12px;
+  // Capped + scrollable so a long option list (make has 60+) fills the space the
+  // hidden rows freed WITHOUT growing the console — the block's height stays inside
+  // the reserved .vt-lines min-height instead of pushing the whole form taller.
+  max-height: 240px;
+  overflow-y: auto;
+
+  // Chips reuse .vt-chip; the top (ghost) match is bright/bold via .selected.
+  .vt-chip { font-size: 0.84rem; }
+}
+
+.vt-edit-empty {
+  color: var(--obd-text-muted);
+  font-size: 0.82rem;
+  padding: 8px 0 4px 12px;
+}
+
+// ── Validation output ────────────────────────────────────────────────────────────
+// Red console lines printed beneath all the fields (stderr-style).
+.vt-errors {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.vt-error {
+  color: var(--obd-red);
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vt-input { caret-shape: auto; }
+}

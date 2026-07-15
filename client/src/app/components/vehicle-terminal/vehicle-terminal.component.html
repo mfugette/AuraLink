@@ -1,0 +1,163 @@
+<div class="vt">
+  <!-- Banner: the vehicle's name as a pixel wordmark, with make/model + VIN beside it.
+       Uses the shared page-title wordmark so it stays identical to other pages. -->
+  <app-pixel-title
+    [text]="nickname() || 'VEHICLE'"
+    [tagline]="tagline()"
+    [sub]="'vin: ' + vinLine()"
+  />
+
+  <!-- One line per field: `prompt$ …… value`, or a live input when editing.
+       The full-height reservation only kicks in while editing (so a select's
+       option list has room without the block resizing); when settled the lines
+       size to their content, leaving no dead space beneath the last field. -->
+  <div class="vt-lines" [class.editing]="editingKey() !== null">
+    @for (f of fields; track f.key) {
+      @if (!isHiddenWhileEditing(f)) {
+      <div
+        class="vt-line"
+        [class.editing]="editingKey() === f.key"
+        [class.disabled]="!isEnabled(f)"
+        [class.chips]="f.kind === 'chips'"
+        (click)="startEdit(f)"
+      >
+        <span class="vt-prompt">{{ f.prompt }}<span class="vt-caret">$</span></span>
+
+        @if (f.kind === 'chips') {
+          @if (chipOpen(f)) {
+            <!-- Open: all options float right (wrapping). If a value is already set,
+                 the pick stays bright and the rest are greyed out. -->
+            <span class="vt-chips vt-chips-open">
+              @for (opt of f.optionsOf ? f.optionsOf() : []; track opt) {
+                <button
+                  type="button"
+                  class="vt-chip"
+                  [class.selected]="isChipSelected(f, opt)"
+                  [class.dim]="displayValue(f) && !isChipSelected(f, opt)"
+                  (click)="$event.stopPropagation(); selectChip(f, opt)"
+                >[{{ opt }}]</button>
+              }
+            </span>
+          } @else {
+            <!-- Settled: leader dots then only the chosen [OPT] on the right.
+                 Click it to reopen (brings the greyed options back). -->
+            <span class="vt-dots" aria-hidden="true"></span>
+            <span class="vt-chips vt-chips-picked">
+              <button
+                type="button"
+                class="vt-chip selected"
+                (click)="$event.stopPropagation(); reopenChip(f)"
+              >[{{ displayValue(f) }}]</button>
+            </span>
+          }
+        } @else if (editingKey() === f.key) {
+          <!-- Live editing: input + inline ghost completion. For select fields the
+               option list is rendered BELOW (see .vt-edit-options), not here. -->
+          <span class="vt-entry">
+            <span class="vt-typed-wrap">
+              <input
+                class="vt-input"
+                [value]="draft()"
+                [attr.inputmode]="f.kind === 'number' ? 'numeric' : null"
+                (input)="onDraftInput($any($event.target).value)"
+                (keydown)="onKeydown(f, $event)"
+                (blur)="onBlur(f)"
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <!-- Ghost remainder sits under the input, aligned to the typed text. -->
+              @if (ghostRemainder(f)) {
+                <span class="vt-ghost" aria-hidden="true"><span class="vt-ghost-typed">{{ draft() }}</span>{{ ghostRemainder(f) }}</span>
+              }
+            </span>
+          </span>
+        } @else {
+          <!-- Committed line: leader dots then the right-aligned value. -->
+          <span class="vt-dots" aria-hidden="true"></span>
+          @if (f.key === 'vin') {
+            <!-- VIN: once set, show the value like any field. While empty it offers
+                 an inline [SCAN] action (distinct green) — scan OR type. Visible on
+                 mobile + desktop. -->
+            @if (displayValue(f)) {
+              <span class="vt-value">{{ displayValue(f) }}</span>
+            } @else {
+              <button
+                type="button"
+                class="vt-chip vt-scan"
+                (click)="$event.stopPropagation(); toggleScanner()"
+              >[{{ scannerActive() ? 'CANCEL' : 'SCAN' }}]</button>
+            }
+          } @else if (f.kind === 'primary') {
+            <span class="vt-value vt-primary">
+              @if (primary()) { <span class="vt-yes">yes</span> } @else { <span class="vt-no">no</span> }
+              <span class="vt-hint">[{{ primaryHint() }}]</span>
+            </span>
+          } @else if (isLoading(f)) {
+            <span class="vt-value vt-loading">loading…</span>
+          } @else if (displayValue(f)) {
+            <!-- Select-backed fields (make/model/trim) wear [ ] brackets so the
+                 readout reads as a chosen option, matching the chip fields. -->
+            @if (isSelectField(f)) {
+              <span class="vt-value vt-select-value">[{{ displayValue(f) }}]</span>
+            } @else {
+              <span class="vt-value">{{ displayValue(f) }}</span>
+            }
+          } @else if (!isEnabled(f)) {
+            <span class="vt-value vt-locked">—</span>
+          } @else {
+            <span class="vt-value vt-empty">…</span>
+          }
+        }
+      </div>
+
+      <!-- Editing a select field: its options render here as bracketed chips,
+           filling the space where the fields below it are hidden. -->
+      @if (showEditOptions(f)) {
+        <div class="vt-edit-options">
+          @for (opt of editOptions(f); track opt) {
+            <button
+              type="button"
+              class="vt-chip"
+              [class.selected]="opt === topMatch(f)"
+              (mousedown)="$event.preventDefault(); pickMatch(f, opt)"
+            >[{{ opt }}]</button>
+          } @empty {
+            <span class="vt-edit-empty">no matches</span>
+          }
+        </div>
+      }
+      }
+    }
+  </div>
+
+  <!-- Validation output — red console lines beneath all the fields. -->
+  @if (errors().length || scanError()) {
+    <div class="vt-errors" role="alert">
+      @for (e of errors(); track e) {
+        <div class="vt-error">! {{ e }}</div>
+      }
+      @if (scanError()) {
+        <div class="vt-error">! {{ scanError() }}</div>
+      }
+    </div>
+  }
+
+  <!-- VIN camera scanner overlay — reads the barcode sticker, fills the vin line. -->
+  @if (scannerActive()) {
+    <div class="vt-scan-overlay">
+      <div class="vt-scan-frame">
+        <video class="vt-scan-video" autoplay playsinline muted></video>
+        <div class="vt-scan-guide">
+          <span class="vt-guide-line top-left"></span>
+          <span class="vt-guide-line top-right"></span>
+          <span class="vt-guide-line bottom-left"></span>
+          <span class="vt-guide-line bottom-right"></span>
+        </div>
+        <p class="vt-scan-hint">Point the camera at the VIN barcode on your door jamb or windshield</p>
+        <button type="button" class="vt-scan-close" (click)="stopScanner()" aria-label="Close scanner">
+          <app-icon name="close" />
+        </button>
+      </div>
+    </div>
+  }
+</div>

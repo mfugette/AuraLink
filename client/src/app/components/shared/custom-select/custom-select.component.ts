@@ -34,6 +34,9 @@ export class CustomSelectComponent implements ControlValueAccessor {
   @Input() searchable = false;
   @Input() icon: string | null = null;
   @Input() loading = false;
+  // Optional terminal shell prompt word (e.g. "make" → renders a green "make$"
+  // prefix in the trigger, matching the app's terminal text fields).
+  @Input() prompt: string | null = null;
 
   // Plain value/event API for standalone (non-formControlName) usage, e.g.
   // the trim selector which isn't a real form field. ControlValueAccessor

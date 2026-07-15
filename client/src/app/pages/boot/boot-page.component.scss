@@ -1,0 +1,148 @@
+// Post-sign-in boot terminal. A full-screen monospace console that plays a
+// scripted bash-style boot log then routes on to Home. Rendered as a FIXED
+// overlay covering the whole viewport (including the app shell's header +
+// sidebar) so it reads as a clean, standalone loading screen. Mirrors the Aura
+// terminal's look (window chrome, mono type, blue output) — see
+// pages/assistant/assistant-page.component.scss.
+
+:host { display: contents; }
+
+.boot {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;                 // above the app shell (header/sidebar/toasts)
+  display: flex;
+  flex-direction: column;
+  font-family: var(--obd-font-mono);
+  color: var(--obd-text);
+  background: var(--obd-bg, var(--obd-surface));
+  cursor: pointer;               // whole screen is a "skip" target
+  animation: boot-fade 0.25s var(--obd-ease) both;
+}
+
+// ── Window chrome ─────────────────────────────────────────────────────────────
+.boot-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  height: 40px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--obd-border-strong);
+  background: var(--obd-surface);
+}
+.boot-dots {
+  display: inline-flex;
+  gap: 6px;
+  // Neutral grey window dots — keep the boot screen fully monochrome.
+  i { width: 10px; height: 10px; border-radius: 50%; background: var(--obd-surface-4); }
+}
+.boot-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.76rem;
+  letter-spacing: 0.02em;
+  color: var(--obd-text-muted);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ── Console body ──────────────────────────────────────────────────────────────
+.boot-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 22px 26px 28px;
+  font-size: 0.95rem;
+  line-height: 1.45;          // tighter — lines sit closer together
+  scrollbar-width: thin;
+
+  @media (max-width: 600px) { padding: 16px 16px 22px; font-size: 0.86rem; }
+}
+
+.boot-figlet {
+  margin: 0 0 8px;
+  color: var(--obd-text-dim);
+  font-size: 0.72rem;
+  line-height: 1.15;
+  white-space: pre;
+  overflow-x: auto;
+}
+.boot-boot {
+  margin-bottom: 8px;
+  color: var(--obd-text-dim);
+  b { color: var(--obd-text); font-weight: 700; }
+}
+.boot-dim { color: var(--obd-text-muted); }
+.boot-mark { color: var(--obd-text-muted); font-weight: 700; }
+
+// Echoed command line: prompt + command. Monochrome — no accent colors.
+.boot-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  animation: boot-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.boot-prompt {
+  flex-shrink: 0;
+  color: var(--obd-text-muted);
+  font-weight: 700;
+  white-space: nowrap;
+  user-select: none;
+}
+.boot-cmd { color: var(--obd-text); word-break: break-word; }
+
+// Output line — grey, with an arrow marker and a trailing [ ok ] / spinner.
+.boot-out {
+  color: var(--obd-text-dim);
+  animation: boot-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  .boot-arrow { color: var(--obd-text-muted); margin-right: 4px; }
+}
+.boot-ok {
+  margin-left: 6px;
+  color: var(--obd-text-muted);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.boot-wait {
+  margin-left: 6px;
+  color: var(--obd-text-muted);
+  // A soft pulse rather than a hard blink — reads as "working", not flickering.
+  animation: boot-pulse 1.1s ease-in-out infinite;
+}
+
+.boot-ready {
+  margin-top: 8px;
+  color: var(--obd-text);
+  font-weight: 700;
+}
+.boot-cursor {
+  margin-left: 2px;
+  color: var(--obd-text);
+  animation: boot-pulse 1.1s ease-in-out infinite;
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────────
+.boot-foot {
+  flex-shrink: 0;
+  border-top: 1px solid var(--obd-border-strong);
+  background: var(--obd-surface);
+  padding: 10px 22px;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+
+  @media (max-width: 600px) { padding: 10px 14px; }
+}
+
+@keyframes boot-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes boot-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes boot-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .boot, .boot-line, .boot-out { animation: none; }
+  .boot-wait, .boot-cursor { animation: none; opacity: 1; }
+}

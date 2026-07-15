@@ -1,8 +1,13 @@
 @use '../page-shell' as *;
+@use '../../components/history-table' as ht;
+@use '../../components/terminal-search' as ts;
 
-// Dedicated add/edit page. Uses the shared page shell (centered reading column),
-// with the vehicle form stacked comfortably — this is a focused single-purpose
-// page, not the console grid, so it reads as a normal form.
+// "Vehicle Summary" page. Two rows:
+//   • top:    edit fields (left) · spinnable point cloud (right)
+//   • bottom: this vehicle's drive-history table (left) · maintenance checklist (right)
+// The drive-history table reuses the shared history-table styling (.ht-*).
+@include ht.history-table;
+
 .page-eyebrow {
   font-family: var(--obd-font-mono);
   font-size: 0.72rem;
@@ -11,14 +16,81 @@
   color: var(--obd-text-muted);
 }
 
+// Fully edge-to-edge console page: no page gutter at all. Everything (point
+// cloud, drive history, maintenance) runs flush to the window borders; only the
+// vehicle terminal itself gets a small top/left inset so its wordmark + field
+// lines don't touch the corner — see .editor-body.
+//
+// Full-height flex column so the bottom row (drive history | maintenance) grows
+// to fill the viewport and its content reaches the bottom edge. .app-main is a
+// flex column (see app.scss); :host grows to fill it above the global footer.
+:host { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+
+.page {
+  max-width: none;
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+// Full-bleed sections: no horizontal padding, so their content reaches both
+// window edges. A hairline seam separates the two rows.
+.vs-bleed {
+  border-top: 1px solid var(--obd-border);
+}
+
+// ── Top row: fields | cloud ────────────────────────────────────────────────────
+// Flush two-up: terminal (left) and point cloud (right) share a hairline seam,
+// no gap. The terminal keeps its own top-left inset (see .editor-body).
+.vs-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0;
+  align-items: stretch;
+
+  .vs-cloud { border-left: 1px solid var(--obd-border); }
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+    .vs-cloud { border-left: 0; border-top: 1px solid var(--obd-border); }
+  }
+}
+
+// No background — a fill/gradient here stacks with the topbar's own border and
+// reads as a too-thick top seam. The cloud renders on the bare page background.
+.vs-cloud {
+  position: relative;
+  height: 100%;
+  min-height: 320px;
+  overflow: hidden;
+
+  app-vehicle-cloud { position: absolute; inset: 0; }
+
+  @media (max-width: 860px) { min-height: 260px; }
+}
+
+.vs-cloud-tag {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-family: var(--obd-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: var(--obd-text-muted);
+  pointer-events: none;
+}
+
+// The only inset on the page: a little breathing room around the vehicle
+// terminal so the wordmark + field lines aren't jammed into the corner. The
+// right pad mirrors the left so the readout sits evenly inside the left column.
 .editor-body {
   display: flex;
   flex-direction: column;
   gap: 20px;
-}
-
-.nickname-field {
-  max-width: 360px;
+  // Bottom pad matches the left inset (28px) so the space below the buttons
+  // equals the gutter beside the form; the actions add a matching gap above.
+  padding: 24px 28px 28px;
 }
 
 .field-error {
@@ -36,22 +108,178 @@
   app-icon { font-size: 16px; width: 16px; height: 16px; }
 }
 
-.primary-toggle {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 0.88rem;
-  color: var(--obd-text-dim);
-  cursor: pointer;
+// ── Bottom row: drive history | maintenance checklist ──────────────────────────
+// Flush two-up sharing a hairline seam; the row's top border comes from .vs-bleed.
+// Grows to fill the remaining viewport height so the checklist reaches the bottom.
+.vs-bottom {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 0;
+  align-items: stretch;
 
-  input { width: 16px; height: 16px; accent-color: var(--obd-blue); cursor: pointer; }
+  .vs-maint { border-left: 1px solid var(--obd-border); }
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+    .vs-maint { border-left: 0; border-top: 1px solid var(--obd-border); }
+  }
 }
 
+// Each panel is a flex column so its list/table can grow to the panel's full
+// height (which is stretched to the row height).
+.vs-panel { min-width: 0; display: flex; flex-direction: column; }
+
+// Section header lives INSIDE the box, styled like the home page's cloud-side
+// eyebrow: a muted mono "— Label" with a quiet sub note beside it. No divider
+// rule beneath it — the header reads as a quiet caption over the content.
+.vs-panel-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 14px 14px;
+}
+.vs-panel-title {
+  margin: 0;
+  font-family: var(--obd-font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--obd-text-muted);
+}
+.vs-panel-sub { @include ts.label; }
+
+// The history table area grows to fill the panel so its empty state sits in the
+// middle of the tall cell rather than bunched under the header.
+.vs-history .ht-wrap { flex: 1; }
+.vs-history .ht-empty { height: 100%; justify-content: center; }
+
+// The history table scrolls sideways on narrow screens (shared mixin handles it).
+
+// ── Maintenance checklist ──────────────────────────────────────────────────────
+// The checklist grows to fill the panel; its rows share the height evenly so the
+// list reaches the bottom edge of the page instead of leaving dead space.
+.vs-checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.vs-check-row {
+  flex: 1;
+  display: flex;
+  border-bottom: 1px solid var(--obd-border);
+  &:last-child { border-bottom: 0; }
+}
+
+.vs-check {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--obd-font-mono);
+  transition: background var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { background: var(--obd-surface-2); }
+  &:focus-visible { outline: 2px solid var(--obd-blue); outline-offset: -2px; }
+}
+
+// Checkbox.
+.vs-check-box {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-sm);
+  display: grid;
+  place-items: center;
+  color: var(--obd-bg, #000);
+  app-icon { font-size: 13px; width: 13px; height: 13px; }
+}
+
+.vs-check-icon { font-size: 16px; width: 16px; height: 16px; color: var(--obd-text-muted); }
+
+.vs-check-label {
+  font-size: 0.82rem;
+  color: var(--obd-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vs-check-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--obd-green);
+  white-space: nowrap;
+}
+.vs-check-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--obd-green); }
+
+// Status tints (mirrors the home-hero maintenance colors).
+.vs-check-row.soon {
+  .vs-check-status { color: var(--obd-yellow); }
+  .vs-check-dot { background: var(--obd-yellow); }
+}
+.vs-check-row.due {
+  .vs-check-icon { color: var(--obd-red); }
+  .vs-check-status { color: var(--obd-red); }
+  .vs-check-dot { background: var(--obd-red); }
+}
+
+// Done: fill the box with the accent, strike the label, dim the row.
+.vs-check-row.done {
+  .vs-check-box { background: var(--obd-blue); border-color: var(--obd-blue); }
+  .vs-check-label { color: var(--obd-text-muted); text-decoration: line-through; }
+  .vs-check-icon { opacity: 0.5; }
+  .vs-check-status { opacity: 0.6; }
+}
+
+// Sits in the space below the terminal form (inside .editor-body), centered.
+// The body's gap handles the spacing above it; no divider needed.
 .editor-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid var(--obd-border);
+  justify-content: center;
+  gap: 20px;
+  // Total space above the buttons = body gap (20px) + this (8px) = 28px, matching
+  // the form's left inset and the 28px pad below the buttons.
+}
+
+// Terminal-style bracketed action, matching the form's [OPT]/[SCAN] chips:
+// borderless mono text tinted by role (cancel=blue, save=green, delete=red).
+// Fixed line-height so toggling label text never changes the row height.
+.term-btn {
+  background: transparent;
+  border: 0;
+  padding: 2px 4px;
+  font-family: var(--obd-font-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
+
+  &.is-cancel { color: var(--obd-blue); }
+  &.is-save   { color: var(--obd-green); }
+  &.is-delete { color: var(--obd-red); }
+
+  &:hover:not(:disabled) { color: color-mix(in srgb, currentColor 65%, var(--obd-text)); }
+  &:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+  // Not applicable → dimmed in place (still occupies its slot, no reflow).
+  &:disabled { opacity: 0.35; cursor: default; }
 }

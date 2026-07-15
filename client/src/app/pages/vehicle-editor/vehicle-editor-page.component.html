@@ -1,48 +1,123 @@
 <div class="page">
-  <div class="page-head">
-    <span class="page-eyebrow">— {{ isEditing() ? 'Edit vehicle' : 'Add vehicle' }}</span>
-    <h1 class="page-title">
-      {{ isEditing() ? 'Edit vehicle' : 'Add a vehicle' }}
-    </h1>
-    <p class="page-subtitle">
-      Scan or enter a VIN to auto-fill the details, or pick year / make / model manually.
-    </p>
-  </div>
+  <!-- No text page header: the vehicle's pixel-block name (rendered by the
+       terminal's shared <app-pixel-title> banner) is this page's title. -->
 
-  <div class="editor-body">
-    @if (saveError()) {
-      <p class="field-error"><app-icon name="error_outline" /> {{ saveError() }}</p>
-    }
+  <!-- ── Top row: edit fields (left) · point cloud (right) ───────────────────── -->
+  <div class="vs-top vs-bleed">
+    <div class="editor-body">
+      @if (saveError()) {
+        <p class="field-error"><app-icon name="error_outline" /> {{ saveError() }}</p>
+      }
 
-    <div class="field nickname-field">
-      <label class="field-label" for="nickname-input">Nickname (optional)</label>
-      <div class="field-control">
-        <input
-          id="nickname-input"
-          class="field-input"
-          [ngModel]="nickname()"
-          (ngModelChange)="nickname.set($event)"
-          placeholder="My Daily"
-        />
+      <!-- Terminal-style vehicle form: name/vin/year/make/model/trim/engine/…/
+           primary, each committed as a `field$ …… value` console line. Owns the
+           nickname + primary state that used to live outside the selector. -->
+      <app-vehicle-terminal
+        [initialVehicle]="editSeed()"
+        [initialNickname]="nickname()"
+        [initialPrimary]="makePrimary()"
+        [otherPrimaryExists]="otherPrimaryExists()"
+        (vehicleChanged)="onVehicleChange($event)"
+        (nicknameChanged)="nickname.set($event)"
+        (primaryChanged)="makePrimary.set($event)"
+        (vinRequested)="onVinRequested($event)"
+      />
+
+      <!-- Actions: terminal-style bracketed chips, centered under the form.
+           Always visible; each disables when not applicable so the row never
+           changes height. -->
+      <div class="editor-actions">
+        <button type="button" class="term-btn is-cancel"
+                (click)="cancel()">[ cancel ]</button>
+        <button type="button" class="term-btn is-save"
+                [disabled]="!dirty() || saving()" (click)="save()">
+          [ {{ saving() ? 'saving…' : 'save' }} ]
+        </button>
+        <button type="button" class="term-btn is-delete"
+                [disabled]="!isEditing() || deleting()" (click)="remove()">
+          [ {{ deleting() ? 'deleting…' : 'delete' }} ]
+        </button>
       </div>
     </div>
 
-    <!-- VIN scan/entry + year/make/model/trim autocompletes + extra spec -->
-    <app-vehicle-selector
-      [initialVehicle]="editSeed()"
-      (vehicleChanged)="onVehicleChange($event)"
-    />
-
-    <label class="primary-toggle">
-      <input type="checkbox" [ngModel]="makePrimary()" (ngModelChange)="makePrimary.set($event)" />
-      <span>Set as primary vehicle</span>
-    </label>
+    <!-- Spinnable point-cloud of the vehicle (drag to rotate). -->
+    <div class="vs-cloud">
+      <app-vehicle-cloud src="/models/wrx-sti.bin" />
+      <span class="vs-cloud-tag">— your vehicle · drag to rotate</span>
+    </div>
   </div>
 
-  <div class="editor-actions">
-    <button type="button" class="btn btn-action" (click)="cancel()">Cancel</button>
-    <button type="button" class="btn btn-action is-primary" [disabled]="saving()" (click)="save()">
-      @if (saving()) { Saving… } @else { {{ isEditing() ? 'Save changes' : 'Save vehicle' }} }
-    </button>
-  </div>
+  <!-- ── Bottom row: drive history (left) · maintenance checklist (right) ─────── -->
+  @if (isEditing()) {
+    <div class="vs-bottom vs-bleed">
+      <!-- Vehicle-specific drive history -->
+      <section class="vs-panel vs-history">
+        <div class="vs-panel-head">
+          <span class="vs-panel-title">— Drive history</span>
+          <span class="vs-panel-sub">recent sessions for this vehicle</span>
+        </div>
+
+        <div class="ht-wrap">
+          <table class="ht-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Session</th>
+                <th class="num">Distance</th>
+                <th class="num">Duration</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of historyRows(); track $index) {
+                <tr [class.warn]="r.warnLabel">
+                  <td class="td-primary">{{ r.dateLabel }}<small>{{ r.timeLabel }}</small></td>
+                  <td class="td-title">{{ r.title }}</td>
+                  <td class="num">{{ r.distance }}</td>
+                  <td class="num">{{ r.duration }}</td>
+                  <td>
+                    @if (r.warnLabel) {
+                      <span class="ht-chip warn"><app-icon name="warning" /> {{ r.warnLabel }}</span>
+                    } @else {
+                      <span class="ht-chip ok"><app-icon name="check" /> Nominal</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          @if (historyRows().length === 0) {
+            <div class="ht-empty">
+              <app-icon name="history" />
+              <p>No drives logged for this vehicle yet.</p>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- Maintenance checklist -->
+      <section class="vs-panel vs-maint">
+        <div class="vs-panel-head">
+          <span class="vs-panel-title">— Routine maintenance</span>
+          <span class="vs-panel-sub">tap to mark done</span>
+        </div>
+
+        <ul class="vs-checklist">
+          @for (m of maintItems(); track m.key) {
+            <li class="vs-check-row" [class.done]="m.done"
+                [class.soon]="m.status === 'soon'" [class.due]="m.status === 'due'">
+              <button type="button" class="vs-check" (click)="toggleMaint(m.key)"
+                      [attr.aria-pressed]="m.done" [attr.aria-label]="'Toggle ' + m.label">
+                <span class="vs-check-box">@if (m.done) { <app-icon name="check" /> }</span>
+                <app-icon class="vs-check-icon" [name]="m.icon" />
+                <span class="vs-check-label">{{ m.label }}</span>
+                <span class="vs-check-status"><span class="vs-check-dot"></span>{{ m.detail }}</span>
+              </button>
+            </li>
+          }
+        </ul>
+      </section>
+    </div>
+  }
 </div>

@@ -4,6 +4,7 @@ import { SessionHistoryComponent } from '../../components/session-history/sessio
 import { RepairLogComponent } from '../../components/repair-log/repair-log.component';
 import { IssueHistoryPageComponent } from '../issue-history/issue-history-page.component';
 import { IconComponent } from '../../components/shared/icon/icon.component';
+import { PixelTitleComponent } from '../../components/shared/pixel-title/pixel-title.component';
 
 type HistoryTab = 'drives' | 'issues' | 'repairs' | 'chats' | 'vehicle';
 
@@ -22,7 +23,7 @@ interface TabDef {
   selector: 'app-history-page',
   standalone: true,
   imports: [
-    CommonModule, IconComponent,
+    CommonModule, IconComponent, PixelTitleComponent,
     SessionHistoryComponent, RepairLogComponent, IssueHistoryPageComponent,
   ],
   templateUrl: './history-page.component.html',

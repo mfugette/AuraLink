@@ -1,0 +1,9 @@
+<div class="pt-head">
+  <pre class="pt-figlet">{{ banner() }}</pre>
+  @if (tagline || sub) {
+    <div class="pt-meta">
+      @if (tagline) { <div class="pt-tagline"><span class="pt-mark">▶</span> {{ tagline }}</div> }
+      @if (sub) { <div class="pt-sub">{{ sub }}</div> }
+    </div>
+  }
+</div>

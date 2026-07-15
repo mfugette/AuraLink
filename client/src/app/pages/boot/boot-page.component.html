@@ -1,0 +1,46 @@
+<!-- Full-screen boot terminal shown between sign-in and Home. Click or press any
+     key to skip straight to the destination. -->
+<div class="boot" (click)="skip()" (window:keydown)="skip()" role="log" aria-label="Loading AuraLink">
+  <!-- Window chrome — AURALINK (app boot), mirroring the Aura terminal bar. -->
+  <div class="boot-bar">
+    <span class="boot-dots"><i></i><i></i><i></i></span>
+    <span class="boot-title">auralink — session boot</span>
+  </div>
+
+  <!-- Console body: banner, then the boot log streams in top-down. -->
+  <div class="boot-body" #body>
+    <pre class="boot-figlet">{{ banner }}</pre>
+    <div class="boot-boot">
+      <span class="boot-mark">▸</span> initializing session — signed in as <b>{{ userName() }}</b><br />
+      <span class="boot-dim">      warming account, vehicles, and diagnostics…</span>
+    </div>
+
+    @for (item of lines(); track $index) {
+      <!-- Echoed command line -->
+      <div class="boot-line">
+        <span class="boot-prompt">&dollar;</span>
+        <span class="boot-cmd">{{ item.line.cmd }}</span>
+      </div>
+      <!-- Output line + [ ok ] once the step completes -->
+      <div class="boot-out">
+        <span class="boot-arrow">→</span> {{ item.line.out }}
+        @if (item.done) {
+          <span class="boot-ok">[ {{ item.line.ok }} ]</span>
+        } @else {
+          <span class="boot-wait">…</span>
+        }
+      </div>
+    }
+
+    @if (finished()) {
+      <div class="boot-ready">
+        <span class="boot-mark">▸</span> all systems ready — entering console<span class="boot-cursor">█</span>
+      </div>
+    }
+  </div>
+
+  <!-- Footer hint -->
+  <div class="boot-foot">
+    <span class="boot-dim">press any key to skip</span>
+  </div>
+</div>

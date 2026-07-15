@@ -14,10 +14,13 @@
               <!-- Top row: welcome headline (left) + Aura status terminal (right) -->
               <div class="console-top">
                 <div class="console-lede">
-                  <span class="hero-eyebrow">Diagnostics Console</span>
-                  <h1 class="hero-title">
-                    Welcome back@if (firstName()) {,<br /><span class="hero-accent">{{ firstName() }}</span>}.
-                  </h1>
+                  <!-- Pixel-block greeting: "WELCOME BACK," stacked above the
+                       user's first name (the name reads as the accent line, like
+                       the Vehicle Summary page's vehicle wordmark). -->
+                  <div class="hero-greeting">
+                    <app-pixel-title class="hero-figlet hero-figlet--greet" text="Welcome back" />
+                    <app-pixel-title class="hero-figlet hero-figlet--name" [text]="firstName()" fallback="WELCOME" />
+                  </div>
                   <p class="hero-sub">
                     @if (heroVehicle()) {
                       Here's the current state of your <b>{{ heroVehicle() }}</b>.
@@ -26,18 +29,10 @@
                     }
                   </p>
                   <div class="console-actions">
-                    <button type="button" class="btn hero-action hero-action--primary" (click)="scrollToForm()">
-                      <app-icon name="keyboard" /> Enter Codes
-                    </button>
-                    <button type="button" class="btn hero-action hero-action--primary" (click)="enterLiveMode()">
-                      <app-icon name="bluetooth" /> Sync
-                    </button>
-                    <button type="button" class="btn hero-action" (click)="go('/dashboard')">
-                      <app-icon name="monitoring" /> Telemetry
-                    </button>
-                    <button type="button" class="btn hero-action" (click)="go('/history')">
-                      <app-icon name="history" /> History
-                    </button>
+                    <button type="button" class="term-btn is-primary" (click)="scrollToForm()">[ enter codes ]</button>
+                    <button type="button" class="term-btn is-primary" (click)="enterLiveMode()">[ sync ]</button>
+                    <button type="button" class="term-btn" (click)="go('/dashboard')">[ telemetry ]</button>
+                    <button type="button" class="term-btn" (click)="go('/history')">[ history ]</button>
                   </div>
                 </div>
 
@@ -61,55 +56,101 @@
                 </div>
               </div>
 
-              <!-- Performance Overview: full-bleed hairline stat grid -->
-              <div class="console-overview">
-                <div class="overview-head">
-                  <span class="overview-eyebrow">01 — Key metrics</span>
-                  <h2 class="overview-title">Performance Overview</h2>
-                  <span class="overview-updated">Recent sessions</span>
+              <!-- Vehicle point cloud: metrics (left) · cloud · maintenance (right) -->
+              <div class="console-cloud">
+                <div class="cloud-side cloud-metrics">
+                  <span class="cloud-side-eyebrow">— Vehicle</span>
+                  @for (m of cloudMetrics(); track m.label) {
+                    <div class="cloud-metric">
+                      <span class="cloud-metric-label">{{ m.label }}</span>
+                      <span class="cloud-metric-value">{{ m.value }}</span>
+                    </div>
+                  }
                 </div>
-                <div class="overview-grid">
-                  @for (s of heroStats(); track s.label) {
-                    <div class="stat-cell" [class.warn]="s.warn">
-                      <div class="stat-top">
-                        <app-icon class="stat-icon" [name]="s.icon" />
-                        @if (s.delta) {
-                          <span class="stat-delta" [class.warn]="s.deltaWarn">{{ s.delta }}</span>
-                        }
-                      </div>
-                      <div class="stat-value" [class.warn]="s.warn">{{ s.value }}</div>
-                      <div class="stat-label">{{ s.label }}</div>
-                      <div class="stat-sub">{{ s.sub }}</div>
+
+                <div class="cloud-stage">
+                  <app-vehicle-cloud src="/models/wrx-sti.bin" />
+                  <div class="cloud-stage-specs">
+                    @for (s of cloudSpecs(); track s.label) {
+                      <span class="cloud-spec">
+                        <span class="cloud-spec-label">{{ s.label }}</span>
+                        <span class="cloud-spec-value">{{ s.value }}</span>
+                      </span>
+                    }
+                  </div>
+                  <span class="cloud-stage-vin">
+                    <span class="cloud-vin-label">VIN</span> {{ cloudVin() }}
+                  </span>
+                </div>
+
+                <div class="cloud-side cloud-maint">
+                  <span class="cloud-side-eyebrow">— Routine maintenance</span>
+                  @for (item of maintenanceItems(); track item.label) {
+                    <div class="maint-row" [class.soon]="item.status === 'soon'" [class.due]="item.status === 'due'">
+                      <app-icon class="maint-icon" [name]="item.icon" />
+                      <span class="maint-label">{{ item.label }}</span>
+                      <span class="maint-status">
+                        <span class="maint-dot"></span>{{ item.detail }}
+                      </span>
                     </div>
                   }
                 </div>
               </div>
-            } @else {
-              <!-- ── Guest hero: unchanged free-pipeline pitch ───────────────── -->
-              <span class="hero-eyebrow">OBD2 Fault Code Analysis</span>
-              <h1 class="hero-title">
-                Diagnose your car.<br>
-                <span class="hero-accent">For free.</span>
-              </h1>
-              <p class="hero-sub">
-                Enter your OBD2 fault codes to get detailed explanations, likely causes, and find the
-                parts you need at nearby stores — all in one place, no account required.
-              </p>
-              <div class="hero-badges">
-                <span class="badge"><app-icon name="check" /> No account needed</span>
-                <span class="badge"><app-icon name="check" /> Works on any device</span>
-                <span class="badge"><app-icon name="check" /> 100% free</span>
+
+              <!-- Metric cells: the same 4-across hairline stat grid, flush
+                   directly beneath the vehicle box (no header row). -->
+              <div class="overview-grid">
+                @for (s of heroStats(); track s.label) {
+                  <div class="stat-cell" [class.warn]="s.warn">
+                    <div class="stat-top">
+                      <app-icon class="stat-icon" [name]="s.icon" />
+                      @if (s.delta) {
+                        <span class="stat-delta" [class.warn]="s.deltaWarn">{{ s.delta }}</span>
+                      }
+                    </div>
+                    <div class="stat-body">
+                      <div class="stat-value" [class.warn]="s.warn">{{ s.value }}</div>
+                      <div class="stat-label">{{ s.label }}</div>
+                      <div class="stat-sub">{{ s.sub }}</div>
+                    </div>
+                  </div>
+                }
               </div>
-              <div class="hero-cta">
-                <button type="button" class="btn get-started-btn" (click)="scrollToForm()">
-                  Enter DTCs
-                  <app-icon name="arrow_downward" />
-                </button>
-                <span class="cta-or">or</span>
-                <button type="button" class="btn detect-live-btn" (click)="goToSignup()">
-                  Sign Up
-                  <app-icon name="arrow_forward" />
-                </button>
+            } @else {
+              <!-- ── Guest hero: free-pipeline pitch + spinnable vehicle cloud ── -->
+              <div class="guest-hero">
+                <div class="guest-copy">
+                  <span class="hero-eyebrow">OBD2 Fault Code Analysis</span>
+                  <h1 class="hero-title">
+                    Diagnose your car.<br>
+                    <span class="hero-accent">For free.</span>
+                  </h1>
+                  <p class="hero-sub">
+                    Enter your OBD2 fault codes to get detailed explanations, likely causes, and find the
+                    parts you need at nearby stores — all in one place, no account required.
+                  </p>
+                  <div class="hero-badges">
+                    <span class="badge"><app-icon name="check" /> No account needed</span>
+                    <span class="badge"><app-icon name="check" /> Works on any device</span>
+                    <span class="badge"><app-icon name="check" /> 100% free</span>
+                  </div>
+                  <div class="hero-cta">
+                    <button type="button" class="btn get-started-btn" (click)="scrollToForm()">
+                      Enter DTCs
+                      <app-icon name="arrow_downward" />
+                    </button>
+                    <span class="cta-or">or</span>
+                    <button type="button" class="btn detect-live-btn" (click)="goToSignup()">
+                      Sign Up
+                      <app-icon name="arrow_forward" />
+                    </button>
+                  </div>
+                </div>
+
+                <div class="guest-cloud">
+                  <app-vehicle-cloud src="/models/wrx-sti.bin" />
+                  <span class="guest-cloud-tag">— drag to rotate</span>
+                </div>
               </div>
             }
           </div>

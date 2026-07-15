@@ -11,6 +11,8 @@ import { AuthService } from '../../services/auth.service';
 import { AccountService } from '../../services/account.service';
 import { SessionService } from '../../services/session.service';
 import { IconComponent } from '../../components/shared/icon/icon.component';
+import { VehicleCloudComponent } from '../../components/shared/vehicle-cloud/vehicle-cloud.component';
+import { PixelTitleComponent } from '../../components/shared/pixel-title/pixel-title.component';
 
 // One cell of the hero's "Performance Overview" instrument grid.
 interface HeroStat {
@@ -21,6 +23,21 @@ interface HeroStat {
   delta?: string;       // e.g. "+34%" / "−2°" — optional trend chip
   deltaWarn?: boolean;  // red chip instead of green
   warn?: boolean;       // value itself reads as a warning
+}
+
+// A single readout in the vehicle-cloud panel's left "metrics" column.
+interface CloudMetric {
+  label: string;
+  value: string;
+}
+
+// A routine-maintenance line in the vehicle-cloud panel's right column.
+type MaintStatus = 'ok' | 'soon' | 'due';
+interface MaintItem {
+  icon: string;
+  label: string;
+  detail: string;       // e.g. "in 1,200 mi" / "overdue" / "3 mo ago"
+  status: MaintStatus;
 }
 
 // The original single-page hero → DTC entry → vehicle → results → parts flow,
@@ -38,6 +55,8 @@ interface HeroStat {
     CodeResultsComponent,
     PartsLocatorComponent,
     LiveDtcComponent,
+    VehicleCloudComponent,
+    PixelTitleComponent,
   ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss',
@@ -88,6 +107,7 @@ export class HomePageComponent implements OnInit, OnDestroy {
     const peakCoolant = Math.max(...drives.map(d => d.summary.coolant?.max ?? 0));
     const coolantWarn = drives.some(d => d.summary.coolant?.warn);
     const openWarns = drives.filter(d => d.warnLabel).length;
+    const avgDriveMin = drives.length > 0 ? totalMin / drives.length : 0;
 
     return [
       {
@@ -109,6 +129,13 @@ export class HomePageComponent implements OnInit, OnDestroy {
         value: `${peakCoolant.toFixed(0)}°F`,
         warn: coolantWarn,
         delta: coolantWarn ? 'high' : 'nominal', deltaWarn: coolantWarn,
+      },
+      {
+        icon: openWarns > 0 ? 'warning' : 'check_circle', label: 'Open issues',
+        sub: openWarns > 0 ? 'flagged on recent drives' : 'no active warnings',
+        value: `${openWarns}`,
+        warn: openWarns > 0,
+        delta: `${avgDriveMin.toFixed(0)} min avg`,
       },
     ];
   });
@@ -132,6 +159,73 @@ export class HomePageComponent implements OnInit, OnDestroy {
       lines.push('review issue history or ask aura for next steps.');
     }
     return lines;
+  });
+
+  // ── Vehicle-cloud panel data ──────────────────────────────────────────────────
+  // Left column: a few compact readouts about the headline vehicle. Right column:
+  // routine-maintenance status derived from the primary vehicle's odometer using
+  // standard service intervals. Both are computed locally (no API) and update
+  // automatically when live vehicle/telemetry data replaces the current mocks.
+
+  private readonly primaryVehicle = computed(() =>
+    this.account.vehicles().find(v => v.isPrimary) ?? this.account.vehicles()[0] ?? null,
+  );
+
+  // Spec readouts for the cloud stage caption (Year · Make · Model · Trim · Engine).
+  readonly cloudSpecs = computed<CloudMetric[]>(() => {
+    const v = this.primaryVehicle();
+    return [
+      { label: 'Year', value: v?.year != null ? `${v.year}` : '—' },
+      { label: 'Make', value: v?.make || '—' },
+      { label: 'Model', value: v?.model || '—' },
+      { label: 'Trim', value: v?.subModel || '—' },
+      { label: 'Engine', value: v?.engine || '—' },
+    ];
+  });
+
+  // VIN shown in the cloud stage's bottom-right corner.
+  readonly cloudVin = computed(() => this.primaryVehicle()?.vin || '—');
+
+  readonly cloudMetrics = computed<CloudMetric[]>(() => {
+    const v = this.primaryVehicle();
+    const drives = this.recentDrives();
+    const totalMi = drives.reduce((s, d) => s + d.distanceMi, 0);
+    const odo = v?.mileage ?? null;
+    return [
+      { label: 'Vehicle', value: v ? (v.nickname || `${v.year ?? ''} ${v.make ?? ''} ${v.model ?? ''}`.trim()) : '—' },
+      { label: 'Odometer', value: odo != null ? `${odo.toLocaleString()} mi` : '—' },
+      { label: 'Recent drives', value: `${drives.length}` },
+      { label: 'Logged', value: `${totalMi.toFixed(0)} mi` },
+    ];
+  });
+
+  readonly maintenanceItems = computed<MaintItem[]>(() => {
+    const odo = this.primaryVehicle()?.mileage ?? null;
+
+    // Standard mileage-based service intervals. Without a real odometer we still
+    // show the schedule with an "unknown" (soon) posture rather than nothing.
+    const schedule: { icon: string; label: string; interval: number }[] = [
+      { icon: 'local_gas_station', label: 'Oil change',     interval: 5000 },
+      { icon: 'sync',              label: 'Tire rotation',   interval: 7500 },
+      { icon: 'warning',          label: 'Brake inspection', interval: 20000 },
+      { icon: 'air',               label: 'Air filter',      interval: 15000 },
+      { icon: 'bolt',              label: 'Battery check',   interval: 30000 },
+    ];
+
+    return schedule.map(s => {
+      if (odo == null) {
+        return { icon: s.icon, label: s.label, detail: 'sync odometer', status: 'soon' as const };
+      }
+      // Miles until the next interval boundary.
+      const into = odo % s.interval;
+      const remaining = s.interval - into;
+      let status: MaintStatus = 'ok';
+      if (remaining <= s.interval * 0.05) status = 'due';
+      else if (remaining <= s.interval * 0.2) status = 'soon';
+      const detail =
+        status === 'due' ? 'due now' : `in ${remaining.toLocaleString()} mi`;
+      return { icon: s.icon, label: s.label, detail, status };
+    });
   });
 
   codes = signal<string[]>([]);

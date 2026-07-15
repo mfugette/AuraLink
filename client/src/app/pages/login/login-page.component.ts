@@ -104,6 +104,8 @@ export class LoginPageComponent {
 
   private finish(): void {
     const redirect = this.route.snapshot.queryParamMap.get('redirect') ?? '/home';
-    this.router.navigateByUrl(redirect);
+    // Route through the terminal boot screen, which plays a short loading
+    // sequence and then forwards to the real destination.
+    this.router.navigate(['/booting'], { queryParams: { redirect } });
   }
 }

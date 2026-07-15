@@ -58,6 +58,7 @@ export class VehicleSelectorComponent implements OnInit, OnDestroy {
   loadingMakes = signal(false);
   loadingModels = signal(false);
   loadingTrims = signal(false);
+  loadingEngines = signal(false);
   loadingVin = signal(false);
   scannerActive = signal(false);
   isMobile = signal(false);
@@ -68,6 +69,10 @@ export class VehicleSelectorComponent implements OnInit, OnDestroy {
 
   vinError = signal<string | null>(null);
   scanError = signal<string | null>(null);
+
+  // True once the VIN field holds a value — the "Decode VIN" button only shows
+  // while the VIN is empty (once entered/decoded the button is no longer needed).
+  hasVin = signal(false);
 
   @ViewChild('videoPreview') private videoRef?: ElementRef<HTMLVideoElement>;
   private videoEl: HTMLVideoElement | null = null;
@@ -85,34 +90,48 @@ export class VehicleSelectorComponent implements OnInit, OnDestroy {
   readonly bodyStyleOptions = VehicleSelectorComponent.toOptions(['Sedan', 'Coupe', 'Hatchback', 'SUV/Crossover', 'Truck', 'Van/Minivan', 'Wagon', 'Convertible']);
 
   constructor(private fb: FormBuilder, private vehicleService: VehicleService) {
+    // Detail fields (engine/drive/trans/fuel/mileage/trim) are always visible and
+    // editable now — only make/model stay disabled until their parent resolves.
+    // `bodyStyle` is retained in the model so a previously-saved value round-trips
+    // through save, but it's no longer a rendered field on this form.
     this.form = this.fb.group({
       year:         [null, Validators.required],
       make:         [{ value: null, disabled: true }, Validators.required],
       model:        [{ value: null, disabled: true }, Validators.required],
-      subModel:     [{ value: null, disabled: true }],
-      engine:       [{ value: null, disabled: true }],
-      driveType:    [{ value: null, disabled: true }],
-      transmission: [{ value: null, disabled: true }],
-      fuelType:     [{ value: null, disabled: true }],
-      bodyStyle:    [{ value: null, disabled: true }],
-      mileage:      [{ value: null, disabled: true }],
+      subModel:     [null],
+      engine:       [null],
+      driveType:    [null],
+      transmission: [null],
+      fuelType:     [null],
+      bodyStyle:    [null],
+      mileage:      [null],
       vin:          [null],
     });
   }
 
-  // Fields that describe the specific vehicle instance — meaningless (and
-  // disabled) until a model has actually been selected.
+  // Fields describing the specific vehicle instance (as opposed to its identity —
+  // year/make/model). Cleared when the identity changes, but no longer disabled.
   private readonly detailFieldNames = [
     'subModel', 'engine', 'driveType', 'transmission', 'fuelType', 'bodyStyle', 'mileage',
   ] as const;
 
   private enableVehicleDetails(): void {
+    // Detail fields are always enabled now — retained as a no-op call site so the
+    // cascade code reads the same; enabling here is harmless.
     for (const name of this.detailFieldNames) this.form.get(name)!.enable({ emitEvent: false });
   }
 
   ngOnInit(): void {
     this.years = this.vehicleService.getYears();
     this.isMobile.set('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
+    // Track whether the VIN field has a value so the template can hide the
+    // "Decode VIN" button once a VIN is present (seed, decode, or typed).
+    const vinCtrl = this.form.get('vin')!;
+    this.hasVin.set(!!(vinCtrl.value as string | null)?.trim());
+    vinCtrl.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((v: string | null) => {
+      this.hasVin.set(!!v?.trim());
+    });
 
     // These three handlers only react to genuine user-driven changes (autocomplete
     // selection, or typed text that exactly matches a known option). Programmatic
@@ -208,7 +227,7 @@ export class VehicleSelectorComponent implements OnInit, OnDestroy {
   // used by decodeVin so the dependent autocompletes populate and stay selected.
   private seedFromVehicle(v: Vehicle): void {
     // Instance-detail fields don't depend on the cascade — set them up front.
-    if (v.vin)          this.form.get('vin')!.setValue(v.vin, { emitEvent: false });
+    if (v.vin)          { this.form.get('vin')!.setValue(v.vin, { emitEvent: false }); this.hasVin.set(true); }
     if (v.driveType)    this.form.get('driveType')!.setValue(v.driveType);
     if (v.transmission) this.form.get('transmission')!.setValue(v.transmission);
     if (v.fuelType)     this.form.get('fuelType')!.setValue(v.fuelType);
@@ -320,7 +339,6 @@ export class VehicleSelectorComponent implements OnInit, OnDestroy {
       bodyStyle: null,
       mileage: null,
     });
-    for (const name of this.detailFieldNames) this.form.get(name)!.disable({ emitEvent: false });
     this.trims.set([]);
     this.selectedTrimIndex.set(null);
     this.vinFilledDetails.set(false);

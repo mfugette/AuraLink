@@ -1,3 +1,5 @@
+@use '../terminal-search' as ts;
+
 .vehicle-selector {
   display: flex;
   flex-direction: column;
@@ -15,39 +17,40 @@
     min-width: 200px;
   }
 
-  .vin-decode-btn, .scan-btn {
-    height: 52px;
-    gap: 6px;
-    padding: 0 22px;
-    border-radius: var(--obd-radius-pill);
-    white-space: nowrap;
-    transition: background var(--obd-dur-fast) var(--obd-ease),
-                border-color var(--obd-dur-fast) var(--obd-ease),
-                color var(--obd-dur-fast) var(--obd-ease),
-                opacity var(--obd-dur-fast) var(--obd-ease);
-
-    app-icon { font-size: 20px; width: 20px; height: 20px; }
-  }
-
-  // Outline accent button (moved away from solid fill, matching .btn-action).
-  .vin-decode-btn {
-    background: transparent;
-    border: 1px solid color-mix(in srgb, var(--obd-blue) 55%, transparent);
-    color: var(--obd-blue);
-
-    &:hover:not(:disabled) {
-      border-color: var(--obd-blue);
-      background: color-mix(in srgb, var(--obd-blue) 14%, transparent);
-    }
-    &:disabled { opacity: 0.5; }
-  }
-
   .scan-btn {
+    // Match the VIN field's height (.field-control.ts-field is 44px).
+    height: 44px;
+    gap: 6px;
+    padding: 0 18px;
+    border-radius: var(--obd-radius-sm);
+    white-space: nowrap;
     border: 1px solid var(--obd-border-strong);
     color: var(--obd-text-dim);
+    transition: border-color var(--obd-dur-fast) var(--obd-ease),
+                color var(--obd-dur-fast) var(--obd-ease);
+
+    app-icon { font-size: 20px; width: 20px; height: 20px; }
 
     &:hover { border-color: var(--obd-blue); color: var(--obd-text); }
   }
+}
+
+// Decode-VIN action, now the VIN field's trailing icon. Enabled once a VIN is
+// present (disabled + dimmed while empty). Reads as an affordance, not a button.
+.vin-decode-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--obd-text-muted);
+  cursor: pointer;
+  transition: color var(--obd-dur-fast) var(--obd-ease);
+
+  app-icon { font-size: 18px; width: 18px; height: 18px; }
+
+  &:hover:not(:disabled) { color: var(--obd-blue); }
+  &:disabled { opacity: 0.4; cursor: default; }
 }
 
 .field-error {
@@ -65,79 +68,23 @@
   }
 }
 
-.divider-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  .divider {
-    flex: 1;
-    width: auto;
-  }
-
-  .divider-label {
-    font-size: 0.75rem;
-    color: var(--obd-text-muted);
-    white-space: nowrap;
-  }
-}
-
-.ymm-grid {
+// Shared field grid — each row has a fixed column count that collapses on
+// narrower screens. Row layout (per design): R2 year/make/model/trim (4),
+// R3 engine/drive/trans (3), R4 fuel/mileage (2).
+.vs-grid {
   display: grid;
-  // Large screens: Year, Make, Model, Sub-model, Engine all in one row.
-  grid-template-columns: 100px repeat(4, 1fr);
   gap: 12px;
-
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  @media (max-width: 380px) {
-    grid-template-columns: 1fr;
-  }
 }
+.vs-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.vs-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.vs-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
-.details-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  color: var(--obd-blue);
-
-  app-icon { font-size: 15px; width: 15px; height: 15px; }
+@media (max-width: 760px) {
+  .vs-grid-4 { grid-template-columns: 1fr 1fr; }
+  .vs-grid-3 { grid-template-columns: 1fr 1fr; }
 }
-
-.details-toggle {
-  align-self: flex-start;
-  color: var(--obd-text-dim) !important;
-  font-size: 0.85rem !important;
-  padding: 0 8px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-
-  app-icon { font-size: 18px; width: 18px; height: 18px; }
-}
-
-.details-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-
-  @media (max-width: 700px) {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  @media (max-width: 440px) {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 460px) {
+  .vs-grid-4, .vs-grid-3, .vs-grid-2 { grid-template-columns: 1fr; }
 }
 
 // ── VIN Scanner ───────────────────────────────────────────────────────────────
@@ -212,3 +159,6 @@
 
   &:hover { background: var(--obd-surface-4); }
 }
+
+// Mono field caption — shared terminal-field label (see _terminal-search.scss).
+.vs-panel-sub { @include ts.label; }
