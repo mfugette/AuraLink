@@ -11,7 +11,7 @@
       {{ accountService.vehicles().length }} of {{ slots().length }} slots used
     </span>
     <button type="button" class="btn btn-action garage-bulk-add" (click)="bulkAdd()">
-      <app-icon name="library_add" /> Bulk add
+      <mat-icon>library_add</mat-icon> Bulk add
     </button>
   </div>
 
@@ -24,7 +24,7 @@
         <a class="vehicle-cell" [class.primary]="v.isPrimary" [routerLink]="['/my-vehicles', v.id, 'edit']">
           <div class="vehicle-head">
             <span class="vehicle-eyebrow">
-              <app-icon name="directions_car" />
+              <mat-icon>directions_car</mat-icon>
               {{ v.make || 'Vehicle' }}{{ v.model ? ' · ' + v.model : '' }}
             </span>
             @if (v.isPrimary) {
@@ -43,12 +43,12 @@
             <div class="span-2"><dt>VIN</dt><dd class="mono">{{ v.vin ?? '—' }}</dd></div>
           </dl>
 
-          <span class="vehicle-cta"><app-icon name="edit" /> Edit details</span>
+          <span class="vehicle-cta"><mat-icon>edit</mat-icon> Edit details</span>
         </a>
       } @else {
         <!-- Empty garage slot: click to add a vehicle -->
         <a class="vehicle-cell vehicle-cell--empty" routerLink="/my-vehicles/add">
-          <app-icon name="add" />
+          <mat-icon>add</mat-icon>
           <span class="empty-slot-label">Add a vehicle</span>
         </a>
       }

@@ -14,15 +14,15 @@
       <span class="ts-prompt">{{ prompt }}<span class="ts-caret">$</span></span>
     }
     @if (icon) {
-      <app-icon [name]="icon" />
+      <mat-icon>{{ icon }}</mat-icon>
     }
     <span class="select-value" [class.placeholder]="!selectedLabel()">
       {{ selectedLabel() ?? placeholder }}
     </span>
     @if (loading) {
-      <app-icon class="spin" name="progress_activity" />
+      <mat-icon class="spin">progress_activity</mat-icon>
     } @else {
-      <app-icon class="chevron" name="expand_more" />
+      <mat-icon class="chevron">expand_more</mat-icon>
     }
   </button>
 

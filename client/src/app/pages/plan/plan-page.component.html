@@ -7,7 +7,7 @@
   <!-- Contextual banner when redirected from a gated page -->
   @if (lockedInfo(); as locked) {
     <div class="locked-banner">
-      <app-icon name="lock" />
+      <mat-icon>lock</mat-icon>
       <span>
         <strong>{{ locked.label }}</strong> is a
         {{ locked.tier === 'pro' ? 'Pro' : 'Plus' }} feature.
@@ -57,7 +57,7 @@
         <ul class="tier-features">
           @for (f of t.features; track f.label) {
             <li [class.feature--off]="!f.included">
-              <app-icon [name]="f.included ? 'check_circle' : 'cancel'" />
+              <mat-icon>{{ f.included ? 'check_circle' : 'cancel' }}</mat-icon>
               <span>
                 {{ f.label }}
                 @if (f.note) { <em class="feature-note">({{ f.note }})</em> }
@@ -74,7 +74,7 @@
           (click)="selectPlan(t.tier)"
         >
           @if (current() === t.tier) {
-            <app-icon name="check" /> Current plan
+            <mat-icon>check</mat-icon> Current plan
           } @else if (t.priceMonthly === 0) {
             Switch to Free
           } @else {
@@ -89,11 +89,11 @@
   <section class="adapter-section">
     <div class="adapter-card">
       <div class="adapter-info">
-        <div class="adapter-badge"><app-icon name="bluetooth" /> Hardware</div>
+        <div class="adapter-badge"><mat-icon>bluetooth</mat-icon> Hardware</div>
         <h2 class="adapter-name">{{ adapter.name }}</h2>
         <p class="adapter-blurb">{{ adapter.blurb }}</p>
         <p class="adapter-hint">
-          <app-icon name="info" />
+          <mat-icon>info</mat-icon>
           Required for the live dashboard's real-time telemetry. Plus members can
           scan with any Bluetooth adapter; the AuraLink adapter unlocks streaming.
         </p>
@@ -106,13 +106,13 @@
             <span class="adapter-once">one-time</span>
           </div>
           <button type="button" class="btn adapter-cta" (click)="buyAdapter(false)">
-            <app-icon name="shopping_cart" /> Buy adapter
+            <mat-icon>shopping_cart</mat-icon> Buy adapter
           </button>
         </div>
 
         <div class="adapter-bundle">
           <div class="bundle-label">
-            <app-icon name="local_offer" />
+            <mat-icon>local_offer</mat-icon>
             <span>Pro bundle — adapter + Pro plan</span>
           </div>
           <div class="bundle-price">
@@ -121,7 +121,7 @@
             <span class="adapter-once">+ Pro</span>
           </div>
           <button type="button" class="btn adapter-cta adapter-cta--primary" (click)="buyAdapter(true)">
-            <app-icon name="workspace_premium" /> Get the bundle
+            <mat-icon>workspace_premium</mat-icon> Get the bundle
           </button>
         </div>
       </div>
@@ -129,7 +129,7 @@
   </section>
 
   <p class="plan-disclaimer">
-    <app-icon name="construction" />
+    <mat-icon>construction</mat-icon>
     Payment processing is simulated for now — no card is charged. Real billing is coming soon.
   </p>
 </div>

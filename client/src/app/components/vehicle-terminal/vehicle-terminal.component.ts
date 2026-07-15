@@ -8,8 +8,8 @@ import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
 import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 import { VehicleService } from '../../services/vehicle.service';
 import { Vehicle } from '../../models/vehicle.model';
-import { IconComponent } from '../shared/icon/icon.component';
 import { PixelTitleComponent } from '../shared/pixel-title/pixel-title.component';
+import { MatIconModule } from '@angular/material/icon';
 
 // One row of the terminal form.
 //   options — ghost-completes + drops a completion list (make/model)
@@ -41,7 +41,7 @@ interface TermField {
 @Component({
   selector: 'app-vehicle-terminal',
   standalone: true,
-  imports: [CommonModule, IconComponent, PixelTitleComponent],
+  imports: [CommonModule, MatIconModule, PixelTitleComponent],
   templateUrl: './vehicle-terminal.component.html',
   styleUrl: './vehicle-terminal.component.scss',
 })

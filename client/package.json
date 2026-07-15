@@ -35,7 +35,6 @@
     "@types/three": "^0.185.1",
     "@zxing/browser": "^0.2.1",
     "@zxing/library": "^0.23.0",
-    "pixelarticons": "^2.2.0",
     "rxjs": "~7.8.0",
     "three": "^0.185.1",
     "tslib": "^2.3.0",

@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { supabase } from '../../services/supabase-client';
-import { IconComponent } from '../../components/shared/icon/icon.component';
+import { MatIconModule } from '@angular/material/icon';
 
 // Landing page for email links (signup confirmation, magic links). Supabase's
 // client parses the token from the URL and establishes a session; we wait for it
@@ -10,7 +10,7 @@ import { IconComponent } from '../../components/shared/icon/icon.component';
 @Component({
   selector: 'app-auth-callback-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, IconComponent],
+  imports: [CommonModule, RouterLink, MatIconModule],
   templateUrl: './auth-callback-page.component.html',
   styleUrl: './auth-callback-page.component.scss',
 })

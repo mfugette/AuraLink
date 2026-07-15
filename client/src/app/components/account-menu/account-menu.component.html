@@ -13,7 +13,7 @@
     </button>
   } @else {
     <button type="button" class="btn account-signin" (click)="toggleMenu()">
-      <app-icon name="login" />
+      <mat-icon>login</mat-icon>
       <span class="account-signin-text">Sign in</span>
     </button>
   }
@@ -37,26 +37,26 @@
 
       <div class="account-items">
         <button type="button" class="btn account-item" role="menuitem" (click)="openPanel('profile')">
-          <app-icon name="person" /> My Profile
+          <mat-icon>person</mat-icon> My Profile
         </button>
         <button type="button" class="btn account-item" role="menuitem" (click)="openPanel('vehicles')">
-          <app-icon name="directions_car" /> My Vehicles
+          <mat-icon>directions_car</mat-icon> My Vehicles
         </button>
         <button type="button" class="btn account-item" role="menuitem" (click)="goTo('/my-plan')">
-          <app-icon name="workspace_premium" /> My Plan
+          <mat-icon>workspace_premium</mat-icon> My Plan
         </button>
         <button type="button" class="btn account-item" role="menuitem" (click)="goTo('/account')">
-          <app-icon name="manage_accounts" /> Account
+          <mat-icon>manage_accounts</mat-icon> Account
         </button>
         <button type="button" class="btn account-item" role="menuitem" (click)="openPanel('settings')">
-          <app-icon name="settings" /> Settings
+          <mat-icon>settings</mat-icon> Settings
         </button>
       </div>
 
       <hr class="divider" />
 
       <button type="button" class="btn account-item account-item--danger" role="menuitem" (click)="signOut()">
-        <app-icon name="logout" /> Sign out
+        <mat-icon>logout</mat-icon> Sign out
       </button>
 
       <!-- TEMPORARY tier switcher — for testing tier-gated features before real

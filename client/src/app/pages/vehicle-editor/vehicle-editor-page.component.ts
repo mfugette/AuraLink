@@ -7,10 +7,10 @@ import { NewSavedVehicle, SavedVehicle } from '../../models/account.model';
 import { VehicleTerminalComponent } from '../../components/vehicle-terminal/vehicle-terminal.component';
 import { Vehicle } from '../../models/vehicle.model';
 import { VehicleService } from '../../services/vehicle.service';
-import { IconComponent } from '../../components/shared/icon/icon.component';
 import { VehicleCloudComponent } from '../../components/shared/vehicle-cloud/vehicle-cloud.component';
 import { SessionService } from '../../services/session.service';
 import { DriveSession } from '../../models/session.model';
+import { MatIconModule } from '@angular/material/icon';
 
 // A row in this vehicle's drive-history table.
 interface HistoryRow {
@@ -43,7 +43,7 @@ interface MaintItem {
 @Component({
   selector: 'app-vehicle-editor-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent, VehicleTerminalComponent, VehicleCloudComponent],
+  imports: [CommonModule, FormsModule, MatIconModule, VehicleTerminalComponent, VehicleCloudComponent],
   templateUrl: './vehicle-editor-page.component.html',
   styleUrl: './vehicle-editor-page.component.scss',
 })

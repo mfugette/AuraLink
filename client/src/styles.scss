@@ -36,6 +36,44 @@ html {
   ));
 }
 
+// ─── Material Symbols (icon font) ─────────────────────────────────────────────
+// Every icon in the app is a <mat-icon> rendered with the Material Symbols
+// Outlined variable font. Axes are tuned once here to match the design:
+//   FILL 0 (outlined) · wght 700 · GRAD 200 (high emphasis) · opsz 48
+// mat-icon sizes via font-size (default 20px below); width/height track it so
+// the glyph never clips. Component SCSS that sets `mat-icon { font-size: Npx }`
+// keeps working — it just overrides the size here.
+mat-icon,
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  vertical-align: middle;
+  flex-shrink: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'liga';
+  font-variation-settings: 'FILL' 0, 'wght' 700, 'GRAD' 200, 'opsz' 48;
+}
+
+// mat-icon defaults to a fixed 24px box; let the glyph size to its font-size so
+// existing `font-size` rules control it (matching the old inline-SVG behavior).
+mat-icon.mat-icon {
+  width: 1em;
+  height: 1em;
+  overflow: visible;
+}
+
 // ─── CSS Custom Properties ────────────────────────────────────────────────────
 :root {
   // Surfaces — neutral cool-graphite. Depth reads from tonal steps + soft
@@ -223,7 +261,7 @@ h1, h2, h3, .obd-section-title {
   align-items: center;
   gap: 8px;
 
-  app-icon {
+  mat-icon {
     color: var(--obd-blue);
     font-size: 20px;
     width: 20px;
@@ -306,7 +344,7 @@ h1, h2, h3, .obd-section-title {
               border-color var(--obd-dur-fast) var(--obd-ease),
               color var(--obd-dur-fast) var(--obd-ease);
 
-  app-icon { font-size: 18px; width: 18px; height: 18px; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
 
   &:hover { border-color: var(--obd-text-muted); color: var(--obd-text); background: var(--obd-surface-2); }
 
@@ -360,7 +398,7 @@ h1, h2, h3, .obd-section-title {
   font-weight: 500;
   color: var(--obd-text-dim);
 
-  app-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-text-muted); }
+  mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-text-muted); }
   .req { color: var(--obd-blue); }
 }
 
@@ -385,7 +423,7 @@ h1, h2, h3, .obd-section-title {
   }
 
   // Leading/trailing icons inside the box.
-  > app-icon {
+  > mat-icon {
     flex-shrink: 0;
     font-size: 20px;
     width: 20px;

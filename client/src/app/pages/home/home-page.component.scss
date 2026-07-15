@@ -304,7 +304,7 @@
   text-transform: uppercase;
   color: var(--obd-text-dim);
 
-  app-icon {
+  mat-icon {
     font-size: 14px;
     width: 14px;
     height: 14px;
@@ -382,7 +382,7 @@
 
   &:active { transform: translateY(0); }
 
-  app-icon { font-size: 18px; width: 18px; height: 18px; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
 }
 
 .detect-live-btn {
@@ -417,7 +417,7 @@
 
   &:active { transform: translateY(0); }
 
-  app-icon { font-size: 18px; width: 18px; height: 18px; color: var(--obd-blue); }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--obd-blue); }
 }
 
 // ── Authenticated hero: terminal-style [ACTION] buttons (in .console-actions) ──
@@ -610,7 +610,7 @@
   font-size: 0.72rem;
   letter-spacing: 0.04em;
   transition: background var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
-  app-icon { font-size: 15px; width: 15px; height: 15px; }
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
   &:hover { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 14%, transparent); }
 }
 
@@ -900,7 +900,7 @@
 
   &:hover { border-color: var(--obd-blue) !important; color: var(--obd-text) !important; }
 
-  app-icon { font-size: 18px; width: 18px; height: 18px; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
 }
 
 // ── Section card ──────────────────────────────────────────────────────────────
@@ -971,7 +971,7 @@
     opacity: 0.4;
   }
 
-  app-icon { font-size: 18px; width: 18px; height: 18px; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
 }
 
 .reset-btn {

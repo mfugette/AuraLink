@@ -44,7 +44,7 @@
 .sh-trace-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .sh-trace-title {
   display: flex; align-items: center; gap: 7px; font-size: 0.86rem; font-weight: 600; color: var(--obd-text);
-  app-icon { font-size: 17px; width: 17px; height: 17px; }
+  mat-icon { font-size: 17px; width: 17px; height: 17px; }
 }
 .sh-trace-peak {
   font-size: 0.84rem; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--obd-text);

@@ -14,12 +14,12 @@
       <button type="button" class="view-tab" role="tab"
               [class.active]="view() === 'gauges'" [attr.aria-selected]="view() === 'gauges'"
               (click)="setView('gauges')">
-        <app-icon name="speed" /> Gauges
+        <mat-icon>speed</mat-icon> Gauges
       </button>
       <button type="button" class="view-tab" role="tab"
               [class.active]="view() === 'charts'" [attr.aria-selected]="view() === 'charts'"
               (click)="setView('charts')">
-        <app-icon name="show_chart" /> Line graphs
+        <mat-icon>show_chart</mat-icon> Line graphs
       </button>
     </div>
     <span class="dash-toolbar-hint">Live · last 5 minutes</span>
@@ -33,7 +33,7 @@
            [style.--status-color]="'var(' + c.healthColorVar + ')'">
         <div class="gauge-label">
           <span class="gauge-eyebrow">
-            <app-icon [name]="c.def.icon" />
+            <mat-icon>{{ c.def.icon }}</mat-icon>
             {{ c.def.label }}
           </span>
           <span class="gauge-badge">
@@ -65,7 +65,7 @@
       <div class="chart-cell" [style.--metric-color]="'var(' + c.def.colorVar + ')'">
         <div class="chart-head">
           <span class="chart-eyebrow">
-            <app-icon [style.color]="'var(' + c.def.colorVar + ')'" [name]="c.def.icon" />
+            <mat-icon [style.color]="'var(' + c.def.colorVar + ')'">{{ c.def.icon }}</mat-icon>
             {{ c.def.label }}
           </span>
           <span class="chart-current" [class.chart-current--warn]="c.isWarn">

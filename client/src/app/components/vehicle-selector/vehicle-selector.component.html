@@ -32,7 +32,7 @@
             aria-label="Decode VIN"
             matTooltip="Decode VIN"
           >
-            <app-icon name="qr_code_scanner" />
+            <mat-icon>qr_code_scanner</mat-icon>
           </button>
         }
       </div>
@@ -44,17 +44,17 @@
         class="btn scan-btn"
         (click)="scannerActive() ? stopScanner() : startScanner()"
       >
-        <app-icon [name]="scannerActive() ? 'camera_off' : 'photo_camera'" />
+        <mat-icon>{{ scannerActive() ? 'camera_off' : 'photo_camera' }}</mat-icon>
         {{ scannerActive() ? 'Cancel' : 'Scan VIN' }}
       </button>
     }
   </div>
 
   @if (vinError()) {
-    <p class="field-error"><app-icon name="error_outline" /> {{ vinError() }}</p>
+    <p class="field-error"><mat-icon>error_outline</mat-icon> {{ vinError() }}</p>
   }
   @if (scanError()) {
-    <p class="field-error"><app-icon name="error_outline" /> {{ scanError() }}</p>
+    <p class="field-error"><mat-icon>error_outline</mat-icon> {{ scanError() }}</p>
   }
 
   <!-- Camera scanner (mobile only) -->
@@ -70,7 +70,7 @@
         </div>
         <p class="scanner-hint">Point camera at the barcode sticker on your door jamb or windshield</p>
         <button type="button" class="btn scanner-close" (click)="stopScanner()" aria-label="Close scanner">
-          <app-icon name="close" />
+          <mat-icon>close</mat-icon>
         </button>
       </div>
     </div>

@@ -183,7 +183,7 @@
               color var(--obd-dur-fast) var(--obd-ease),
               border-color var(--obd-dur-fast) var(--obd-ease);
 
-  app-icon { font-size: 18px; width: 18px; height: 18px; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
 
   &:hover { background: var(--obd-surface-3); color: var(--obd-text); border-color: var(--obd-border-strong); }
 }
@@ -278,7 +278,7 @@
   color: var(--obd-blue);
   transition: background var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease), opacity var(--obd-dur-fast) var(--obd-ease);
 
-  app-icon { font-size: 18px; width: 18px; height: 18px; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
 
   &:hover:not(:disabled) { border-color: var(--obd-blue); }
   &:disabled { opacity: 0.35; }

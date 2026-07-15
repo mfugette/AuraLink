@@ -51,7 +51,7 @@
   color: var(--obd-text-muted);
   text-align: center;
 
-  app-icon {
+  mat-icon {
     font-size: 26px;
     width: 26px;
     height: 26px;
@@ -69,7 +69,7 @@
 
   &:hover {
     color: var(--obd-blue);
-    app-icon { color: var(--obd-blue); }
+    mat-icon { color: var(--obd-blue); }
   }
 }
 
@@ -95,7 +95,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 
-  app-icon { flex-shrink: 0; font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); }
+  mat-icon { flex-shrink: 0; font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); }
 }
 
 .vehicle-name {
@@ -184,7 +184,7 @@
   color: var(--obd-text-muted);
   transition: color var(--obd-dur-fast) var(--obd-ease);
 
-  app-icon { font-size: 15px; width: 15px; height: 15px; }
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
 
   .vehicle-cell:hover & { color: var(--obd-blue); }
 }

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { supabase } from '../../services/supabase-client';
-import { IconComponent } from '../../components/shared/icon/icon.component';
+import { MatIconModule } from '@angular/material/icon';
 
 // Landing page for the password-reset email link. Supabase's client (with
 // detectSessionInUrl) parses the recovery token from the URL and fires a
@@ -13,7 +13,7 @@ import { IconComponent } from '../../components/shared/icon/icon.component';
 @Component({
   selector: 'app-reset-password-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [CommonModule, FormsModule, MatIconModule],
   templateUrl: './reset-password-page.component.html',
   styleUrl: './reset-password-page.component.scss',
 })

@@ -35,7 +35,7 @@
 
   &:hover { border-color: var(--obd-blue) !important; color: var(--obd-text) !important; }
 
-  app-icon { font-size: 18px; width: 18px; height: 18px; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
 }
 
 .live-progress {
@@ -110,7 +110,7 @@
   letter-spacing: 0.5px;
   color: var(--obd-blue);
 
-  app-icon { font-size: 16px; width: 16px; height: 16px; }
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
 
   &.success { color: var(--obd-green); }
 }
@@ -171,7 +171,7 @@
   align-items: center;
   justify-content: center;
 
-  app-icon {
+  mat-icon {
     font-size: 26px;
     width: 26px;
     height: 26px;
@@ -223,7 +223,7 @@
 
   &:active { transform: translateY(0) scale(0.98); }
 
-  app-icon { font-size: 20px; width: 20px; height: 20px; }
+  mat-icon { font-size: 20px; width: 20px; height: 20px; }
 }
 
 .demo-note {
@@ -234,7 +234,7 @@
   color: var(--obd-text-muted);
   margin: 0;
 
-  app-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); opacity: 0.7; }
+  mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); opacity: 0.7; }
 }
 
 // ── Connecting ──────────────────────────────────────────────────────────────
@@ -287,11 +287,11 @@
     font-size: 0.875rem;
     color: var(--obd-text-muted);
 
-    app-icon { font-size: 16px; width: 16px; height: 16px; }
+    mat-icon { font-size: 16px; width: 16px; height: 16px; }
 
     &.done {
       color: var(--obd-text-dim);
-      app-icon { color: var(--obd-green); }
+      mat-icon { color: var(--obd-green); }
     }
 
     &.active { color: var(--obd-text); }
@@ -352,7 +352,7 @@
               color var(--obd-dur-fast) var(--obd-ease),
               background var(--obd-dur-fast) var(--obd-ease) !important;
 
-  app-icon { font-size: 16px; width: 16px; height: 16px; }
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
 
   &.active, &:hover {
     border-color: var(--obd-blue) !important;
@@ -384,14 +384,14 @@
     border-color: rgba(234, 179, 8, 0.35);
     background: rgba(234, 179, 8, 0.05);
 
-    .scanner-panel-header app-icon { color: #eab308; }
+    .scanner-panel-header mat-icon { color: #eab308; }
   }
 
   &--success {
     border-color: rgba(34, 197, 94, 0.35);
     background: rgba(34, 197, 94, 0.07);
 
-    .scanner-panel-header app-icon { color: var(--obd-green); }
+    .scanner-panel-header mat-icon { color: var(--obd-green); }
   }
 }
 
@@ -404,7 +404,7 @@
   color: var(--obd-text);
   flex-wrap: wrap;
 
-  app-icon { font-size: 18px; width: 18px; height: 18px; color: var(--obd-blue); flex-shrink: 0; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--obd-blue); flex-shrink: 0; }
 }
 
 .scanner-panel-sub {
@@ -462,11 +462,11 @@
   border-radius: var(--obd-radius-sm);
   background: var(--obd-surface-3);
 
-  app-icon { font-size: 15px; width: 15px; height: 15px; }
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
 
-  &.readiness-complete   { app-icon { color: var(--obd-green); } }
-  &.readiness-incomplete { app-icon { color: var(--obd-red); } color: var(--obd-text); }
-  &.readiness-na         { app-icon { color: var(--obd-text-muted); } opacity: 0.6; }
+  &.readiness-complete   { mat-icon { color: var(--obd-green); } }
+  &.readiness-incomplete { mat-icon { color: var(--obd-red); } color: var(--obd-text); }
+  &.readiness-na         { mat-icon { color: var(--obd-text-muted); } opacity: 0.6; }
 }
 
 // Clear codes
@@ -487,7 +487,7 @@
   gap: 6px !important;
   font-size: 0.875rem !important;
 
-  app-icon { font-size: 18px; width: 18px; height: 18px; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
 }
 
 .clear-cancel-btn {

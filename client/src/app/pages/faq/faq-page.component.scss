@@ -24,7 +24,7 @@
   font-weight: 700;
   color: var(--obd-text);
 
-  app-icon { font-size: 20px; width: 20px; height: 20px; color: var(--obd-blue); }
+  mat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--obd-blue); }
 }
 
 .faq-list {
@@ -97,7 +97,7 @@
   padding: 40px 20px;
   color: var(--obd-text-dim);
 
-  app-icon { font-size: 36px; width: 36px; height: 36px; color: var(--obd-text-muted); }
+  mat-icon { font-size: 36px; width: 36px; height: 36px; color: var(--obd-text-muted); }
   p { margin: 8px 0 0; }
   .faq-empty-sub { font-size: 0.88rem; color: var(--obd-text-muted); }
   a { color: var(--obd-blue); text-decoration: none; &:hover { text-decoration: underline; } }
@@ -114,7 +114,7 @@
   background: linear-gradient(135deg, var(--obd-blue-dim), transparent 75%), var(--obd-surface-2);
   border: 1px solid var(--obd-border);
 
-  > app-icon {
+  > mat-icon {
     font-size: 26px;
     width: 26px;
     height: 26px;

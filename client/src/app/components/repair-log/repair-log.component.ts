@@ -4,10 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { RepairLogService } from '../../services/repair-log.service';
 import { AccountService } from '../../services/account.service';
 import { CustomSelectComponent, SelectOption } from '../shared/custom-select/custom-select.component';
-import { IconComponent } from '../shared/icon/icon.component';
 import {
   RepairCategory, RepairRecord, REPAIR_CATEGORY_META,
 } from '../../models/repair.model';
+import { MatIconModule } from '@angular/material/icon';
 
 type SortKey = 'date' | 'mileage' | 'cost';
 
@@ -17,7 +17,7 @@ type SortKey = 'date' | 'mileage' | 'cost';
 @Component({
   selector: 'app-repair-log',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent, CustomSelectComponent],
+  imports: [CommonModule, FormsModule, MatIconModule, CustomSelectComponent],
   templateUrl: './repair-log.component.html',
   styleUrl: './repair-log.component.scss',
 })

@@ -35,10 +35,10 @@
       </form>
 
       @if (nameSaved()) {
-        <p class="acct-hint acct-hint--ok"><app-icon name="check_circle" /> Name updated.</p>
+        <p class="acct-hint acct-hint--ok"><mat-icon>check_circle</mat-icon> Name updated.</p>
       }
       @if (nameError()) {
-        <p class="acct-hint acct-hint--err"><app-icon name="error" /> {{ nameError() }}</p>
+        <p class="acct-hint acct-hint--err"><mat-icon>error</mat-icon> {{ nameError() }}</p>
       }
 
       <p class="acct-note">
@@ -55,21 +55,21 @@
         saved vehicles, settings, and issue history — as a JSON file.
       </p>
       <button type="button" class="btn acct-btn acct-btn--ghost" (click)="exportData()" [disabled]="exporting()">
-        <app-icon name="download" /> {{ exporting() ? 'Preparing…' : 'Export my data' }}
+        <mat-icon>download</mat-icon> {{ exporting() ? 'Preparing…' : 'Export my data' }}
       </button>
     </section>
 
     <!-- ── Danger zone ───────────────────────────────────────────────────────── -->
     <section class="acct-card acct-card--danger">
       <h2 class="acct-card-title acct-card-title--danger">
-        <app-icon name="warning" /> Danger zone
+        <mat-icon>warning</mat-icon> Danger zone
       </h2>
       <p class="acct-card-sub">
         Deleting your account is permanent. Your profile, saved vehicles, settings,
         and history will be erased and cannot be recovered.
       </p>
       <button type="button" class="btn acct-btn acct-btn--danger" (click)="openDeleteDialog()">
-        <app-icon name="delete_forever" /> Delete my account
+        <mat-icon>delete_forever</mat-icon> Delete my account
       </button>
     </section>
   } @else {
@@ -81,7 +81,7 @@
     <div class="dialog-scrim" (click)="closeDeleteDialog()">
       <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="delete-title"
            (click)="$event.stopPropagation()">
-        <div class="dialog-icon dialog-icon--danger"><app-icon name="delete_forever" /></div>
+        <div class="dialog-icon dialog-icon--danger"><mat-icon>delete_forever</mat-icon></div>
         <h2 class="dialog-title" id="delete-title">Delete your account?</h2>
         <p class="dialog-body">
           This <strong>permanently erases</strong> your profile, vehicles, settings,
@@ -99,7 +99,7 @@
           </label>
 
           @if (deleteError()) {
-            <p class="dialog-error"><app-icon name="error" /> {{ deleteError() }}</p>
+            <p class="dialog-error"><mat-icon>error</mat-icon> {{ deleteError() }}</p>
           }
 
           <div class="dialog-actions">

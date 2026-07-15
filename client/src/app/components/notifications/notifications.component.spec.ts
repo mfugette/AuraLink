@@ -50,18 +50,18 @@ describe('NotificationsComponent', () => {
     fixture.detectChanges();
   }
 
-  it('shows no badge when the inbox is empty', () => {
-    // Before load() there are no notifications, so the unread badge is absent.
-    const badge = fixture.nativeElement.querySelector('.notif-badge');
-    expect(badge).toBeNull();
+  it('shows no unread count when the inbox is empty', () => {
+    // Before load() there are no notifications, so the count pill is absent.
+    const count = fixture.nativeElement.querySelector('.notif-tab-count');
+    expect(count).toBeNull();
     expect(inbox.unreadCount()).toBe(0);
   });
 
-  it('shows the unread badge count on the bell', () => {
+  it('shows the unread count on the right-edge tab', () => {
     loadInbox();
-    const badge = fixture.nativeElement.querySelector('.notif-badge');
+    const count = fixture.nativeElement.querySelector('.notif-tab-count');
     expect(inbox.unreadCount()).toBe(1);
-    expect(badge?.textContent?.trim()).toBe(String(inbox.unreadCount()));
+    expect(count?.textContent?.trim()).toBe(String(inbox.unreadCount()));
   });
 
   it('toggle opens and closes the pane', () => {

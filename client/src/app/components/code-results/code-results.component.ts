@@ -2,15 +2,12 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, signa
 import { CommonModule } from '@angular/common';
 import { DtcService } from '../../services/dtc.service';
 import { DtcCode, Severity, SEVERITY_RANK } from '../../models/dtc-code.model';
-import { IconComponent } from '../shared/icon/icon.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-code-results',
   standalone: true,
-  imports: [
-    CommonModule,
-    IconComponent,
-  ],
+  imports: [CommonModule, MatIconModule],
   templateUrl: './code-results.component.html',
   styleUrl: './code-results.component.scss',
 })

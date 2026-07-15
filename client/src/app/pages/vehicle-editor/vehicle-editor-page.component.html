@@ -6,7 +6,7 @@
   <div class="vs-top vs-bleed">
     <div class="editor-body">
       @if (saveError()) {
-        <p class="field-error"><app-icon name="error_outline" /> {{ saveError() }}</p>
+        <p class="field-error"><mat-icon>error_outline</mat-icon> {{ saveError() }}</p>
       }
 
       <!-- Terminal-style vehicle form: name/vin/year/make/model/trim/engine/…/
@@ -77,9 +77,9 @@
                   <td class="num">{{ r.duration }}</td>
                   <td>
                     @if (r.warnLabel) {
-                      <span class="ht-chip warn"><app-icon name="warning" /> {{ r.warnLabel }}</span>
+                      <span class="ht-chip warn"><mat-icon>warning</mat-icon> {{ r.warnLabel }}</span>
                     } @else {
-                      <span class="ht-chip ok"><app-icon name="check" /> Nominal</span>
+                      <span class="ht-chip ok"><mat-icon>check</mat-icon> Nominal</span>
                     }
                   </td>
                 </tr>
@@ -89,7 +89,7 @@
 
           @if (historyRows().length === 0) {
             <div class="ht-empty">
-              <app-icon name="history" />
+              <mat-icon>history</mat-icon>
               <p>No drives logged for this vehicle yet.</p>
             </div>
           }
@@ -109,8 +109,8 @@
                 [class.soon]="m.status === 'soon'" [class.due]="m.status === 'due'">
               <button type="button" class="vs-check" (click)="toggleMaint(m.key)"
                       [attr.aria-pressed]="m.done" [attr.aria-label]="'Toggle ' + m.label">
-                <span class="vs-check-box">@if (m.done) { <app-icon name="check" /> }</span>
-                <app-icon class="vs-check-icon" [name]="m.icon" />
+                <span class="vs-check-box">@if (m.done) { <mat-icon>check</mat-icon> }</span>
+                <mat-icon class="vs-check-icon">{{ m.icon }}</mat-icon>
                 <span class="vs-check-label">{{ m.label }}</span>
                 <span class="vs-check-status"><span class="vs-check-dot"></span>{{ m.detail }}</span>
               </button>

@@ -5,10 +5,10 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { TierService } from '../../services/tier.service';
 import { CheckoutService } from '../../services/checkout.service';
-import { IconComponent } from '../../components/shared/icon/icon.component';
 import {
   ADAPTER, BillingInterval, Feature, Tier, TIERS, tierDef, annualPrice, ANNUAL_MONTHS_PAID,
 } from '../../models/tier.model';
+import { MatIconModule } from '@angular/material/icon';
 
 // Pricing / plans page. Shows the three tiers side by side, the current plan,
 // and the AuraLink adapter purchase (with a Pro-bundle discount). A ?locked=
@@ -20,7 +20,7 @@ import {
 @Component({
   selector: 'app-plan-page',
   standalone: true,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, MatIconModule],
   templateUrl: './plan-page.component.html',
   styleUrl: './plan-page.component.scss',
 })

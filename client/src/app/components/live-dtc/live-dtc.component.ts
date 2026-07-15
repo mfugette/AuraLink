@@ -4,15 +4,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DtcService } from '../../services/dtc.service';
 import { DtcCode, SEVERITY_RANK } from '../../models/dtc-code.model';
 import { Vehicle } from '../../models/vehicle.model';
-import { IconComponent } from '../shared/icon/icon.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-live-dtc',
   standalone: true,
-  imports: [
-    CommonModule,
-    IconComponent, MatProgressSpinnerModule,
-  ],
+  imports: [CommonModule, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './live-dtc.component.html',
   styleUrl: './live-dtc.component.scss',
 })

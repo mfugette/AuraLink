@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { AssistantService } from '../../services/assistant.service';
 import { AccountService } from '../../services/account.service';
 import { AuraTerminalPipe } from '../../pipes/aura-terminal.pipe';
-import { IconComponent } from '../../components/shared/icon/icon.component';
+import { MatIconModule } from '@angular/material/icon';
 
 // Small ASCII wordmark printed as the boot banner of the terminal.
 const BANNER = String.raw`
@@ -21,7 +21,7 @@ const BANNER = String.raw`
 @Component({
   selector: 'app-assistant-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent, AuraTerminalPipe],
+  imports: [CommonModule, FormsModule, MatIconModule, AuraTerminalPipe],
   templateUrl: './assistant-page.component.html',
   styleUrl: './assistant-page.component.scss',
 })

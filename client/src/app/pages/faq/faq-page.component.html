@@ -18,14 +18,14 @@
     />
     @if (query()) {
       <button type="button" class="ts-clear" (click)="query.set('')" aria-label="Clear search">
-        <app-icon name="close" />
+        <mat-icon>close</mat-icon>
       </button>
     }
   </div>
 
   @if (noResults()) {
     <div class="faq-empty">
-      <app-icon name="search_off" />
+      <mat-icon>search_off</mat-icon>
       <p>No answers matched “{{ query() }}”.</p>
       <p class="faq-empty-sub">Try different words, or ask <a routerLink="/assistant">Aura</a> directly.</p>
     </div>
@@ -35,7 +35,7 @@
   @for (section of filtered(); track section.title) {
     <section class="faq-section">
       <h2 class="faq-section-title">
-        <app-icon [name]="section.icon" /> {{ section.title }}
+        <mat-icon>{{ section.icon }}</mat-icon> {{ section.title }}
       </h2>
 
       <div class="faq-list">
@@ -44,7 +44,7 @@
             <button type="button" class="faq-q" (click)="toggle(section.title + '-' + i)"
                     [attr.aria-expanded]="isOpen(section.title + '-' + i)">
               <span>{{ item.q }}</span>
-              <app-icon class="faq-chevron" name="expand_more" />
+              <mat-icon class="faq-chevron">expand_more</mat-icon>
             </button>
             @if (isOpen(section.title + '-' + i)) {
               <div class="faq-a" [innerHTML]="item.a"></div>
@@ -57,7 +57,7 @@
 
   <!-- Still-need-help footer -->
   <div class="faq-cta">
-    <app-icon name="auto_awesome" />
+    <mat-icon>auto_awesome</mat-icon>
     <div class="faq-cta-copy">
       <span class="faq-cta-title">Still have a question?</span>
       <span class="faq-cta-sub">Aura can help with most vehicle and app questions.</span>

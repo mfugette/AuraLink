@@ -11,7 +11,7 @@ import { NotificationsComponent } from './components/notifications/notifications
 import { ToastHostComponent } from './components/toast-host/toast-host.component';
 import { ThemeService } from './services/theme.service';
 import { AuthService } from './services/auth.service';
-import { IconComponent } from './components/shared/icon/icon.component';
+import { MatIconModule } from '@angular/material/icon';
 
 // Header wordmark drawn in the same half-block figlet vocabulary as the Aura
 // terminal boot banner. Two pieces so each keeps its own color: AURA (white,
@@ -27,16 +27,7 @@ const LOGO_LINK = String.raw`█░░ █ █▄░█ █▄▀
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterOutlet, RouterLink,
-    IconComponent, MatTooltipModule,
-    SidebarComponent,
-    AiSearchComponent,
-    AccountMenuComponent,
-    NotificationsComponent,
-    ToastHostComponent,
-  ],
+  imports: [CommonModule, RouterOutlet, RouterLink, MatIconModule, MatTooltipModule, SidebarComponent, AiSearchComponent, AccountMenuComponent, NotificationsComponent, ToastHostComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

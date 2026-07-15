@@ -12,7 +12,7 @@
   line-height: 1.5;
   color: var(--obd-text-muted);
 
-  app-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); opacity: 0.7; flex-shrink: 0; margin-top: 1px; }
+  mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); opacity: 0.7; flex-shrink: 0; margin-top: 1px; }
 }
 
 .save-confirm {
@@ -23,7 +23,7 @@
   font-size: 0.82rem;
   color: var(--obd-green);
 
-  app-icon { font-size: 16px; width: 16px; height: 16px; }
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
 }
 
 .panel-cancel-btn {

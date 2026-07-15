@@ -50,7 +50,7 @@
                       <div class="aura-box-out"><span class="aura-arrow">→</span> {{ line }}</div>
                     }
                     <button type="button" class="btn aura-box-cta" (click)="go('/assistant')">
-                      ask aura <app-icon name="arrow_outward" />
+                      ask aura <mat-icon>arrow_outward</mat-icon>
                     </button>
                   </div>
                 </div>
@@ -87,7 +87,7 @@
                   <span class="cloud-side-eyebrow">— Routine maintenance</span>
                   @for (item of maintenanceItems(); track item.label) {
                     <div class="maint-row" [class.soon]="item.status === 'soon'" [class.due]="item.status === 'due'">
-                      <app-icon class="maint-icon" [name]="item.icon" />
+                      <mat-icon class="maint-icon">{{ item.icon }}</mat-icon>
                       <span class="maint-label">{{ item.label }}</span>
                       <span class="maint-status">
                         <span class="maint-dot"></span>{{ item.detail }}
@@ -103,7 +103,7 @@
                 @for (s of heroStats(); track s.label) {
                   <div class="stat-cell" [class.warn]="s.warn">
                     <div class="stat-top">
-                      <app-icon class="stat-icon" [name]="s.icon" />
+                      <mat-icon class="stat-icon">{{ s.icon }}</mat-icon>
                       @if (s.delta) {
                         <span class="stat-delta" [class.warn]="s.deltaWarn">{{ s.delta }}</span>
                       }
@@ -130,19 +130,19 @@
                     parts you need at nearby stores — all in one place, no account required.
                   </p>
                   <div class="hero-badges">
-                    <span class="badge"><app-icon name="check" /> No account needed</span>
-                    <span class="badge"><app-icon name="check" /> Works on any device</span>
-                    <span class="badge"><app-icon name="check" /> 100% free</span>
+                    <span class="badge"><mat-icon>check</mat-icon> No account needed</span>
+                    <span class="badge"><mat-icon>check</mat-icon> Works on any device</span>
+                    <span class="badge"><mat-icon>check</mat-icon> 100% free</span>
                   </div>
                   <div class="hero-cta">
                     <button type="button" class="btn get-started-btn" (click)="scrollToForm()">
                       Enter DTCs
-                      <app-icon name="arrow_downward" />
+                      <mat-icon>arrow_downward</mat-icon>
                     </button>
                     <span class="cta-or">or</span>
                     <button type="button" class="btn detect-live-btn" (click)="goToSignup()">
                       Sign Up
-                      <app-icon name="arrow_forward" />
+                      <mat-icon>arrow_forward</mat-icon>
                     </button>
                   </div>
                 </div>
@@ -177,7 +177,7 @@
       <!-- Back to hero -->
       <div class="form-header">
         <button type="button" class="btn form-back-btn" (click)="backToHero()">
-          <app-icon name="arrow_back" />
+          <mat-icon>arrow_back</mat-icon>
           Back
         </button>
       </div>
@@ -187,7 +187,7 @@
         <div class="section-label">
           <span class="step-num">1</span>
           <div>
-            <div class="obd-section-title"><app-icon name="qr_code_scanner" /> Enter Your Fault Codes</div>
+            <div class="obd-section-title"><mat-icon>qr_code_scanner</mat-icon> Enter Your Fault Codes</div>
             <p class="obd-section-subtitle">Type each code from your OBD2 scanner and press Enter or comma to add it.</p>
           </div>
         </div>
@@ -201,7 +201,7 @@
         <div class="section-label">
           <span class="step-num">2</span>
           <div>
-            <div class="obd-section-title"><app-icon name="directions_car" /> Your Vehicle</div>
+            <div class="obd-section-title"><mat-icon>directions_car</mat-icon> Your Vehicle</div>
             <p class="obd-section-subtitle">Used to find the right parts for your year, make, and model.</p>
           </div>
         </div>
@@ -216,13 +216,13 @@
           [disabled]="!canLookup()"
           (click)="lookup()"
         >
-          <app-icon name="search" />
+          <mat-icon>search</mat-icon>
           Look Up {{ codes().length > 0 ? codes().length : '' }} Code{{ codes().length !== 1 ? 's' : '' }}
         </button>
 
         @if (showResults()) {
           <button type="button" class="btn reset-btn" (click)="reset()">
-            <app-icon name="refresh" />
+            <mat-icon>refresh</mat-icon>
             Start Over
           </button>
         }
@@ -238,7 +238,7 @@
             <div class="section-label">
               <span class="step-num">3</span>
               <div>
-                <div class="obd-section-title"><app-icon name="article" /> Code Explanations</div>
+                <div class="obd-section-title"><mat-icon>article</mat-icon> Code Explanations</div>
                 <p class="obd-section-subtitle">Detailed breakdown of each fault code.</p>
               </div>
             </div>
@@ -255,7 +255,7 @@
               <div class="section-label">
                 <span class="step-num">4</span>
                 <div>
-                  <div class="obd-section-title"><app-icon name="store" /> Find Parts</div>
+                  <div class="obd-section-title"><mat-icon>store</mat-icon> Find Parts</div>
                   <p class="obd-section-subtitle">
                     Locate the parts you selected at your preferred online retailer and send your shopping list.
                   </p>

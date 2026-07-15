@@ -5,10 +5,10 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { InboxService } from '../../services/inbox.service';
 import { TierService } from '../../services/tier.service';
-import { IconComponent } from '../shared/icon/icon.component';
 import {
   AppNotification, CATEGORY_META, NotificationCategory,
 } from '../../models/notification.model';
+import { MatIconModule } from '@angular/material/icon';
 
 type PaneTab = 'all' | 'unread' | 'settings';
 
@@ -47,7 +47,7 @@ const CATEGORY_TAG: Record<NotificationCategory, string> = {
 @Component({
   selector: 'app-notifications',
   standalone: true,
-  imports: [CommonModule, RouterLink, IconComponent],
+  imports: [CommonModule, RouterLink, MatIconModule],
   templateUrl: './notifications.component.html',
   styleUrl: './notifications.component.scss',
 })

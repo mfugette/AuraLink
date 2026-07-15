@@ -20,10 +20,10 @@
   <!-- Error state -->
   @if (searchError()) {
     <div class="error-state">
-      <app-icon name="error_outline" />
+      <mat-icon>error_outline</mat-icon>
       <span>{{ searchError() }}</span>
       <button type="button" class="btn retry-btn" (click)="searchParts()">
-        <app-icon name="refresh" /> Retry
+        <mat-icon>refresh</mat-icon> Retry
       </button>
     </div>
   }
@@ -116,7 +116,7 @@
               [class.active]="filterFreeShippingOnly()"
               (click)="toggleFreeShippingOnly()"
             >
-              <app-icon name="local_shipping" /> Free shipping
+              <mat-icon>local_shipping</mat-icon> Free shipping
             </button>
             <button
               type="button"
@@ -124,24 +124,24 @@
               [class.active]="filterBestOfferOnly()"
               (click)="toggleBestOfferOnly()"
             >
-              <app-icon name="handshake" /> Best offer
+              <mat-icon>handshake</mat-icon> Best offer
             </button>
           </div>
         </div>
 
         @if (hasActiveFilters()) {
           <button type="button" class="clear-filters-btn" (click)="clearFilters()">
-            <app-icon name="close" /> Clear filters
+            <mat-icon>close</mat-icon> Clear filters
           </button>
         }
       </div>
 
       @if (hasActiveFilters() && filteredResults().length === 0) {
         <div class="no-matches-state">
-          <app-icon name="filter_alt_off" />
+          <mat-icon>filter_alt_off</mat-icon>
           <p>No listings match your filters.</p>
           <button type="button" class="clear-filters-btn" (click)="clearFilters()">
-            <app-icon name="close" /> Clear filters
+            <mat-icon>close</mat-icon> Clear filters
           </button>
         </div>
       }
@@ -171,7 +171,7 @@
                         (click)="prevImage(item, $event)"
                         aria-label="Previous image"
                       >
-                        <app-icon name="chevron_left" />
+                        <mat-icon>chevron_left</mat-icon>
                       </button>
                       <button
                         type="button"
@@ -179,7 +179,7 @@
                         (click)="nextImage(item, $event)"
                         aria-label="Next image"
                       >
-                        <app-icon name="chevron_right" />
+                        <mat-icon>chevron_right</mat-icon>
                       </button>
                       <div class="image-dots">
                         @for (img of item.part.images; track img; let i = $index) {
@@ -193,13 +193,13 @@
                     }
                   } @else {
                     <div class="part-image-placeholder">
-                      <app-icon name="image_not_supported" />
+                      <mat-icon>image_not_supported</mat-icon>
                     </div>
                   }
 
                   @if (item.selected) {
                     <div class="selected-badge">
-                      <app-icon name="check" />
+                      <mat-icon>check</mat-icon>
                     </div>
                   }
                 </div>
@@ -216,7 +216,7 @@
                         (click)="$event.stopPropagation()"
                         matTooltip="View on eBay"
                       >
-                        <app-icon name="open_in_new" />
+                        <mat-icon>open_in_new</mat-icon>
                       </a>
                     }
                   </div>
@@ -234,12 +234,12 @@
                     }
                     @if (item.part.sellerRating) {
                       <span class="badge badge-rating">
-                        <app-icon name="star" />{{ item.part.sellerRating }}%
+                        <mat-icon>star</mat-icon>{{ item.part.sellerRating }}%
                       </span>
                     }
                     @if (item.part.freeShipping) {
                       <span class="badge badge-shipping">
-                        <app-icon name="local_shipping" />Free ship
+                        <mat-icon>local_shipping</mat-icon>Free ship
                       </span>
                     }
                     @if (item.part.bestOffer) {
@@ -248,7 +248,7 @@
                   </div>
 
                   <div class="store-info">
-                    <app-icon name="sell" />
+                    <mat-icon>sell</mat-icon>
                     <span>{{ item.part.store.name }}</span>
                   </div>
                 </div>
@@ -262,7 +262,7 @@
       @if (selectedCount > 0) {
         <div class="notify-panel">
           <h4 class="notify-title">
-            <app-icon name="send" />
+            <mat-icon>send</mat-icon>
             Send your parts list
           </h4>
 
@@ -271,12 +271,12 @@
               <label class="radio-option" [class.checked]="notifyMethod === 'sms'">
                 <input type="radio" name="notifyMethod" value="sms" [(ngModel)]="notifyMethod" />
                 <span class="radio-mark"></span>
-                <app-icon name="sms" /> Text Message
+                <mat-icon>sms</mat-icon> Text Message
               </label>
               <label class="radio-option" [class.checked]="notifyMethod === 'email'">
                 <input type="radio" name="notifyMethod" value="email" [(ngModel)]="notifyMethod" />
                 <span class="radio-mark"></span>
-                <app-icon name="email" /> Email
+                <mat-icon>email</mat-icon> Email
               </label>
             </div>
           </div>
@@ -287,7 +287,7 @@
                 {{ notifyMethod === 'sms' ? 'Phone number' : 'Email address' }}
               </label>
               <div class="field-control">
-                <app-icon [name]="notifyMethod === 'sms' ? 'phone' : 'alternate_email'" />
+                <mat-icon>{{ notifyMethod === 'sms' ? 'phone' : 'alternate_email' }}</mat-icon>
                 <input
                   id="notify-recipient"
                   class="field-input"
@@ -307,7 +307,7 @@
               @if (sendingNotification()) {
                 <mat-spinner diameter="18" />
               } @else {
-                <app-icon name="send" />
+                <mat-icon>send</mat-icon>
               }
               Send
             </button>
@@ -318,13 +318,13 @@
               (click)="copyList()"
               matTooltip="Copy list to clipboard"
             >
-              <app-icon name="content_copy" />
+              <mat-icon>content_copy</mat-icon>
               Copy
             </button>
           </div>
 
           <p class="notify-note">
-            <app-icon name="info" />
+            <mat-icon>info</mat-icon>
             List includes {{ selectedCount }} item{{ selectedCount !== 1 ? 's' : '' }} — estimated total
             <strong>${{ selectedTotal.toFixed(2) }}</strong>
           </p>
@@ -335,7 +335,7 @@
 
   @if (!searching() && !searchError() && results().length === 0 && partNames.length > 0) {
     <div class="empty-state">
-      <app-icon name="search_off" />
+      <mat-icon>search_off</mat-icon>
       <p>No listings found — try a broader part name or check your server connection.</p>
     </div>
   }

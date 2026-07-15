@@ -6,7 +6,7 @@
       <input type="search" placeholder="filter…"
              [ngModel]="query()" (ngModelChange)="query.set($event)" autocomplete="off" spellcheck="false" />
       @if (query()) {
-        <button type="button" class="ts-clear" (click)="query.set('')" aria-label="Clear search"><app-icon name="close" /></button>
+        <button type="button" class="ts-clear" (click)="query.set('')" aria-label="Clear search"><mat-icon>close</mat-icon></button>
       }
     </div>
     <div class="ht-controls">
@@ -14,7 +14,7 @@
         [options]="vehicleOptions()" [value]="vehicleFilter()"
         (valueChange)="vehicleFilter.set($any($event))" icon="directions_car" />
       <button type="button" class="btn ht-add" (click)="openDialog()">
-        <app-icon name="add" /> Add record
+        <mat-icon>add</mat-icon> Add record
       </button>
     </div>
   </div>
@@ -34,14 +34,14 @@
       <thead>
         <tr>
           <th class="sortable" (click)="sortBy('date')">Date
-            @if (arrow('date')) { <app-icon class="ht-arr" [name]="arrow('date')" /> }</th>
+            @if (arrow('date')) { <mat-icon class="ht-arr">{{ arrow('date') }}</mat-icon> }</th>
           <th>Service</th>
           <th>Vehicle</th>
           <th class="num sortable" (click)="sortBy('mileage')">Mileage
-            @if (arrow('mileage')) { <app-icon class="ht-arr" [name]="arrow('mileage')" /> }</th>
+            @if (arrow('mileage')) { <mat-icon class="ht-arr">{{ arrow('mileage') }}</mat-icon> }</th>
           <th>Shop</th>
           <th class="num sortable" (click)="sortBy('cost')">Cost
-            @if (arrow('cost')) { <app-icon class="ht-arr" [name]="arrow('cost')" /> }</th>
+            @if (arrow('cost')) { <mat-icon class="ht-arr">{{ arrow('cost') }}</mat-icon> }</th>
         </tr>
       </thead>
       <tbody>
@@ -50,7 +50,7 @@
             <td class="td-primary">{{ dateLabel(r.date) }}<small>{{ yearLabel(r.date) }}</small></td>
             <td class="td-title">
               <span class="cell-with-ic">
-                <app-icon [style.color]="'var(--obd-blue)'" [name]="meta[r.category].icon" />
+                <mat-icon [style.color]="'var(--obd-blue)'">{{ meta[r.category].icon }}</mat-icon>
                 {{ r.title }}
               </span>
               <small>{{ meta[r.category].label }}</small>
@@ -67,7 +67,7 @@
     <div class="ht-cards">
       @for (r of records(); track trackId($index, r)) {
         <button type="button" class="ht-card" (click)="openDetail(r)">
-          <span class="ht-card-badge"><app-icon [name]="meta[r.category].icon" /></span>
+          <span class="ht-card-badge"><mat-icon>{{ meta[r.category].icon }}</mat-icon></span>
           <div class="ht-card-top">
             <span class="ht-card-title">{{ r.title }}</span>
             <span class="ht-chip neutral">{{ meta[r.category].label }}</span>
@@ -84,9 +84,9 @@
 
     @if (records().length === 0) {
       <div class="ht-empty">
-        <app-icon name="build" />
+        <mat-icon>build</mat-icon>
         <p>No service records yet. Add your first one to start your maintenance log.</p>
-        <button type="button" class="btn ht-add" (click)="openDialog()"><app-icon name="add" /> Add record</button>
+        <button type="button" class="btn ht-add" (click)="openDialog()"><mat-icon>add</mat-icon> Add record</button>
       </div>
     }
   </div>
@@ -100,12 +100,12 @@
       <div class="ht-dialog-head">
         <div>
           <h3 class="ht-dialog-title" id="rl-detail-title">
-            <app-icon [style.color]="'var(--obd-blue)'" [name]="meta[r.category].icon" />
+            <mat-icon [style.color]="'var(--obd-blue)'">{{ meta[r.category].icon }}</mat-icon>
             {{ r.title }}
           </h3>
           <p class="ht-dialog-when">{{ dateLabel(r.date) }} · {{ r.vehicleLabel }}</p>
         </div>
-        <button type="button" class="ht-x" (click)="closeDetail()" aria-label="Close"><app-icon name="close" /></button>
+        <button type="button" class="ht-x" (click)="closeDetail()" aria-label="Close"><mat-icon>close</mat-icon></button>
       </div>
 
       <div class="ht-tiles">
@@ -122,7 +122,7 @@
       @if (!isSeed(r)) {
         <div class="ht-dialog-section">
           <button type="button" class="btn rl-btn rl-btn--danger" (click)="remove(r)">
-            <app-icon name="delete_outline" /> Delete this record
+            <mat-icon>delete_outline</mat-icon> Delete this record
           </button>
         </div>
       }
@@ -137,7 +137,7 @@
          (click)="$event.stopPropagation()">
       <div class="ht-dialog-head">
         <h3 class="ht-dialog-title" id="rl-add-title">Add service record</h3>
-        <button type="button" class="ht-x" (click)="closeDialog()" aria-label="Close"><app-icon name="close" /></button>
+        <button type="button" class="ht-x" (click)="closeDialog()" aria-label="Close"><mat-icon>close</mat-icon></button>
       </div>
 
       <form class="rl-form" (ngSubmit)="save()">

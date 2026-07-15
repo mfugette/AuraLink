@@ -10,9 +10,9 @@ import { Vehicle } from '../../models/vehicle.model';
 import { AuthService } from '../../services/auth.service';
 import { AccountService } from '../../services/account.service';
 import { SessionService } from '../../services/session.service';
-import { IconComponent } from '../../components/shared/icon/icon.component';
 import { VehicleCloudComponent } from '../../components/shared/vehicle-cloud/vehicle-cloud.component';
 import { PixelTitleComponent } from '../../components/shared/pixel-title/pixel-title.component';
+import { MatIconModule } from '@angular/material/icon';
 
 // One cell of the hero's "Performance Overview" instrument grid.
 interface HeroStat {
@@ -47,17 +47,7 @@ interface MaintItem {
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [
-    CommonModule,
-    IconComponent,
-    CodeEntryComponent,
-    VehicleSelectorComponent,
-    CodeResultsComponent,
-    PartsLocatorComponent,
-    LiveDtcComponent,
-    VehicleCloudComponent,
-    PixelTitleComponent,
-  ],
+  imports: [CommonModule, MatIconModule, CodeEntryComponent, VehicleSelectorComponent, CodeResultsComponent, PartsLocatorComponent, LiveDtcComponent, VehicleCloudComponent, PixelTitleComponent],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss',
 })

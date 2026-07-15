@@ -2,7 +2,7 @@ import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { IconComponent } from '../../components/shared/icon/icon.component';
+import { MatIconModule } from '@angular/material/icon';
 interface FaqItem {
   q: string;
   a: string; // may contain simple inline HTML (links) — authored here, trusted.
@@ -18,7 +18,7 @@ interface FaqSection {
 @Component({
   selector: 'app-faq-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, IconComponent],
+  imports: [CommonModule, FormsModule, RouterLink, MatIconModule],
   templateUrl: './faq-page.component.html',
   styleUrl: './faq-page.component.scss',
 })

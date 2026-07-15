@@ -3,34 +3,34 @@
   <!-- No order staged (e.g. someone navigated straight here) -->
   @if (!order()) {
     <div class="checkout-empty">
-      <app-icon name="shopping_cart_off" />
+      <mat-icon>shopping_cart_off</mat-icon>
       <h1>Nothing to check out</h1>
       <p>Pick a plan or the AuraLink adapter to get started.</p>
       <a class="btn checkout-primary" routerLink="/plan">
-        <app-icon name="workspace_premium" /> View plans
+        <mat-icon>workspace_premium</mat-icon> View plans
       </a>
     </div>
   } @else if (stage() === 'done') {
     <!-- ── Success ──────────────────────────────────────────────────────────── -->
     <div class="checkout-success">
-      <div class="success-check"><app-icon name="check" /></div>
+      <div class="success-check"><mat-icon>check</mat-icon></div>
       <h1>Payment successful</h1>
       <p class="success-sub">
         Your {{ order()!.label }} is confirmed. A receipt is on its way to your inbox.
       </p>
       <div class="success-actions">
-        <a class="btn checkout-primary" routerLink="/home"><app-icon name="home" /> Go home</a>
+        <a class="btn checkout-primary" routerLink="/home"><mat-icon>home</mat-icon> Go home</a>
         <a class="btn checkout-secondary" routerLink="/plan">Back to plans</a>
       </div>
       <p class="checkout-note">
-        <app-icon name="info" />
+        <mat-icon>info</mat-icon>
         This was a simulated payment — no card was charged.
       </p>
     </div>
   } @else {
     <!-- ── Checkout ─────────────────────────────────────────────────────────── -->
     <a class="checkout-back" (click)="cancel()" role="button" tabindex="0">
-      <app-icon name="arrow_back" /> Back to plans
+      <mat-icon>arrow_back</mat-icon> Back to plans
     </a>
 
     <div class="checkout-grid">
@@ -57,7 +57,7 @@
               <label class="field">
                 <span class="field-label">Card number</span>
                 <div class="card-input-shell">
-                  <app-icon class="card-input-icon" name="credit_card" />
+                  <mat-icon class="card-input-icon">credit_card</mat-icon>
                   <input class="field-input field-input--card" type="text" inputmode="numeric" autocomplete="cc-number"
                          [ngModel]="card()" (ngModelChange)="onCard($event)" name="ccnumber"
                          placeholder="1234 5678 9012 3456" />
@@ -125,7 +125,7 @@
           </section>
 
           @if (error()) {
-            <p class="checkout-error"><app-icon name="error" /> {{ error() }}</p>
+            <p class="checkout-error"><mat-icon>error</mat-icon> {{ error() }}</p>
           }
 
           <button type="submit" class="btn checkout-primary checkout-pay"
@@ -133,12 +133,12 @@
             @if (stage() === 'processing') {
               <span class="spinner"></span> Processing…
             } @else {
-              <app-icon name="lock" /> Pay ${{ dueToday() }}
+              <mat-icon>lock</mat-icon> Pay ${{ dueToday() }}
             }
           </button>
 
           <p class="checkout-secure">
-            <app-icon name="lock" />
+            <mat-icon>lock</mat-icon>
             Payments are encrypted and secure. Simulated — no card is charged.
           </p>
         </fieldset>
@@ -186,7 +186,7 @@
 
           @if (order()!.planPrice > 0) {
             <p class="summary-recurring">
-              <app-icon name="autorenew" />
+              <mat-icon>autorenew</mat-icon>
               Renews at ${{ order()!.planPrice }}/{{ renewLabel() }}. Cancel anytime.
             </p>
           }
@@ -196,7 +196,7 @@
         @if (adapterOffer(); as offer) {
           <div class="adapter-offer" [class.adapter-offer--added]="adapterAdded()">
             <div class="adapter-offer-head">
-              <app-icon class="adapter-offer-icon" name="bluetooth" />
+              <mat-icon class="adapter-offer-icon">bluetooth</mat-icon>
               <div class="adapter-offer-copy">
                 <span class="adapter-offer-title">
                   {{ offer.isBundle ? 'Add the adapter — bundle deal' : 'Add the AuraLink Adapter' }}
@@ -222,9 +222,9 @@
                       [disabled]="stage() === 'processing'"
                       (click)="toggleAdapter()">
                 @if (adapterAdded()) {
-                  <app-icon name="check" /> Added
+                  <mat-icon>check</mat-icon> Added
                 } @else {
-                  <app-icon name="add" /> Add
+                  <mat-icon>add</mat-icon> Add
                 }
               </button>
             </div>
@@ -232,9 +232,9 @@
         }
 
         <ul class="summary-trust">
-          <li><app-icon name="verified_user" /> 30-day money-back guarantee</li>
-          <li><app-icon name="lock" /> Encrypted &amp; PCI-compliant checkout</li>
-          <li><app-icon name="event_busy" /> No commitment — cancel whenever</li>
+          <li><mat-icon>verified_user</mat-icon> 30-day money-back guarantee</li>
+          <li><mat-icon>lock</mat-icon> Encrypted &amp; PCI-compliant checkout</li>
+          <li><mat-icon>event_busy</mat-icon> No commitment — cancel whenever</li>
         </ul>
       </aside>
     </div>

@@ -27,7 +27,9 @@ describe('SidebarComponent', () => {
     const items = fixture.nativeElement.querySelectorAll('.nav-item');
     expect(items.length).toBe(fixture.componentInstance.items.length);
     for (const item of items) {
-      expect(item.querySelector('app-icon svg')).withContext('pixel icon must resolve').toBeTruthy();
+      const icon = item.querySelector('mat-icon');
+      expect(icon).withContext('nav item must have an icon').toBeTruthy();
+      expect(icon.textContent.trim()).withContext('icon must name a glyph').toBeTruthy();
     }
   });
 

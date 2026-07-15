@@ -1,11 +1,16 @@
-<!-- Bell trigger (lives in the header) -->
-<button type="button" class="btn notif-bell" [class.active]="open()" (click)="toggle()"
-        aria-label="Notifications" [attr.aria-expanded]="open()">
-  <app-icon name="notifications" />
-  @if (unreadCount() > 0) {
-    <span class="notif-badge">{{ unreadCount() > 9 ? '9+' : unreadCount() }}</span>
-  }
-</button>
+<!-- Right-edge pull-tab trigger. Hidden while the pane is open (the pane has its
+     own collapse chevron). Vertical strip: bell + unread count + INBOX label. -->
+@if (!open()) {
+  <button type="button" class="notif-tab-trigger" (click)="toggle()"
+          aria-label="Notifications" [attr.aria-expanded]="open()">
+    <mat-icon class="notif-tab-chevron">chevron_left</mat-icon>
+    <mat-icon class="notif-tab-bell">notifications</mat-icon>
+    @if (unreadCount() > 0) {
+      <span class="notif-tab-count">{{ unreadCount() > 99 ? '99+' : unreadCount() }}</span>
+    }
+    <span class="notif-tab-label" aria-hidden="true">INBOX</span>
+  </button>
+}
 
 <!-- Right-side pane. Moved to <body> on open so the header's backdrop-filter
      doesn't trap this position:fixed overlay in the header's containing block. -->
@@ -16,17 +21,17 @@
       <div class="notif-head">
         <div class="notif-head-title">
           <button type="button" class="notif-collapse" (click)="close()" aria-label="Close panel">
-            <app-icon name="chevron_right" />
+            <mat-icon>chevron_right</mat-icon>
           </button>
           <h2>Notifications</h2>
         </div>
         <div class="notif-head-actions">
           <button type="button" class="notif-icon-btn" (click)="setTab('settings')"
                   aria-label="Notification settings" matTooltip="Settings">
-            <app-icon name="settings" />
+            <mat-icon>settings</mat-icon>
           </button>
           <button type="button" class="notif-x" (click)="close()" aria-label="Close">
-            <app-icon name="close" />
+            <mat-icon>close</mat-icon>
           </button>
         </div>
       </div>
@@ -35,7 +40,7 @@
         <!-- Settings: per-category SMS opt-in -->
         <div class="notif-tabs">
           <button type="button" class="notif-tab" (click)="setTab('all')">
-            <app-icon name="chevron_left" /> Back
+            <mat-icon>chevron_left</mat-icon> Back
           </button>
         </div>
 
@@ -47,7 +52,7 @@
 
           @for (cat of categories; track cat) {
             <div class="notif-setrow">
-              <span class="notif-setic" [attr.data-cat]="cat"><app-icon [name]="meta[cat].icon" /></span>
+              <span class="notif-setic" [attr.data-cat]="cat"><mat-icon>{{ meta[cat].icon }}</mat-icon></span>
               <span class="notif-setl">{{ meta[cat].label }}</span>
               <label class="notif-switch">
                 <input type="checkbox" [checked]="smsPrefs()[cat]" [disabled]="!isPro()"
@@ -60,7 +65,7 @@
 
           @if (!isPro()) {
             <p class="notif-locked">
-              <app-icon name="lock" />
+              <mat-icon>lock</mat-icon>
               SMS alerts are a Pro feature. <a routerLink="/plan" (click)="close()">Upgrade</a>
             </p>
           }
@@ -80,7 +85,7 @@
           />
           @if (query()) {
             <button type="button" class="ts-clear" (click)="query.set('')" aria-label="Clear search">
-              <app-icon name="close" />
+              <mat-icon>close</mat-icon>
             </button>
           }
         </div>
@@ -101,7 +106,7 @@
         <div class="notif-body">
           @if (items().length === 0) {
             <div class="notif-empty">
-              <app-icon [name]="query() ? 'search_off' : 'done_all'" />
+              <mat-icon>{{ query() ? 'search_off' : 'done_all' }}</mat-icon>
               {{ query() ? 'No matching notifications.' : "You're all caught up." }}
             </div>
           } @else {
@@ -109,7 +114,7 @@
               <button type="button" class="notif-item" [class.unread]="!n.read" (click)="markRead(n)">
                 <!-- Checkbox-style mark (read = empty, unread = filled) -->
                 <span class="notif-item-check" [class.on]="!n.read" aria-hidden="true">
-                  @if (!n.read) { <app-icon name="check" /> }
+                  @if (!n.read) { <mat-icon>check</mat-icon> }
                 </span>
 
                 <!-- Title + category descriptor underneath (reference layout) -->
@@ -136,7 +141,7 @@
             [disabled]="unreadCount() === 0"
             (click)="markAllRead()"
           >
-            <app-icon name="done_all" />
+            <mat-icon>done_all</mat-icon>
             Mark all read
           </button>
         </div>

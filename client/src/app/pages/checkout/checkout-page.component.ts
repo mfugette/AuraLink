@@ -7,7 +7,7 @@ import { TierService } from '../../services/tier.service';
 import { SubscriptionService } from '../../services/subscription.service';
 import { AccountService } from '../../services/account.service';
 import { ADAPTER } from '../../models/tier.model';
-import { IconComponent } from '../../components/shared/icon/icon.component';
+import { MatIconModule } from '@angular/material/icon';
 
 type Stage = 'form' | 'processing' | 'done';
 
@@ -20,7 +20,7 @@ type Stage = 'form' | 'processing' | 'done';
 @Component({
   selector: 'app-checkout-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, IconComponent],
+  imports: [CommonModule, FormsModule, RouterLink, MatIconModule],
   templateUrl: './checkout-page.component.html',
   styleUrl: './checkout-page.component.scss',
 })

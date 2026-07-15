@@ -2,12 +2,12 @@ import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AccountService } from '../../../services/account.service';
 import { ThemeService, Theme } from '../../../services/theme.service';
-import { IconComponent } from '../../shared/icon/icon.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-settings-panel',
   standalone: true,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, MatIconModule],
   templateUrl: './settings-panel.component.html',
   styleUrl: './settings-panel.component.scss',
 })

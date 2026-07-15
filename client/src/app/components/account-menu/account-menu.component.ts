@@ -14,7 +14,7 @@ import { Tier } from '../../models/tier.model';
 import { ProfilePanelComponent } from '../account-panels/profile-panel/profile-panel.component';
 import { VehiclesPanelComponent } from '../account-panels/vehicles-panel/vehicles-panel.component';
 import { SettingsPanelComponent } from '../account-panels/settings-panel/settings-panel.component';
-import { IconComponent } from '../shared/icon/icon.component';
+import { MatIconModule } from '@angular/material/icon';
 
 type AccountPanel = 'profile' | 'vehicles' | 'settings' | null;
 
@@ -24,7 +24,7 @@ type AccountPanel = 'profile' | 'vehicles' | 'settings' | null;
 @Component({
   selector: 'app-account-menu',
   standalone: true,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, MatIconModule],
   templateUrl: './account-menu.component.html',
   styleUrl: './account-menu.component.scss',
 })

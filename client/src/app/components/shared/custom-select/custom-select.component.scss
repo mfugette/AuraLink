@@ -15,7 +15,7 @@
   &:hover:not(:disabled) { border-color: var(--obd-text-muted); }
 
   // Leading glyph icon (when an [icon] is used instead of a text prompt).
-  > app-icon:not(.chevron):not(.spin) {
+  > mat-icon:not(.chevron):not(.spin) {
     flex-shrink: 0;
     font-size: 18px;
     width: 18px;

@@ -59,7 +59,7 @@
     height: 38px; padding: 0 14px; border-radius: var(--obd-radius-sm); gap: 6px;
     background: var(--obd-surface); border: 1px solid var(--obd-border); color: var(--obd-text-dim);
     font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center;
-    app-icon { font-size: 17px; width: 17px; height: 17px; }
+    mat-icon { font-size: 17px; width: 17px; height: 17px; }
     &:hover { border-color: var(--obd-border-strong); }
     &.on {
       background: color-mix(in srgb, var(--obd-red) 14%, var(--obd-surface));
@@ -75,7 +75,7 @@
     color: var(--obd-blue); font-family: var(--obd-font-mono); font-weight: 700; font-size: 0.76rem;
     text-transform: uppercase; letter-spacing: 0.06em; display: inline-flex; align-items: center;
     transition: background var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
-    app-icon { font-size: 18px; width: 18px; height: 18px; }
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
     &:hover { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 14%, transparent); }
   }
 
@@ -123,7 +123,7 @@
       small { display: block; color: var(--obd-text-muted); font-weight: 400; font-size: 0.76rem; } }
     .cell-warn { color: var(--obd-red); }
     .cell-with-ic { display: inline-flex; align-items: center; gap: 7px;
-      app-icon { font-size: 17px; width: 17px; height: 17px; } }
+      mat-icon { font-size: 17px; width: 17px; height: 17px; } }
   }
 
   // ── Status / category chip ────────────────────────────────────────────────────
@@ -134,7 +134,7 @@
     font-family: var(--obd-font-mono); font-size: 0.64rem; letter-spacing: 0.06em;
     text-transform: uppercase; padding: 3px 8px; border-radius: var(--obd-radius-sm);
     font-weight: 700; white-space: nowrap; border: 1px solid transparent;
-    app-icon { font-size: 13px; width: 13px; height: 13px; }
+    mat-icon { font-size: 13px; width: 13px; height: 13px; }
     &.ok       { background: color-mix(in srgb, var(--obd-green) 14%, transparent);  color: var(--obd-green);  border-color: color-mix(in srgb, var(--obd-green) 38%, transparent); }
     &.warn     { background: color-mix(in srgb, var(--obd-red) 14%, transparent);    color: var(--obd-red);    border-color: color-mix(in srgb, var(--obd-red) 38%, transparent); }
     &.info     { background: color-mix(in srgb, var(--obd-blue) 14%, transparent);   color: var(--obd-blue);   border-color: color-mix(in srgb, var(--obd-blue) 38%, transparent); }
@@ -145,7 +145,7 @@
   .ht-empty {
     padding: 40px 24px; text-align: center; color: var(--obd-text-muted); font-size: 0.9rem;
     display: flex; flex-direction: column; align-items: center; gap: 10px;
-    app-icon { font-size: 32px; width: 32px; height: 32px; opacity: 0.6; }
+    mat-icon { font-size: 32px; width: 32px; height: 32px; opacity: 0.6; }
     p { margin: 0; max-width: 340px; }
   }
 
@@ -197,7 +197,7 @@
   .ht-x {
     flex-shrink: 0; width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--obd-border);
     background: var(--obd-surface); color: var(--obd-text-dim); cursor: pointer; display: grid; place-items: center;
-    app-icon { font-size: 20px; width: 20px; height: 20px; }
+    mat-icon { font-size: 20px; width: 20px; height: 20px; }
     &:hover { background: var(--obd-surface-2); color: var(--obd-text); }
   }
 

@@ -6,7 +6,7 @@ import { TierService } from '../../services/tier.service';
 import { SubscriptionService } from '../../services/subscription.service';
 import { AuthService } from '../../services/auth.service';
 import { tierDef } from '../../models/tier.model';
-import { IconComponent } from '../../components/shared/icon/icon.component';
+import { MatIconModule } from '@angular/material/icon';
 
 // My Plan — the account's subscription hub: current plan + usage, billing
 // history, hardware order status, and cancellation. Reads SubscriptionService
@@ -14,7 +14,7 @@ import { IconComponent } from '../../components/shared/icon/icon.component';
 @Component({
   selector: 'app-my-plan-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, IconComponent],
+  imports: [CommonModule, FormsModule, RouterLink, MatIconModule],
   templateUrl: './my-plan-page.component.html',
   styleUrl: './my-plan-page.component.scss',
 })

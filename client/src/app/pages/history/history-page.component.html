@@ -14,7 +14,7 @@
       <button type="button" class="hist-tab" role="tab"
               [class.active]="active() === t.key" [attr.aria-selected]="active() === t.key"
               (click)="setTab(t.key)">
-        <app-icon [name]="t.icon" />
+        <mat-icon>{{ t.icon }}</mat-icon>
         <span class="hist-tab-label">{{ t.label }}</span>
         @if (t.soon) { <span class="hist-tab-soon">Soon</span> }
       </button>
@@ -35,7 +35,7 @@
       }
       @default {
         <div class="hist-soon">
-          <app-icon [name]="active() === 'chats' ? 'auto_awesome' : 'fact_check'" />
+          <mat-icon>{{ active() === 'chats' ? 'auto_awesome' : 'fact_check' }}</mat-icon>
           <h2>{{ soonMessage(active()).title }}</h2>
           <p>{{ soonMessage(active()).body }}</p>
           <span class="hist-soon-badge">Coming soon</span>

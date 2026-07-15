@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AssistantService } from '../../services/assistant.service';
-import { IconComponent } from '../shared/icon/icon.component';
+import { MatIconModule } from '@angular/material/icon';
 
 // Compact top-bar entry point for the AI assistant. Clicking it opens a centered,
 // AI-focused overlay (hero + suggestion chips). Submitting a query closes the
@@ -14,7 +14,7 @@ import { IconComponent } from '../shared/icon/icon.component';
 @Component({
   selector: 'app-ai-search',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [CommonModule, FormsModule, MatIconModule],
   templateUrl: './ai-search.component.html',
   styleUrl: './ai-search.component.scss',
 })

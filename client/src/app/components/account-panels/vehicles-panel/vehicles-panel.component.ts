@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../../services/account.service';
 import { NewSavedVehicle } from '../../../models/account.model';
-import { IconComponent } from '../../shared/icon/icon.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-vehicles-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [CommonModule, FormsModule, MatIconModule],
   templateUrl: './vehicles-panel.component.html',
   styleUrl: './vehicles-panel.component.scss',
 })

@@ -22,7 +22,7 @@
       />
       @if (query()) {
         <button type="button" class="btn toolbar-search-clear" (click)="clearFilters()" aria-label="Clear search">
-          <app-icon name="close" />
+          <mat-icon>close</mat-icon>
         </button>
       }
     </div>
@@ -56,7 +56,7 @@
       @if (part) {
         <div class="part-cell">
           <div class="part-head">
-            <span class="part-eyebrow"><app-icon name="settings" /> {{ part.category }}</span>
+            <span class="part-eyebrow"><mat-icon>settings</mat-icon> {{ part.category }}</span>
             <span class="part-price">${{ part.priceLow }}–${{ part.priceHigh }}</span>
           </div>
 
@@ -85,7 +85,7 @@
     <!-- No results: message overlaid on the (blank) grid frame -->
     @if (results().length === 0) {
       <div class="empty-overlay">
-        <app-icon name="search_off" />
+        <mat-icon>search_off</mat-icon>
         <p>No parts match your search.</p>
         <button type="button" class="btn btn-action" (click)="clearFilters()">Clear filters</button>
       </div>

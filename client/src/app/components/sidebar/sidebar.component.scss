@@ -68,7 +68,7 @@
               color var(--obd-dur-fast) var(--obd-ease),
               border-color var(--obd-dur-fast) var(--obd-ease);
 
-  app-icon {
+  mat-icon {
     font-size: 20px;
     width: 20px;
     height: 20px;
@@ -127,7 +127,7 @@
   transition: background var(--obd-dur-fast) var(--obd-ease),
               color var(--obd-dur-fast) var(--obd-ease);
 
-  app-icon {
+  mat-icon {
     flex-shrink: 0;
     font-size: 18px;
     width: 18px;
@@ -145,7 +145,7 @@
     background: var(--obd-blue);
     color: #fff;
 
-    app-icon { color: #fff; }
+    mat-icon { color: #fff; }
 
     &:hover { background: var(--obd-blue); }
   }

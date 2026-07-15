@@ -11,16 +11,12 @@ import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 import { VehicleService, VehicleTrim } from '../../services/vehicle.service';
 import { Vehicle } from '../../models/vehicle.model';
 import { CustomSelectComponent, SelectOption } from '../shared/custom-select/custom-select.component';
-import { IconComponent } from '../shared/icon/icon.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-vehicle-selector',
   standalone: true,
-  imports: [
-    CommonModule, ReactiveFormsModule,
-    IconComponent, MatProgressSpinnerModule,
-    MatTooltipModule, CustomSelectComponent,
-  ],
+  imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatProgressSpinnerModule, MatTooltipModule, CustomSelectComponent],
   templateUrl: './vehicle-selector.component.html',
   styleUrl: './vehicle-selector.component.scss',
 })

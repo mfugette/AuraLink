@@ -1,7 +1,7 @@
 <!-- Persistent offline banner (pinned top-center). -->
 @if (toast.offline()) {
   <div class="offline-banner" role="status">
-    <app-icon name="cloud_off" />
+    <mat-icon>cloud_off</mat-icon>
     You're offline — some features won't work until you reconnect.
   </div>
 }
@@ -10,10 +10,10 @@
 <div class="toast-stack" aria-live="polite" aria-atomic="false">
   @for (t of toast.toasts(); track t.id) {
     <div class="toast toast--{{ t.kind }}" role="status">
-      <app-icon class="toast-icon" [name]="iconFor(t.kind)" />
+      <mat-icon class="toast-icon">{{ iconFor(t.kind) }}</mat-icon>
       <span class="toast-text">{{ t.text }}</span>
       <button type="button" class="toast-close" (click)="toast.dismiss(t.id)" aria-label="Dismiss">
-        <app-icon name="close" />
+        <mat-icon>close</mat-icon>
       </button>
     </div>
   }

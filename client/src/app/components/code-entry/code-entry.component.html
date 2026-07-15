@@ -1,7 +1,7 @@
 <div class="code-entry-wrapper">
   <div class="field code-field">
     <label class="field-label" for="code-input">
-      <app-icon name="search" />
+      <mat-icon>search</mat-icon>
       Enter DTC codes (e.g. P0420, P0171)
     </label>
 
@@ -17,7 +17,7 @@
                 (click)="removeCode(code)"
                 [attr.aria-label]="'Remove ' + code"
               >
-                <app-icon name="cancel" />
+                <mat-icon>cancel</mat-icon>
               </button>
             </span>
           }
@@ -51,7 +51,7 @@
             matTooltip="Clear all codes"
             aria-label="Clear all codes"
           >
-            <app-icon name="clear_all" />
+            <mat-icon>clear_all</mat-icon>
           </button>
         }
       </div>
@@ -79,7 +79,7 @@
 
   @if (!hasCode()) {
     <div class="code-hint">
-      <app-icon name="info" />
+      <mat-icon>info</mat-icon>
       <span>Add codes from your OBD2 scanner — separate multiple codes with commas or Enter. Codes start with P, B, C, or U followed by 4 digits.</span>
     </div>
   }

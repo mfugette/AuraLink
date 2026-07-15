@@ -31,7 +31,7 @@
   text-transform: uppercase;
   transition: background var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
 
-  app-icon { font-size: 18px; width: 18px; height: 18px; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
 
   &:hover { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 20%, transparent); }
 
@@ -143,18 +143,18 @@
   text-align: left;
   transition: background var(--obd-dur-fast) var(--obd-ease), color var(--obd-dur-fast) var(--obd-ease);
 
-  app-icon { font-size: 19px; width: 19px; height: 19px; color: var(--obd-text-muted); }
+  mat-icon { font-size: 19px; width: 19px; height: 19px; color: var(--obd-text-muted); }
 
   &:hover {
     background: var(--obd-surface-4);
     color: var(--obd-text);
 
-    app-icon { color: var(--obd-blue); }
+    mat-icon { color: var(--obd-blue); }
   }
 
   &--danger:hover {
     color: var(--obd-red);
-    app-icon { color: var(--obd-red); }
+    mat-icon { color: var(--obd-red); }
   }
 }
 

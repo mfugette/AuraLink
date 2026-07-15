@@ -10,17 +10,12 @@ import { NotificationService } from '../../services/notification.service';
 import { AuthService } from '../../services/auth.service';
 import { PartCondition, PartSearchResult } from '../../models/part.model';
 import { Vehicle } from '../../models/vehicle.model';
-import { IconComponent } from '../shared/icon/icon.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-parts-locator',
   standalone: true,
-  imports: [
-    CommonModule, FormsModule,
-    IconComponent,
-    MatProgressSpinnerModule, MatSnackBarModule,
-    MatTooltipModule,
-  ],
+  imports: [CommonModule, FormsModule, MatIconModule, MatProgressSpinnerModule, MatSnackBarModule, MatTooltipModule],
   templateUrl: './parts-locator.component.html',
   styleUrl: './parts-locator.component.scss',
 })

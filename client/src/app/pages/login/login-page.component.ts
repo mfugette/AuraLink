@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { IconComponent } from '../../components/shared/icon/icon.component';
+import { MatIconModule } from '@angular/material/icon';
 
 // Email/password sign-in and sign-up. Supabase Auth handles the credentials;
 // on success we route to the page the user was headed for (?redirect=) or Home.
 @Component({
   selector: 'app-login-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, IconComponent],
+  imports: [CommonModule, FormsModule, RouterLink, MatIconModule],
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.scss',
 })

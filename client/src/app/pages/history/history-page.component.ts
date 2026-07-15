@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { SessionHistoryComponent } from '../../components/session-history/session-history.component';
 import { RepairLogComponent } from '../../components/repair-log/repair-log.component';
 import { IssueHistoryPageComponent } from '../issue-history/issue-history-page.component';
-import { IconComponent } from '../../components/shared/icon/icon.component';
 import { PixelTitleComponent } from '../../components/shared/pixel-title/pixel-title.component';
+import { MatIconModule } from '@angular/material/icon';
 
 type HistoryTab = 'drives' | 'issues' | 'repairs' | 'chats' | 'vehicle';
 
@@ -22,10 +22,7 @@ interface TabDef {
 @Component({
   selector: 'app-history-page',
   standalone: true,
-  imports: [
-    CommonModule, IconComponent, PixelTitleComponent,
-    SessionHistoryComponent, RepairLogComponent, IssueHistoryPageComponent,
-  ],
+  imports: [CommonModule, MatIconModule, PixelTitleComponent, SessionHistoryComponent, RepairLogComponent, IssueHistoryPageComponent],
   templateUrl: './history-page.component.html',
   styleUrl: './history-page.component.scss',
 })
