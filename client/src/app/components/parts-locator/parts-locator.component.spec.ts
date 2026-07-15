@@ -1,8 +1,13 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { WritableSignal } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
+import type { Session } from '@supabase/supabase-js';
 import { PartsLocatorComponent } from './parts-locator.component';
 import { PartSearchResult } from '../../models/part.model';
+import { AuthService } from '../../services/auth.service';
+import { provideMockAuth } from '../../../testing/test-utils';
+import { environment } from '../../../environments/environment';
 
 function fakeResult(price: number, opts: Partial<{ condition: string; sellerRating: number; freeShipping: boolean; selected: boolean }> = {}): PartSearchResult {
   return {
@@ -26,7 +31,7 @@ describe('PartsLocatorComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [PartsLocatorComponent],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideMockAuth()],
     });
     fixture = TestBed.createComponent(PartsLocatorComponent);
     component = fixture.componentInstance;
@@ -69,5 +74,31 @@ describe('PartsLocatorComponent', () => {
     component.setMinRating(4);
     expect(component.filteredResults().length).toBe(1);
     expect(component.filteredResults()[0].part.price).toBe(20);
+  });
+
+  it('sendList does NOT hit the server when signed out (guest gate)', async () => {
+    (TestBed.inject(AuthService) as unknown as { _session: WritableSignal<Session | null> })._session.set(null);
+    component.isMobile.set(false);
+    component.notifyMethod = 'email';
+    component.notifyRecipient = 'a@b.com';
+    component.results.set([fakeResult(10, { selected: true })]);
+
+    await component.sendList();
+
+    httpMock.expectNone(`${environment.apiUrl}/api/notify`);
+    expect(component.sendingNotification()).toBeFalse();
+  });
+
+  it('sendList POSTs to /api/notify when signed in', async () => {
+    component.isMobile.set(false);
+    component.notifyMethod = 'email';
+    component.notifyRecipient = 'a@b.com';
+    component.results.set([fakeResult(10, { selected: true })]);
+
+    await component.sendList();
+
+    const req = httpMock.expectOne(`${environment.apiUrl}/api/notify`);
+    expect(req.request.method).toBe('POST');
+    req.flush({ success: true, message: 'sent' });
   });
 });

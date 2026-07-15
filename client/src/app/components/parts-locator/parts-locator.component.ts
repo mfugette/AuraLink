@@ -7,6 +7,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { forkJoin } from 'rxjs';
 import { PartsService } from '../../services/parts.service';
 import { NotificationService } from '../../services/notification.service';
+import { AuthService } from '../../services/auth.service';
 import { PartCondition, PartSearchResult } from '../../models/part.model';
 import { Vehicle } from '../../models/vehicle.model';
 import { IconComponent } from '../shared/icon/icon.component';
@@ -85,6 +86,7 @@ export class PartsLocatorComponent implements OnChanges {
     private partsService: PartsService,
     private notificationService: NotificationService,
     private snackBar: MatSnackBar,
+    private auth: AuthService,
   ) {
     this.isMobile.set('ontouchstart' in window || navigator.maxTouchPoints > 0);
   }
@@ -203,6 +205,13 @@ export class PartsLocatorComponent implements OnChanges {
 
     if (this.notifyMethod === 'sms' && this.isMobile()) {
       this.notificationService.openSmsLink(this.notifyRecipient || '', listText);
+      return;
+    }
+
+    // Server-side send now requires a signed-in user (see notify.route.ts). The
+    // native SMS-link path above needs no server, so guests can still use that.
+    if (!this.auth.isSignedIn()) {
+      this.snackBar.open('Sign in to text or email your parts list.', 'Dismiss', { duration: 4000 });
       return;
     }
 

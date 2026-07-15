@@ -1,22 +1,29 @@
 import { Router, Request, Response } from 'express';
+import twilio from 'twilio';
+import { requireAuth } from '../middleware/auth';
+import { notificationsStore } from '../data/notifications.store';
 
-// TODO: Wire up Twilio for SMS and Nodemailer/SendGrid for email.
-// Credentials should go in .env — see .env.example at the project root.
+// SMS is sent via Twilio (server-to-server, Account SID + Auth Token). Email is
+// still a stub (SendGrid/Nodemailer — a separate setup).
 //
-// SECURITY: this endpoint is intentionally left open (no requireAuth) because
-// the parts-list feature is part of the free/guest Home pipeline. It's a stub
-// today. **Before wiring real SMS/email (Twilio/SendGrid), add requireAuth or a
-// strict per-recipient/day cap** — an open send endpoint is a spam-relay and
-// cost-abuse vector. For now it's protected by strict input validation below +
-// the expensiveLimiter rate limit applied in index.ts.
+// SECURITY: this endpoint now requires a valid session (requireAuth) — real
+// sending makes an open endpoint a spam-relay / cost-abuse vector, so every send
+// must be attributable to a signed-in user. It's further protected by strict
+// input validation below + the expensiveLimiter rate limit applied in index.ts.
 //
-// DELIVERY LOG: a notification_deliveries table exists (0004) to audit outbound
-// sends, but it requires a user_id and this route is intentionally guest/
-// unauthenticated — so we do NOT log here yet. When this route gains requireAuth
-// (a prerequisite for real sending, per above), record each send via
-// notificationsStore.logDelivery(req.userId, { channel, recipient, body }).
+// DELIVERY LOG: each outbound send is recorded in notification_deliveries (0004)
+// via notificationsStore.logDelivery(req.userId, …) for audit — status 'sent' on
+// success, 'failed' if the provider call throws.
 
 export const notifyRouter = Router();
+
+// Lazily construct the Twilio client so a missing key doesn't crash boot; SMS
+// sends fail with a clear 503 instead. Reused across requests once built.
+const TWILIO_SID = process.env.TWILIO_ACCOUNT_SID;
+const TWILIO_TOKEN = process.env.TWILIO_AUTH_TOKEN;
+const TWILIO_FROM = process.env.TWILIO_FROM;
+const twilioClient =
+  TWILIO_SID && TWILIO_TOKEN ? twilio(TWILIO_SID, TWILIO_TOKEN) : null;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^\+?[0-9\s\-().]{7,20}$/;
@@ -27,7 +34,8 @@ function str(v: unknown, max = 200): string {
   return typeof v === 'string' ? v.slice(0, max) : '';
 }
 
-notifyRouter.post('/', async (req: Request, res: Response) => {
+notifyRouter.post('/', requireAuth, async (req: Request, res: Response) => {
+  const userId = req.userId!; // guaranteed by requireAuth
   const { recipient, type, items } = req.body as {
     recipient?: unknown;
     type?: unknown;
@@ -49,6 +57,10 @@ notifyRouter.post('/', async (req: Request, res: Response) => {
     return;
   }
 
+  // Post-validation: pin to concrete types so they narrow inside the log closure.
+  const channel: 'sms' | 'email' = type;
+  const to: string = recipient;
+
   // Build the message defensively — never trust field types from the client.
   const selected = (items as Array<Record<string, unknown>>).filter(i => i && i['selected']);
   const lines = selected.map(i => {
@@ -64,12 +76,30 @@ notifyRouter.post('/', async (req: Request, res: Response) => {
   }, 0);
   const body = `AuraLink Parts List\n${'─'.repeat(30)}\n${lines.join('\n')}\n${'─'.repeat(30)}\nEstimated Total: $${total.toFixed(2)}`;
 
+  // Record the delivery attempt (best-effort audit) with the given status; never
+  // let a logging failure break the send response.
+  async function log(status: 'sent' | 'failed' | 'stub'): Promise<void> {
+    try {
+      await notificationsStore.logDelivery(userId, { channel, recipient: to, body, status });
+    } catch (err) {
+      console.error('logDelivery failed:', err);
+    }
+  }
+
   if (type === 'sms') {
-    // TODO: Replace stub with Twilio
-    // const twilio = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-    // await twilio.messages.create({ body, from: process.env.TWILIO_FROM, to: recipient });
-    console.log(`[SMS STUB] To: ${recipient}\n${body}`);
-    res.json({ success: true, message: 'SMS sent (stub).' });
+    if (!twilioClient || !TWILIO_FROM) {
+      res.status(503).json({ success: false, message: 'SMS is not configured on the server.' });
+      return;
+    }
+    try {
+      await twilioClient.messages.create({ body, from: TWILIO_FROM, to });
+      await log('sent');
+      res.json({ success: true, message: 'SMS sent.' });
+    } catch (err) {
+      console.error('Twilio send error:', err);
+      await log('failed');
+      res.status(502).json({ success: false, message: 'Failed to send SMS.' });
+    }
     return;
   }
 
@@ -78,6 +108,7 @@ notifyRouter.post('/', async (req: Request, res: Response) => {
     // const transporter = nodemailer.createTransport({ ... });
     // await transporter.sendMail({ from: process.env.SMTP_FROM, to: recipient, subject: 'Your AuraLink Parts List', text: body });
     console.log(`[EMAIL STUB] To: ${recipient}\n${body}`);
+    await log('stub');
     res.json({ success: true, message: 'Email sent (stub).' });
     return;
   }

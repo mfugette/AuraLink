@@ -66,4 +66,81 @@ The **read path is DB-backed** (`load()` → `GET /api/account/subscription`). T
 ## Files touched (for review)
 New: 5 migrations, `server/src/config/access.ts`, 5 `*.store.ts`.
 Modified: `account.route.ts`, `account.store.ts`, `assistant.route.ts`, `notify.route.ts`, 3 client services + 3 client specs, `account-menu.component.ts`.
-Nothing committed — all changes are in the working tree.
+Committed on branch `feat/db-backing-pass` (commit `8e4df70`, off `main`) as one self-consistent unit — 26 files, 269 client tests passing. Not pushed.
+
+---
+
+# What's left to be PRODUCTION-READY
+
+The DB-backing pass made the app functional and testable end-to-end. Getting it
+to production is a separate body of work. Grouped by blocker severity. **Nothing
+here is broken — these are deliberately-deferred gaps, each documented in-code.**
+
+## 🔴 Blockers — cannot charge money / send messages safely without these
+1. **Real billing (Stripe).** `SubscriptionService` is a HYBRID: read path is
+   DB-backed, but the WRITE path (`recordPurchase`/`cancel`/`resume`) is a
+   client-side localStorage mock — there is intentionally no endpoint to set your
+   own tier (0006 is read-your-own / service-role-write-only). Need: Stripe
+   Checkout + a **server webhook** that writes `subscriptions.tier` /
+   `billing_history`. Until this lands, a user can "buy" Pro in the UI and it only
+   persists locally. See `client/src/app/services/subscription.service.ts` class
+   note.
+2. **Per-tier limit enforcement.** `config/access.ts` applies FLAT tester caps (15
+   Aura/day, 3 vehicles) to *everyone* regardless of `subscriptions.tier`. Once
+   billing writes a real tier, flip `limitsForUser()` to resolve per-tier from the
+   subscriptions row. Call sites don't change — only that one module. (Do this
+   right after #1 or paying users get the same caps as free.)
+3. **`notify.route.ts` — SMS wired to Twilio; email still a stub.** ✅ Done
+   (2026-07-15): added `requireAuth` (route is no longer an open relay), real
+   Twilio `messages.create` for SMS, and `notificationsStore.logDelivery()` on
+   every attempt (`sent`/`failed`). Client guests get a "sign in to send" prompt;
+   the mobile native-SMS-link path still works signed-out. Verified end-to-end
+   against the live server — auth, Twilio call, 502-on-failure, and the `failed`
+   audit row all confirmed. **Blocked only on Twilio account state:** the trial
+   account returns `572006` on API `messages.create` (console UI can send, REST
+   API cannot until the trial is upgraded/credited). No code change needed once
+   upgraded. Credentials live in `server/.env` (`TWILIO_ACCOUNT_SID` /
+   `_AUTH_TOKEN` / `_FROM`). **Still a stub:** email (SendGrid/Nodemailer — the
+   `SMTP_FROM` slot exists but nothing sends yet).
+
+## 🟠 Should-have before a real launch
+4. **No server-side tests.** The client suite is solid (269 tests); the server has
+   **zero**. The security-critical paths — `requireAuth`, the per-user query
+   scoping in every store, the vehicle/Aura caps, input validation — are untested
+   in CI. At minimum: integration tests for auth + the two caps (the throwaway-user
+   harness in this session's scratchpad is a starting point).
+5. **No CI.** No `.github/workflows`. Nothing runs the client suite / `tsc` /
+   build on push. Add a pipeline before multiple people touch this.
+6. **No lint.** No ESLint wired to `npm run lint` in either workspace (noted in
+   CLAUDE.md). Prettier config exists but nothing invokes it.
+7. **Migrations are applied by hand.** No runner — each `000N_*.sql` is pasted into
+   the Supabase SQL editor in order. Fine for one operator; risky for a team / repeatable
+   deploys. Consider a lightweight runner (or Supabase CLI migrations) before prod.
+8. **RLS is the second line, not verified here.** The server uses the service-role
+   client (bypasses RLS) and scopes every query to `req.userId` manually. The DB's
+   own RLS policies (defense-in-depth) should be spot-checked against a real anon
+   token before launch — a manual-scoping miss would otherwise be silent.
+
+## 🟡 Known-mocked (fine to ship without; product decisions)
+9. **Telemetry / drive sessions are MOCKED** (`TelemetryService`, `SessionService`)
+   — the Dashboard + Home hero stats + History drives run on generated data. This
+   is intentional: real data needs the AuraLink adapter (on hold) or the desktop
+   ELM327 terminal. No `telemetry_sessions` table exists yet by design. Don't ship
+   these as "live" without a disclaimer, or gate them until hardware lands.
+10. **`TierService` persists tier in localStorage + has a temp header toggle** for
+    testing. The toggle must be removed (or dev-gated) before launch — it lets
+    anyone flip their own tier client-side (harmless once #2 makes the server the
+    real boundary, but confusing UX to ship).
+11. **OpenStreetMap route is an empty stub** (`open-street-map.route.ts`, 0 lines,
+    unregistered). Groundwork for a possible Google-Maps alternative. No action
+    needed unless you want to reduce Maps API cost.
+
+## ✅ Already production-shaped (no action)
+- Secrets: `server/.env` is gitignored and untracked; `.env.example` present.
+- Security posture: helmet, two-tier rate limiting (global + expensive), input
+  validation, HTML-escaped model output, server-verified JWT, per-user scoping.
+- `/health` endpoint exists (note: at `/health`, not `/api/health`) for
+  load-balancer checks.
+- CORS is env-driven (`CLIENT_ORIGIN`, comma-separated) — just set the prod origin.
+- `environment.ts` infers the API host from the browser host, so one client build
+  works local + prod (Cloudflare Tunnel) without a rebuild.
