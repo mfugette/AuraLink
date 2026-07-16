@@ -1,39 +1,38 @@
+@use '../terminal-search' as ts;
+
 .code-entry-wrapper {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
+// Mono caption above the field ("Enter DTC codes…") — matches the vehicle form's
+// terminal labels (ts.label).
+.field-label { @include ts.label; margin-bottom: 8px; }
+
 // ── Chip input control ──────────────────────────────────────────────────────────
+// Terminal field: the shared squared hairline frame + green `dtc$` prompt, on the
+// page base — identical to the vehicle form's inputs. The chip row stacks above
+// the prompt+input row inside the same frame.
 .chip-input {
+  @include ts.frame;
+  @include ts.prompt;
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  min-height: 56px;
-  padding: 10px 12px;
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border-strong);
-  border-radius: var(--obd-radius);
-  transition: border-color var(--obd-dur-fast) var(--obd-ease),
-              box-shadow var(--obd-dur-fast) var(--obd-ease);
-
-  &:hover { border-color: var(--obd-text-muted); }
-
-  &.focused {
-    border-color: var(--obd-blue);
-    box-shadow: 0 0 0 3px var(--obd-blue-dim);
-  }
+  min-height: 44px;
+  padding: 8px 10px 8px 12px;
 }
 
 // Row of entered chips, stacked above the input row.
 .chip-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 0.25rem;
 }
 
-// Row holding the text input + clear-all button.
+// Row holding the prompt, text input + clear-all button.
 .input-row {
   display: flex;
   align-items: center;
@@ -42,72 +41,81 @@
 
 .chip-input-field {
   flex: 1;
-  min-width: 160px;
-  height: 30px;
+  min-width: 140px;
+  height: 28px;
   background: transparent;
   border: none;
   outline: none;
   color: var(--obd-text);
-  font-family: inherit;
-  font-size: 0.9rem;
-  caret-color: var(--obd-blue);
+  font-family: var(--obd-font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+  caret-color: var(--obd-text-dim);
+  caret-shape: block;
 
   &::placeholder { color: var(--obd-text-muted); }
 }
 
 // ── Entered chips ───────────────────────────────────────────────────────────────
+// Squared, mono, tinted status chips (the app-wide chip convention) — not pills.
 .dtc-chip {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  height: 30px;
-  padding: 0 6px 0 12px;
-  border-radius: var(--obd-radius-pill);
-  font-family: 'Courier New', monospace;
+  height: 28px;
+  padding: 0 4px 0 10px;
+  font-family: var(--obd-font-mono);
   font-weight: 700;
   font-size: 0.82rem;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.02em;
   color: var(--obd-text);
-  background: var(--obd-surface-3);
-  border: 1px solid var(--obd-border);
 
-  &.chip-low      { color: var(--obd-green);  border-color: rgba(34, 197, 94, 0.35);  background: rgba(34, 197, 94, 0.1); }
-  &.chip-moderate { color: var(--obd-yellow); border-color: rgba(234, 179, 8, 0.35);  background: rgba(234, 179, 8, 0.1); }
-  &.chip-high     { color: var(--obd-orange); border-color: rgba(249, 115, 22, 0.35); background: rgba(249, 115, 22, 0.1); }
-  &.chip-critical { color: var(--obd-red);    border-color: rgba(239, 68, 68, 0.35);  background: rgba(239, 68, 68, 0.1); }
+  cursor: pointer;
+   &:hover { opacity: 0.6; }
+
+  &.chip-low      { color: var(--obd-green);  border-color: color-mix(in srgb, var(--obd-green) 35%, transparent);  }
+  &.chip-moderate { color: var(--obd-yellow); border-color: color-mix(in srgb, var(--obd-yellow) 35%, transparent); }
+  &.chip-high     { color: var(--obd-orange); border-color: color-mix(in srgb, var(--obd-orange) 35%, transparent);  }
+  &.chip-critical { color: var(--obd-red);    border-color: color-mix(in srgb, var(--obd-red) 35%, transparent);     }
 }
 
-.chip-remove {
+// .chip-remove {
+//   display: inline-flex;
+//   align-items: center;
+//   justify-content: center;
+//   width: 18px;
+//   height: 18px;
+//   padding: 0;
+//   border: none;
+//   background: none;
+//   color: currentColor;
+//   opacity: 0.6;
+//   cursor: pointer;
+//   border-radius: 50%;
+//   transition: opacity var(--obd-dur-fast) var(--obd-ease), background var(--obd-dur-fast) var(--obd-ease);
+
+//   mat-icon { font-size: 16px; width: 16px; height: 16px; }
+
+//   &:hover { opacity: 1; background: rgba(255, 255, 255, 0.12); }
+// }
+
+// Clear-all button — squared terminal treatment (matches ts.field's .ts-clear).
+.chip-clear {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  border: none;
-  background: none;
-  color: currentColor;
-  opacity: 0.6;
-  cursor: pointer;
-  border-radius: 50%;
-  transition: opacity var(--obd-dur-fast) var(--obd-ease), background var(--obd-dur-fast) var(--obd-ease);
+  width: 26px;
+  height: 26px;
+  border-radius: var(--obd-radius-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--obd-text-muted);
+  transition: color var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
 
   mat-icon { font-size: 16px; width: 16px; height: 16px; }
 
-  &:hover { opacity: 1; background: rgba(255, 255, 255, 0.12); }
-}
-
-.chip-clear {
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  color: var(--obd-text-muted);
-  transition: color var(--obd-dur-fast) var(--obd-ease), background var(--obd-dur-fast) var(--obd-ease);
-
-  mat-icon { font-size: 18px; width: 18px; height: 18px; }
-
-  &:hover { color: var(--obd-text); background: var(--obd-surface-4); }
+  &:hover { color: var(--obd-text); border-color: var(--obd-border-strong); }
 }
 
 // ── Suggestions dropdown ────────────────────────────────────────────────────────
@@ -118,13 +126,13 @@
   right: 0;
   z-index: 30;
   margin: 0;
-  padding: 6px;
+  padding: 4px;
   list-style: none;
   max-height: 280px;
   overflow-y: auto;
-  background: var(--obd-surface-3);
+  background: var(--obd-surface);
   border: 1px solid var(--obd-border-strong);
-  border-radius: var(--obd-radius);
+  border-radius: var(--obd-radius-sm);
   box-shadow: var(--obd-shadow-lg);
 }
 
@@ -141,9 +149,9 @@
 }
 
 .suggestion-code {
-  font-family: 'Courier New', monospace;
+  font-family: var(--obd-font-mono);
   font-weight: 700;
-  font-size: 0.875rem;
+  font-size: 0.82rem;
   color: var(--obd-blue);
   min-width: 56px;
 }

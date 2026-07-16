@@ -28,7 +28,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  height: 38px;
+  height: 37px;
   flex: none;
   padding: 0 0 0 12px;
   .collapsed & {
@@ -110,10 +110,10 @@
   align-items: center;
   gap: 12px;
   height: 34px;
-  // Left pad = 11px so the 18px icon's center lands at 8(container) + 11 + 9 =
-  // 28px — the same x as the collapsed rail's icon center (56/2) and the header
+  // Left pad = 6.5px so the 18px icon's center lands at 8(container) + 6.5 + 9 =
+  // 23.5px — the same x as the collapsed rail's icon center (47/2) and the header
   // logo icon, keeping all three vertically aligned in one column.
-  padding: 0 10px 0 11px;
+  padding: 0 10px 0 6.5px;
   border-radius: var(--obd-radius-sm);
   color: var(--obd-text-dim);
   text-decoration: none;

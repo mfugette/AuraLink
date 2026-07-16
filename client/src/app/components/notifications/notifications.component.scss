@@ -1,129 +1,232 @@
 @use '../terminal-search' as ts;
 
-// The component renders only fixed-position UI (a right-edge tab + the pane),
-// so the host itself takes no layout space in the header/shell flow.
-:host { display: contents; }
+// The host is the in-flow right rail — a flex sibling of .app-main inside
+// .app-body — so opening the pane WIDENS it and pushes the page content (exactly
+// like the left nav rail's collapse/expand). It sticks under the header and spans
+// the body height, mirroring .app-sidebar but anchored to the right.
+:host {
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--obd-header-height);
+  align-self: flex-start;
+  height: calc(100vh - var(--obd-header-height));
+  background: var(--obd-bg);
+  border-left: 1px solid var(--obd-border-strong);
+  z-index: 50;
+  overflow: hidden;   // clip the pane while it slides in from the collapsed width
 
-// ── Right-edge pull-tab trigger ────────────────────────────────────────────────
-// A thin vertical strip pinned to the right edge, vertically centered. Reads
-// top→bottom: a left-chevron (opens →), the bell, the unread count, then a
-// rotated "INBOX" label. Sits below the pane's scrim so it hides behind it.
-.notif-tab-trigger {
-  position: fixed;
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
-  z-index: 300;
+  // The host owns the width so the rail↔pane change animates smoothly, exactly
+  // like the left nav's `transition: width`. Collapsed = 47px rail; open = the
+  // expanded nav width (--obd-sidebar-width) — never wider than the nav pane.
+  width: var(--obd-sidebar-collapsed-width);
+  transition: width var(--obd-dur) var(--obd-ease);
+
+  &.open { width: var(--obd-sidebar-width); }
+
+  // On phones the rail leaves the flow and becomes an overlay drawer from the
+  // right edge, mirroring the left nav's mobile drawer (fixed, slid off-screen,
+  // over a scrim). The closed rail collapses to nothing so the page is full-width.
+  @media (max-width: 520px) {
+    position: static;
+    width: 0;
+    height: auto;
+    border-left: none;
+    background: transparent;
+    overflow: visible;
+    &.open { width: 0; }   // pane is a fixed overlay drawer on mobile, not in-flow
+  }
+}
+
+// ── Right rail (closed state) ──────────────────────────────────────────────────
+// Perfect mirror of the collapsed left nav rail: 47px wide
+// (--obd-sidebar-collapsed-width), full body height, --obd-bg fill. Reads
+// top→bottom: a bordered chevron toggle, the unread count, a full-width divider,
+// then a vertical "INBOX" label — the same toggle→divider structure as the nav.
+.notif-rail {
+  width: var(--obd-sidebar-collapsed-width);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  // On phones the collapsed rail is an out-of-flow tab pinned to the right edge
+  // (nothing to push into), matching how the left nav's toggle rail hides.
+  @media (max-width: 520px) {
+    position: fixed;
+    top: calc(var(--obd-header-height) + 10px);
+    right: 0;
+    width: auto;
+    height: auto;
+    background: var(--obd-surface-2);
+    border: 1px solid var(--obd-border-strong);
+    border-right: none;
+    border-radius: var(--obd-radius) 0 0 var(--obd-radius);
+    z-index: 200;
+    .notif-rail-head { height: auto; padding: 8px; }
+    .notif-rail-divider, .notif-rail-body { display: none; }
+  }
+}
+
+// Top section: a fixed 38px square cell (same height as the header bar and the
+// nav's .sidebar-toggle-section), centered chevron. Its full-width bottom border
+// is the .notif-rail-divider directly below it.
+.notif-rail-head {
+  flex: none;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Content below the divider: unread count + vertical INBOX label.
+.notif-rail-body {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  width: 34px;
-  padding: 12px 0 14px;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+// Bordered chevron button (the reference's panel toggle) at the top of the rail.
+// Matches the left rail's .sidebar-toggle exactly (30px bordered square).
+.notif-rail-toggle {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--obd-radius-sm);
   border: 1px solid var(--obd-border-strong);
-  border-right: none;
-  border-radius: var(--obd-radius) 0 0 var(--obd-radius);
   background: var(--obd-surface-2);
   color: var(--obd-text-dim);
+  display: grid;
+  place-items: center;
   cursor: pointer;
-  box-shadow: var(--obd-shadow-sm);
   transition: background var(--obd-dur-fast) var(--obd-ease),
               color var(--obd-dur-fast) var(--obd-ease),
-              border-color var(--obd-dur-fast) var(--obd-ease),
-              padding-right var(--obd-dur-fast) var(--obd-ease);
+              border-color var(--obd-dur-fast) var(--obd-ease);
+  mat-icon { font-size: 19px; width: 19px; height: 19px; }
 
   &:hover {
     background: var(--obd-surface-3);
     color: var(--obd-text);
     border-color: var(--obd-text-muted);
-    padding-right: 3px;   // subtle nudge out from the edge on hover
   }
 }
 
-.notif-tab-chevron { font-size: 18px; width: 18px; height: 18px; color: var(--obd-text-muted); }
-.notif-tab-bell    { font-size: 19px; width: 19px; height: 19px; }
-
-// Unread count pill (the reference's green "20").
-.notif-tab-count {
-  min-width: 20px;
-  padding: 2px 4px;
+// Unread count badge — green-tinted chip like the reference's "20".
+.notif-rail-count {
+  min-width: 22px;
+  padding: 2px 5px;
   border-radius: var(--obd-radius-sm);
-  background: var(--obd-red);
-  color: #fff;
+  background: color-mix(in srgb, var(--obd-green) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--obd-green) 35%, transparent);
+  color: var(--obd-green);
   font-family: var(--obd-font-mono);
-  font-size: 0.6rem;
+  font-size: 0.62rem;
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.3;
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
 
-// Vertical "INBOX" label — rotated so it reads bottom-to-top like the reference.
-.notif-tab-label {
+// Full-width divider beneath the head — mirrors the left nav's .sidebar-divider.
+// Runs flush across the entire rail width (no side margins), so the head reads as
+// a square cell with a bottom border spanning the closed rail.
+.notif-rail-divider {
+  flex: none;
+  border: none;
+  border-bottom: 1px solid var(--obd-border-strong);
+  align-self: stretch;
+  width: auto;
+  height: 0;
+  margin: 0;
+}
+
+// Vertical "INBOX" label — reads bottom-to-top, mono + tracked like the nav
+// eyebrow ("NAVIGATION").
+.notif-rail-label {
   writing-mode: vertical-rl;
   transform: rotate(180deg);
   font-family: var(--obd-font-mono);
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--obd-text-muted);
 }
 
-// ── Pane (right slide-in) ─────────────────────────────────────────────────────
-// A mirror of the left sidebar: it starts just below the header
-// (top: --obd-header-height) and runs to the bottom of the viewport, so its
-// height is exactly the sidebar's `calc(100vh - header)`. On phones it mirrors
-// the sidebar's mobile drawer too: same under-the-header origin, a scrim behind,
-// and a partial-width (82vw) overlay — just anchored to the right edge.
-.notif-scrim {
-  position: fixed;
-  top: var(--obd-header-height);
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 320;
-  display: flex;
-  justify-content: flex-end;
-  background: var(--obd-overlay-scrim, rgba(0, 0, 0, 0.45));
-  backdrop-filter: blur(2px);
-  animation: notif-fade 0.16s var(--obd-ease) both;
-}
-
+// ── Pane (open state) ─────────────────────────────────────────────────────────
+// Desktop: an in-flow panel that widens the rail and pushes .app-main (mirrors
+// the left sidebar's expanded width). Mobile: a slide-in overlay drawer from the
+// right, over a scrim.
 .notif-pane {
-  width: 100%;
-  max-width: 400px;
+  // Fixed to the expanded nav width so the content doesn't reflow while the host
+  // clips it open — the host's width transition does the slide. Never wider than
+  // the left nav pane.
+  width: var(--obd-sidebar-width);
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--obd-surface);
-  border-left: 1px solid var(--obd-border-strong);
-  // Top border only on desktop, where the pane meets the header's bottom edge.
-  border-top: 1px solid var(--obd-border-strong);
-  box-shadow: var(--obd-shadow-lg);
-  animation: notif-slide 0.22s var(--obd-ease) both;
+  // Match the left nav rail's fill so the pane, its header bar, and the header
+  // hairline all read identically to the nav.
+  background: var(--obd-bg);
 
-  // Match the left drawer on phones: partial-width overlay under the header.
+  // Phones: overlay drawer from the right edge (mirror of the left nav drawer).
   @media (max-width: 520px) {
+    position: fixed;
+    top: var(--obd-header-height);
+    right: 0;
+    bottom: 0;
+    height: calc(100vh - var(--obd-header-height));
+    width: var(--obd-sidebar-width);
     max-width: 82vw;
+    z-index: 200;
+    border-left: 1px solid var(--obd-border-strong);
+    box-shadow: var(--obd-shadow-lg);
+    animation: notif-slide 0.22s var(--obd-ease) both;
   }
 }
 
+// Mobile-only scrim behind the drawer pane (mirror of the left nav's
+// .drawer-scrim). Never created/rendered on desktop, where the pane pushes.
+.notif-scrim {
+  display: none;
+  @media (max-width: 520px) {
+    display: block;
+    position: fixed;
+    top: var(--obd-header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 150;
+    background: var(--obd-overlay-scrim, rgba(6, 8, 12, 0.6));
+    animation: notif-fade 0.16s var(--obd-ease) both;
+  }
+}
+
+// Header bar — a mirror of the left nav's .sidebar-toggle-section: 38px tall, the
+// same padding, on the same --obd-bg fill, with a full-bleed hairline beneath it
+// (border-bottom = the nav's .sidebar-divider). The title matches the nav's
+// "NAVIGATION" eyebrow (mono, 0.80rem, weight 600, 0.14em, muted).
 .notif-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  padding: 12px 14px;
+  gap: 8px;
+  height: 38px;
+  flex: none;
+  padding: 0 8px 0 12px;
   border-bottom: 1px solid var(--obd-border-strong);
 
   h2 {
     margin: 0;
     font-family: var(--obd-font-mono);
-    font-size: 0.82rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
+    font-size: 0.80rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--obd-text);
+    color: var(--obd-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
   }
 }
 .notif-head-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
@@ -263,7 +366,7 @@
   gap: 10px;
   padding: 48px 20px;
   color: var(--obd-text-muted);
-  font-size: 0.88rem;
+  font-size: 0.80rem;
   mat-icon { font-size: 30px; width: 30px; height: 30px; opacity: 0.7; }
 }
 

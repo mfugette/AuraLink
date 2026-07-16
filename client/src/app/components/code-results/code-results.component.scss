@@ -9,55 +9,58 @@
   align-items: flex-start;
   gap: 12px;
   padding: 14px 16px;
-  background: rgba(234, 179, 8, 0.08);
-  border: 1px solid rgba(234, 179, 8, 0.25);
-  border-radius: var(--obd-radius);
+  background: color-mix(in srgb, var(--obd-yellow) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--obd-yellow) 30%, transparent);
+  border-radius: var(--obd-radius-sm);
   color: var(--obd-yellow);
-  font-size: 0.875rem;
+  font-family: var(--obd-font-mono);
+  font-size: 0.82rem;
   line-height: 1.5;
 
   mat-icon { flex-shrink: 0; margin-top: 1px; }
 }
 
 // ── Accordion shell ───────────────────────────────────────────────────────────
+// Flat hairline-ruled stack — squared panels flush on the page base, no gaps,
+// shared borders (terminal instrument look), not floating rounded cards.
 .results-accordion {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-sm);
+  overflow: hidden;
+
+  // Shared hairline seams between stacked panels (top border on all but the first).
+  .result-panel + .result-panel { border-top: 1px solid var(--obd-border-strong); }
 }
 
 // ── Each panel ────────────────────────────────────────────────────────────────
 .result-panel {
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border);
-  border-radius: var(--obd-radius);
-  box-shadow: var(--obd-shadow-sm);
-  overflow: hidden;
-  transition: box-shadow var(--obd-dur) var(--obd-ease);
+  background: var(--obd-bg, var(--obd-surface));
+  // Severity shown as a left accent bar (squared, no radius, no shadow).
+  border-left: 3px solid var(--obd-border-strong);
 
-  &:hover,
-  &.expanded { box-shadow: var(--obd-shadow); }
-
-  &.panel-low      { border-left: 4px solid var(--obd-green); }
-  &.panel-moderate { border-left: 4px solid var(--obd-yellow); }
-  &.panel-high     { border-left: 4px solid var(--obd-orange); }
-  &.panel-critical { border-left: 4px solid var(--obd-red); }
+  &.panel-low      { border-left-color: var(--obd-green); }
+  &.panel-moderate { border-left-color: var(--obd-yellow); }
+  &.panel-high     { border-left-color: var(--obd-orange); }
+  &.panel-critical { border-left-color: var(--obd-red); }
 }
 
 // ── Header (native button, full-width click target) ────────────────────────────
 .panel-header {
   width: 100%;
-  min-height: 60px;
-  padding: 16px 22px;
+  min-height: 52px;
+  padding: 12px 18px;
   gap: 14px;
   justify-content: space-between;
   text-align: left;
   white-space: normal;   // override .btn nowrap so long code names can wrap
   color: var(--obd-text);
   background: transparent;
+  border-radius: 0;
   transition: background var(--obd-dur-fast) var(--obd-ease);
 
-  &:hover { background: rgba(255, 255, 255, 0.03); }
+  &:hover { background: color-mix(in srgb, var(--obd-text) 4%, transparent); }
 }
 
 .panel-chevron {
@@ -97,21 +100,22 @@
 }
 
 .code-badge {
-  font-family: 'Courier New', monospace;
-  font-weight: 800;
+  font-family: var(--obd-font-mono);
+  font-weight: 700;
   font-size: 0.8rem;
-  background: var(--obd-surface-3);
+  background: transparent;
   color: var(--obd-blue);
-  padding: 3px 9px;
+  padding: 2px 8px;
   border-radius: var(--obd-radius-sm);
-  letter-spacing: 1px;
+  letter-spacing: 0.04em;
   white-space: nowrap;
   flex-shrink: 0;
-  border: 1px solid var(--obd-blue-dim);
+  border: 1px solid color-mix(in srgb, var(--obd-blue) 40%, transparent);
 }
 
 .code-name {
-  font-size: 0.9rem;
+  font-family: var(--obd-font-mono);
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--obd-text);
   flex: 1;
@@ -124,12 +128,13 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 0 22px 20px;
-  border-top: 1px solid var(--obd-border);
+  padding: 0 18px 20px;
+  border-top: 1px solid var(--obd-border-strong);
 }
 
 .code-description {
-  font-size: 0.875rem;
+  font-family: var(--obd-font-mono);
+  font-size: 0.82rem;
   color: var(--obd-text-dim);
   line-height: 1.65;
   margin: 0;
@@ -157,10 +162,11 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.78rem;
+  font-family: var(--obd-font-mono);
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
   color: var(--obd-text-muted);
 
   mat-icon {
@@ -180,7 +186,8 @@
   gap: 5px;
 
   li {
-    font-size: 0.85rem;
+    font-family: var(--obd-font-mono);
+    font-size: 0.8rem;
     color: var(--obd-text-dim);
     line-height: 1.55;
   }
@@ -190,7 +197,8 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.75rem;
+  font-family: var(--obd-font-mono);
+  font-size: 0.72rem;
   color: var(--obd-text-muted);
   margin: 0;
 
@@ -203,36 +211,33 @@
   gap: 6px;
 }
 
+// Squared, mono terminal chips (not pills) — hairline frame on the page base.
 .part-chip {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 6px 14px;
-  border-radius: var(--obd-radius-pill);
+  padding: 6px 12px;
+  border-radius: var(--obd-radius-sm);
+  font-family: var(--obd-font-mono);
   font-size: 0.78rem;
-  font-weight: 500;
-  font-family: inherit;
+  font-weight: 600;
   cursor: pointer;
-  border: 1px solid var(--obd-border);
-  background: var(--obd-surface-3);
+  border: 1px solid var(--obd-border-strong);
+  background: transparent;
   color: var(--obd-text-dim);
   transition: border-color var(--obd-dur-fast) var(--obd-ease),
               background var(--obd-dur-fast) var(--obd-ease),
-              color var(--obd-dur-fast) var(--obd-ease),
-              transform var(--obd-dur-fast) var(--obd-ease-spring);
+              color var(--obd-dur-fast) var(--obd-ease);
 
   mat-icon { font-size: 14px; width: 14px; height: 14px; }
 
   &:hover {
-    border-color: rgba(59, 130, 246, 0.4);
-    background: var(--obd-surface-4);
+    border-color: color-mix(in srgb, var(--obd-blue) 45%, transparent);
     color: var(--obd-text);
   }
 
-  &:active { transform: scale(0.96); }
-
   &.part-chip--selected {
-    background: var(--obd-blue-dim);
+    background: color-mix(in srgb, var(--obd-blue) 12%, transparent);
     border-color: var(--obd-blue);
     color: var(--obd-blue);
   }
@@ -244,10 +249,11 @@
   align-items: flex-start;
   gap: 12px;
   padding: 14px 16px;
-  background: var(--obd-blue-dim);
-  border: 1px solid var(--obd-blue-glow);
-  border-radius: var(--obd-radius);
-  font-size: 0.85rem;
+  background: color-mix(in srgb, var(--obd-blue) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--obd-blue) 35%, transparent);
+  border-radius: var(--obd-radius-sm);
+  font-family: var(--obd-font-mono);
+  font-size: 0.82rem;
   color: var(--obd-text);
 
   mat-icon { color: var(--obd-blue); flex-shrink: 0; margin-top: 1px; }
@@ -256,6 +262,6 @@
     color: var(--obd-text-dim);
     display: block;
     margin-top: 4px;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
   }
 }

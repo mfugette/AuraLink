@@ -35,14 +35,7 @@
     </div>
   </header>
 
-  <!-- Notifications (signed-in only): a fixed pull-tab on the right edge opens a
-       slide-in inbox pane. Lives at the shell level (not the header) so its tab
-       and pane anchor to the viewport edge. -->
-  @if (auth.isSignedIn()) {
-    <app-notifications />
-  }
-
-  <!-- ── Body: sidebar + routed page ─────────────────────────────────────── -->
+  <!-- ── Body: sidebar + routed page + right notification rail ───────────── -->
   <div class="app-body">
     <!-- Sidebar is signed-in only; guests get just the routed /home page. -->
     @if (auth.isSignedIn()) {
@@ -79,6 +72,14 @@
         </nav>
       </footer>
     </main>
+
+    <!-- Right notification rail (signed-in only): an in-flow flex sibling of
+         .app-main — mirror of the left nav rail. Closed it's a 47px rail; open it
+         widens to the inbox pane and PUSHES the page content (never overlays),
+         exactly like the left sidebar's collapse/expand. -->
+    @if (auth.isSignedIn()) {
+      <app-notifications />
+    }
   </div>
 
   <!-- App-wide toasts + offline banner (fixed-position, renders above content). -->

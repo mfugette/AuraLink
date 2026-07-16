@@ -1,92 +1,62 @@
 <div class="code-entry-wrapper">
   <div class="field code-field">
-    <label class="field-label" for="code-input">
-      <mat-icon>search</mat-icon>
-      Enter DTC codes (e.g. P0420, P0171)
-    </label>
+    <label class="field-label" for="code-input">Enter DTC codes (e.g. P0420, P0171)</label>
 
     <div class="chip-input" [class.focused]="focused()">
       @if (hasCode()) {
-        <div class="chip-row">
-          @for (code of selectedCodes(); track code) {
-            <span class="dtc-chip" [class]="'chip-' + severityFor(code)">
-              {{ code }}
-              <button
-                type="button"
-                class="chip-remove"
-                (click)="removeCode(code)"
-                [attr.aria-label]="'Remove ' + code"
-              >
-                <mat-icon>cancel</mat-icon>
-              </button>
-            </span>
-          }
-        </div>
+      <div class="chip-row">
+        @for (code of selectedCodes(); track code) {
+        <span class="dtc-chip" [class]="'chip-' + severityFor(code)" type="button" (click)="removeCode(code)"
+          [attr.aria-label]="'Remove ' + code">
+          [{{ code }}]
+        </span>
+        }
+      </div>
       }
 
       <div class="input-row">
-        <input
-          #codeInput
-          id="code-input"
-          class="chip-input-field"
-          placeholder="Type a code and press Enter..."
-          [ngModel]="inputValue"
-          (ngModelChange)="onInputChange($event)"
-          (keydown)="onKeydown($event)"
-          (focus)="onFocus()"
-          (blur)="onBlur()"
-          autocomplete="off"
-          autocapitalize="characters"
-          role="combobox"
-          aria-controls="dtc-suggestions"
-          aria-autocomplete="list"
-          [attr.aria-expanded]="showSuggestions()"
-        />
+        <span class="ts-prompt">dtc<span class="ts-caret">$</span></span>
+        <input #codeInput id="code-input" class="chip-input-field" placeholder="type a code and press enter…"
+          [ngModel]="inputValue" (ngModelChange)="onInputChange($event)" (keydown)="onKeydown($event)"
+          (focus)="onFocus()" (blur)="onBlur()" autocomplete="off" autocapitalize="characters" role="combobox"
+          aria-controls="dtc-suggestions" aria-autocomplete="list" [attr.aria-expanded]="showSuggestions()" />
 
         @if (hasCode()) {
-          <button
-            type="button"
-            class="btn chip-clear"
-            (click)="clearAll()"
-            matTooltip="Clear all codes"
-            aria-label="Clear all codes"
-          >
-            <mat-icon>clear_all</mat-icon>
-          </button>
+        <button type="button" class="btn chip-clear ts-clear" (click)="clearAll()" matTooltip="Clear all codes"
+          aria-label="Clear all codes">
+          <mat-icon>clear_all</mat-icon>
+        </button>
         }
       </div>
 
       @if (showSuggestions()) {
-        <ul class="suggestion-list" id="dtc-suggestions" role="listbox">
-          @for (s of suggestions(); track s.code; let i = $index) {
-            <li
-              class="suggestion-option"
-              role="option"
-              [class.active]="i === activeIndex()"
-              [attr.aria-selected]="i === activeIndex()"
-              (mousedown)="selectSuggestion(s.code, $event)"
-              (mouseenter)="activeIndex.set(i)"
-            >
-              <span class="suggestion-code">{{ s.code }}</span>
-              <span class="suggestion-name">{{ s.name }}</span>
-              <span class="severity-badge {{ s.severity }}">{{ s.severity }}</span>
-            </li>
-          }
-        </ul>
+      <ul class="suggestion-list" id="dtc-suggestions" role="listbox">
+        @for (s of suggestions(); track s.code; let i = $index) {
+        <li class="suggestion-option" role="option" [class.active]="i === activeIndex()"
+          [attr.aria-selected]="i === activeIndex()" (mousedown)="selectSuggestion(s.code, $event)"
+          (mouseenter)="activeIndex.set(i)">
+          <span class="suggestion-code">{{ s.code }}</span>
+          <span class="suggestion-name">{{ s.name }}</span>
+          <span class="severity-badge {{ s.severity }}">{{ s.severity }}</span>
+        </li>
+        }
+      </ul>
       }
     </div>
   </div>
 
   @if (!hasCode()) {
-    <div class="code-hint">
-      <mat-icon>info</mat-icon>
-      <span>Add codes from your OBD2 scanner — separate multiple codes with commas or Enter. Codes start with P, B, C, or U followed by 4 digits.</span>
-    </div>
+  <div class="code-hint">
+    <mat-icon>info</mat-icon>
+    <span>Add codes from your OBD2 scanner — separate multiple codes with commas or Enter. Codes start with P, B, C, or
+      U followed by 4 digits.</span>
+  </div>
   }
 
   @if (hasCode()) {
-    <div class="code-count-row">
-      <span class="code-count">{{ selectedCodes().length }} code{{ selectedCodes().length !== 1 ? 's' : '' }} entered</span>
-    </div>
+  <div class="code-count-row">
+    <span class="code-count">{{ selectedCodes().length }} code{{ selectedCodes().length !== 1 ? 's' : '' }}
+      entered</span>
+  </div>
   }
 </div>

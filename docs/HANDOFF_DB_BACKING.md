@@ -28,6 +28,15 @@ Separate from the DB work, a UI restyle was committed on `feat/db-backing-pass` 
 - **Notifications trigger moved** from the top bar to a fixed right-edge pull-tab; the slide-in pane now mirrors the left sidebar's height + mobile drawer.
 - **Client tests: 271 → 263** — the drop is *only* the removed `icon.component.spec.ts` (~8 tests); all 263 pass. No server or DB code changed. (Older references to "271 passing" below predate this.)
 
+## ℹ️ Home + notifications UI pass (2026-07-16) — not DB-related
+A second UI-only pass on `feat/db-backing-pass`, continuing the terminal design language. No server, DB, or API-contract changes; product-code touched is client-only (home page, notifications, code-entry/code-results). Flagged here because it's on the same branch.
+- **Home "Welcome back" wordmark** no longer clips on mobile — the pixel-block figlet font-size scales fluidly ≤640px (`clamp`), scoped to the hero (shared `app-pixel-title` untouched).
+- **Notification tray reworked into a full-height right rail that mirrors the left nav** — closed = a 47px rail (`--obd-sidebar-collapsed-width`, also applied to the left collapsed rail so both match) with a 38px square chevron cell + full-width divider + vertical "INBOX" label; open = an in-flow pane that **pushes** the page (no overlay/scrim on desktop) and **slides** via a host `width` transition, capped at the expanded nav width (`--obd-sidebar-width`). Header bar (38px, `--obd-bg`, muted mono title, hairline) matches the nav's. Mobile stays an overlay drawer + scrim. Removed the old fixed-overlay + body-relocation logic from `notifications.component.ts`.
+- **Home DTC flow restyled terminal** — `code-entry` now uses the shared `ts.frame`/`ts.prompt` (green `dtc$` prompt, mono, squared tinted chips); `code-results` accordions are a flat hairline stack (squared, mono, `color-mix`-tinted chips/badges, severity as a left accent bar) instead of rounded shadowed cards.
+- **Home vehicle step auto-fills from the primary (or first) saved vehicle** and collapses to a compact terminal summary card with an **"Enter manually"** button; users with no saved vehicle see the editable form directly. A `manualVehicleTouched` guard stops a late `fetchVehicles()` from re-collapsing the form.
+- **Fixed the results-view footer overlap + spurious scrollbar** — the home host binds `host--flow` once the hero is gone and switches to `flex: 1 0 auto` (fills the scroll region, never shrinks below content) so the app footer flows below the results and short pages show no scrollbar.
+- **Client tests:** all previously-passing suites still green after these changes (home-page, code-entry, code-results, notifications specs re-run headless; notifications spec selector updated `.notif-tab-count` → `.notif-rail-count`). Not yet committed.
+
 ## Goal of this pass
 Wire the features that were mocked (localStorage / in-memory seed) to real Postgres tables, so everything except hardware-dependent telemetry is testable end-to-end. Schema-first, then routes, then client swaps.
 

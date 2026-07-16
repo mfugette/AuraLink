@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, OnDestroy, computed, effect, HostListener, inject, signal, viewChild,
+  Component, computed, HostListener, inject, signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -50,16 +50,12 @@ const CATEGORY_TAG: Record<NotificationCategory, string> = {
   imports: [CommonModule, RouterLink, MatIconModule],
   templateUrl: './notifications.component.html',
   styleUrl: './notifications.component.scss',
+  // Host class drives the width transition (rail ↔ pane) so opening slides open.
+  host: { '[class.open]': 'open()' },
 })
-export class NotificationsComponent implements OnDestroy {
+export class NotificationsComponent {
   private readonly inbox = inject(InboxService);
   private readonly tier = inject(TierService);
-
-  // The scrim/pane element (only present while open). Relocated to <body> so the
-  // header's backdrop-filter doesn't trap this fixed overlay (see account-menu
-  // for the same fix). Cleaned up in ngOnDestroy.
-  private readonly paneEl = viewChild<ElementRef<HTMLElement>>('paneEl');
-  private movedEl: HTMLElement | null = null;
 
   readonly open = signal(false);
   readonly tab = signal<PaneTab>('all');
@@ -72,27 +68,6 @@ export class NotificationsComponent implements OnDestroy {
 
   // SMS escalation is a Pro capability. Free/Plus see the toggles locked.
   readonly isPro = computed(() => this.tier.tier() === 'pro');
-
-  constructor() {
-    // When the pane renders, move its root element to <body> so it escapes the
-    // header's backdrop-filter containing block and covers the full viewport.
-    // Angular still owns create/destroy via @if — it removes the node (wherever
-    // it now lives) when open() flips false, so we only ever move it on appear.
-    effect(() => {
-      const el = this.paneEl()?.nativeElement;
-      if (this.open() && el && el.parentElement !== document.body) {
-        document.body.appendChild(el);
-        this.movedEl = el;
-      }
-      if (!this.open()) this.movedEl = null;
-    });
-  }
-
-  ngOnDestroy(): void {
-    // Safety net: if the component is torn down while open, drop the moved node.
-    this.movedEl?.remove();
-    this.movedEl = null;
-  }
 
   // The category rows for the settings view, in display order.
   readonly categories: NotificationCategory[] = ['health', 'maintenance', 'aura', 'billing'];
