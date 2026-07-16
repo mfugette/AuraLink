@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { CodeEntryComponent } from '../../components/code-entry/code-entry.component';
 import { VehicleSelectorComponent } from '../../components/vehicle-selector/vehicle-selector.component';
 import { CodeResultsComponent } from '../../components/code-results/code-results.component';
-import { PartsLocatorComponent } from '../../components/parts-locator/parts-locator.component';
 import { LiveDtcComponent } from '../../components/live-dtc/live-dtc.component';
 import { Vehicle } from '../../models/vehicle.model';
 import { AuthService } from '../../services/auth.service';
@@ -47,9 +46,13 @@ interface MaintItem {
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [CommonModule, MatIconModule, CodeEntryComponent, VehicleSelectorComponent, CodeResultsComponent, PartsLocatorComponent, LiveDtcComponent, VehicleCloudComponent, PixelTitleComponent],
+  imports: [CommonModule, MatIconModule, CodeEntryComponent, VehicleSelectorComponent, CodeResultsComponent, LiveDtcComponent, VehicleCloudComponent, PixelTitleComponent],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss',
+  // Once the hero has slid away and the form/results are shown, the host stops
+  // stretching to the viewport (flex:1) and instead sizes to its content, so the
+  // app footer flows below the results instead of overlapping them.
+  host: { '[class.host--flow]': 'heroHidden()' },
 })
 export class HomePageComponent implements OnInit, OnDestroy {
   protected readonly auth = inject(AuthService);
@@ -220,6 +223,11 @@ export class HomePageComponent implements OnInit, OnDestroy {
 
   codes = signal<string[]>([]);
   vehicle = signal<Vehicle>({ year: null, make: null, model: null, subModel: null, engine: null, driveType: null, transmission: null, fuelType: null, bodyStyle: null, mileage: null, vin: null });
+  // When true the editable vehicle form is shown; when false a compact summary of
+  // the auto-filled primary vehicle is shown instead (with an "enter manually"
+  // button to reveal the form). Defaults true (guests / no saved vehicle get the
+  // form directly); flipped to false once a saved vehicle auto-fills (see below).
+  manualVehicle = signal(true);
   showResults = signal(false);
   heroHidden = signal(false);
   formSliding = signal(false);
@@ -227,6 +235,19 @@ export class HomePageComponent implements OnInit, OnDestroy {
   selectedParts = signal<string[]>([]);
 
   readonly canLookup = computed(() => this.codes().length > 0);
+
+  // Compact read-only summary of the auto-filled vehicle, shown in place of the
+  // form when a saved vehicle is used (manualVehicle() === false).
+  readonly vehicleSummary = computed(() => {
+    const v = this.vehicle();
+    const name = [v.year, v.make, v.model].filter(Boolean).join(' ').trim();
+    return {
+      name: name || 'Saved vehicle',
+      trim: v.subModel || null,
+      engine: v.engine || null,
+      vin: v.vin || null,
+    };
+  });
 
   // The hero's slide-up stage relies on the OUTER document not scrolling, so we
   // lock <html> overflow while it's active. On phones the whole app scrolls
@@ -240,8 +261,37 @@ export class HomePageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.lockPageScroll(true);
-    // Signed-in hero surfaces the primary vehicle; make sure the list is loaded.
-    if (this.auth.isSignedIn()) this.account.fetchVehicles().subscribe();
+    // Signed-in hero surfaces the primary vehicle; make sure the list is loaded,
+    // then auto-fill the vehicle form from the primary (or first) saved vehicle
+    // and collapse the form to a summary (user can still "enter manually").
+    if (this.auth.isSignedIn()) {
+      this.account.fetchVehicles().subscribe(() => this.autofillPrimaryVehicle());
+    }
+  }
+
+  // Pre-fill the vehicle form from the user's primary (or first) saved vehicle and
+  // hide the editable form behind a summary. No-op (form stays visible) when the
+  // user has no saved vehicles or has already chosen to edit manually.
+  private autofillPrimaryVehicle(): void {
+    if (this.manualVehicleTouched) return;   // don't clobber a manual choice
+    const saved = this.account.vehicles();
+    const primary = saved.find(v => v.isPrimary) ?? saved[0];
+    if (!primary) return;
+    this.vehicle.set({
+      year: primary.year, make: primary.make, model: primary.model,
+      subModel: primary.subModel, engine: primary.engine, driveType: primary.driveType,
+      transmission: primary.transmission, fuelType: primary.fuelType,
+      bodyStyle: primary.bodyStyle, mileage: primary.mileage, vin: primary.vin,
+    });
+    this.manualVehicle.set(false);
+  }
+
+  // Reveal the editable form (from the summary) and remember the user's choice so
+  // a late vehicles fetch doesn't collapse it back to the summary.
+  private manualVehicleTouched = false;
+  enterManualVehicle(): void {
+    this.manualVehicleTouched = true;
+    this.manualVehicle.set(true);
   }
 
   ngOnDestroy(): void {
@@ -255,6 +305,14 @@ export class HomePageComponent implements OnInit, OnDestroy {
 
   onSelectedPartsChanged(parts: string[]): void {
     this.selectedParts.set(parts);
+  }
+
+  // Hand the selected parts + current vehicle to the Part Lookup page, which runs
+  // the live search there (the inline eBay locator was retired from this flow).
+  goToPartLookup(): void {
+    this.router.navigate(['/part-lookup'], {
+      state: { partNames: this.selectedParts(), vehicle: this.vehicle() },
+    });
   }
 
   onVehicleChanged(v: Vehicle): void {

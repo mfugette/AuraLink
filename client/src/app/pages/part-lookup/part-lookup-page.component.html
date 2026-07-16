@@ -4,90 +4,110 @@
     <app-pixel-title
       text="Parts"
       tagline="Part lookup"
-      sub="Search a catalog of common replacement parts by name, brand, part number, or the DTC it addresses."
+      sub="Search live listings by part name and scope them to your vehicle, or arrive here from a code lookup."
     />
   </div>
 
-  <!-- Console toolbar: search + category filters (left/middle), count + clear (right) -->
+  <!-- Console toolbar: part search (left) + vehicle scope (right). -->
   <div class="parts-toolbar">
-    <div class="toolbar-search">
+    <form class="toolbar-search" (ngSubmit)="submitSearch()">
       <span class="ts-prompt">parts<span class="ts-caret">$</span></span>
       <input
         class="toolbar-search-input"
         [ngModel]="query()"
         (ngModelChange)="onQueryInput($event)"
-        placeholder="oxygen sensor, P0420…"
+        name="partQuery"
+        placeholder="oxygen sensor, brake pads…"
         autocomplete="off"
         spellcheck="false"
       />
       @if (query()) {
-        <button type="button" class="btn toolbar-search-clear" (click)="clearFilters()" aria-label="Clear search">
+        <button type="button" class="btn toolbar-search-clear" (click)="clearSearch()" aria-label="Clear search">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+      <button type="submit" class="btn toolbar-search-go" aria-label="Search parts">
+        <mat-icon>search</mat-icon>
+      </button>
+    </form>
+
+    <!-- Vehicle scope: saved-vehicle chips + a manual entry toggle. -->
+    <div class="vehicle-scope" role="group" aria-label="Scope search to a vehicle">
+      <span class="scope-label">Vehicle</span>
+
+      @for (v of savedVehicles(); track v.id) {
+        <button
+          type="button"
+          class="btn scope-chip"
+          [class.active]="selectedVehicleId() === v.id"
+          (click)="selectVehicle(v.id)"
+        >{{ vehicleName(v) }}</button>
+      }
+
+      <button
+        type="button"
+        class="btn scope-chip scope-chip--manual"
+        [class.active]="manualMode()"
+        (click)="enterManual()"
+      >
+        <mat-icon>edit</mat-icon> Manual
+      </button>
+
+      @if (selectedVehicleId() || manualMode()) {
+        <button type="button" class="btn scope-clear" (click)="clearVehicle()" aria-label="Clear vehicle scope">
           <mat-icon>close</mat-icon>
         </button>
       }
     </div>
-
-    <div class="cat-chips" role="group" aria-label="Filter by category">
-      <button
-        type="button"
-        class="btn cat-chip"
-        [class.active]="activeCategory() === null"
-        (click)="setCategory(null)"
-      >All</button>
-      @for (cat of categories; track cat) {
-        <button
-          type="button"
-          class="btn cat-chip"
-          [class.active]="activeCategory() === cat"
-          (click)="setCategory(cat)"
-        >{{ cat }}</button>
-      }
-    </div>
-
-    <span class="parts-toolbar-hint">
-      {{ results().length }} part{{ results().length !== 1 ? 's' : '' }}
-    </span>
   </div>
 
-  <!-- Parts grid: the shared console metric grid. Filled slots are parts; blank
-       filler cells keep the hairline frame full (like the garage's empty slots). -->
-  <div class="parts-grid">
-    @for (part of slots(); track $index) {
-      @if (part) {
-        <div class="part-cell">
-          <div class="part-head">
-            <span class="part-eyebrow"><mat-icon>settings</mat-icon> {{ part.category }}</span>
-            <span class="part-price">${{ part.priceLow }}–${{ part.priceHigh }}</span>
-          </div>
+  <!-- Manual year/make/model row (only when "Manual" is active). -->
+  @if (manualMode()) {
+    <div class="manual-vehicle-bar">
+      <input
+        class="manual-input manual-year"
+        type="text"
+        inputmode="numeric"
+        placeholder="Year"
+        [ngModel]="manualYear()"
+        (ngModelChange)="manualYear.set($event)"
+        (blur)="applyManual()"
+        name="manualYear"
+      />
+      <input
+        class="manual-input"
+        type="text"
+        placeholder="Make"
+        [ngModel]="manualMake()"
+        (ngModelChange)="manualMake.set($event)"
+        (blur)="applyManual()"
+        name="manualMake"
+      />
+      <input
+        class="manual-input"
+        type="text"
+        placeholder="Model"
+        [ngModel]="manualModel()"
+        (ngModelChange)="manualModel.set($event)"
+        (blur)="applyManual()"
+        name="manualModel"
+      />
+      <button type="button" class="btn manual-apply" (click)="applyManual()">Apply</button>
+    </div>
+  }
 
-          <h3 class="part-name">{{ part.name }}</h3>
-          <p class="part-desc">{{ part.description }}</p>
-
-          <dl class="part-specs">
-            <div><dt>Brand</dt><dd>{{ part.brand }}</dd></div>
-            <div><dt>Part #</dt><dd class="mono">{{ part.partNumber }}</dd></div>
-            <div class="span-2"><dt>Fitment</dt><dd>{{ part.fitment }}</dd></div>
-          </dl>
-
-          @if (part.relatedCodes.length > 0) {
-            <div class="part-codes">
-              @for (code of part.relatedCodes; track code) {
-                <span class="code-tag">{{ code }}</span>
-              }
-            </div>
-          }
-        </div>
-      } @else {
-        <div class="part-cell part-cell--filler" aria-hidden="true"></div>
-      }
-    }
-
-    <!-- No results: message overlaid on the (blank) grid frame -->
-    @if (results().length === 0) {
+  <!-- Results: the shared live-parts locator (eBay search + filters + carousel +
+       send-list). Given a part name + vehicle, it runs the search itself. -->
+  <div class="parts-body">
+    @if (hasSearch()) {
+      <app-parts-locator
+        [partNames]="partNames()"
+        [vehicle]="vehicle()"
+      />
+    } @else {
       <div class="empty-overlay">
-        <mat-icon>search_off</mat-icon>
-        <p>No parts match your search.</p>
-        <button type="button" class="btn btn-action" (click)="clearFilters()">Clear filters</button>
+        <mat-icon>search</mat-icon>
+        <p>Search for a part above, or select parts from a code lookup to find live listings.</p>
       </div>
     }
   </div>

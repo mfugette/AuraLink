@@ -3,6 +3,16 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
+
+  // Hero gone (form/results shown): grow to fill the scroll region but never
+  // shrink below content (flex-basis auto). Short pages fill exactly to the
+  // footer with no scrollbar; tall pages grow and scroll, footer flowing below —
+  // instead of a fixed min-height that would overshoot the viewport by the
+  // footer's height and force a needless scrollbar.
+  &.host--flow {
+    flex: 1 0 auto;
+    min-height: 0;
+  }
 }
 
 // Centered reading column for the hero/form content (the shell itself is
@@ -523,6 +533,17 @@
 .hero-figlet--greet ::ng-deep .pt-figlet { color: var(--obd-text-muted); }
 .hero-figlet--name  ::ng-deep .pt-figlet { color: var(--obd-blue); }
 
+// On narrow viewports the pixel-block wordmark (each char is a fixed column of
+// blocks) is too wide to fit — "Welcome back" is 12 chars and clips under
+// overflow:hidden. Scale the figlet font-size down with the viewport so it fits
+// the widest line instead of being cut off. ~2.05vw hits 0.82rem near 640px and
+// shrinks below that; desktop keeps the fixed 0.82rem above.
+@media (max-width: 640px) {
+  .hero-figlet ::ng-deep .pt-figlet {
+    font-size: clamp(0.42rem, 2.05vw, 0.82rem);
+  }
+}
+
 .console-lede {
   display: flex;
   flex-direction: column;
@@ -564,7 +585,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  height: 34px;
+  height: 39px;
   padding: 0 12px;
   border-bottom: 1px solid var(--obd-border-strong);
   background: var(--obd-surface);
@@ -934,6 +955,54 @@
   margin-top: 2px;
 }
 
+// ── Auto-filled vehicle summary (shown in place of the form) ───────────────────
+// A squared hairline frame on the page base — the terminal aesthetic — naming the
+// saved vehicle, with an "enter manually" action to reveal the editable form.
+.vehicle-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 16px 18px;
+  background: var(--obd-bg, var(--obd-surface));
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-sm);
+}
+.vehicle-summary-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.vehicle-summary-eyebrow {
+  font-family: var(--obd-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--obd-text-muted);
+}
+.vehicle-summary-name {
+  font-family: var(--obd-font-display);
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--obd-text);
+}
+.vehicle-summary-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-family: var(--obd-font-mono);
+  font-size: 0.78rem;
+  color: var(--obd-text-dim);
+
+  .vehicle-summary-vin { color: var(--obd-text-muted); letter-spacing: 0.02em; }
+}
+.vehicle-summary-edit {
+  flex-shrink: 0;
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
 // ── Lookup bar ────────────────────────────────────────────────────────────────
 .lookup-bar {
   display: flex;
@@ -997,4 +1066,51 @@
 .results-region {
   display: flex;
   flex-direction: column;
+}
+
+// ── Step 4: Find Parts hand-off (routes to the Part Lookup page) ──────────────
+.find-parts-handoff {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.handoff-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+
+  .chip-label {
+    font-family: var(--obd-font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--obd-text-muted);
+    white-space: nowrap;
+  }
+}
+
+.handoff-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--obd-radius-sm);
+  font-family: var(--obd-font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--obd-text);
+  background: var(--obd-surface-3);
+  border: 1px solid var(--obd-border);
+}
+
+.find-parts-btn {
+  flex-shrink: 0;
+  gap: 8px;
+  white-space: nowrap;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
 }

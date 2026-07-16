@@ -30,9 +30,14 @@
                   </p>
                   <div class="console-actions">
                     <button type="button" class="term-btn is-primary" (click)="scrollToForm()">[ enter codes ]</button>
-                    <button type="button" class="term-btn is-primary" (click)="enterLiveMode()">[ sync ]</button>
+                    <button type="button" class="term-btn is-primary" (click)="go('/my-vehicles')">[ my vehicles ]</button>
+                    <!-- <button type="button" class="term-btn is-primary" (click)="enterLiveMode()">[ sync ]</button> -->
                     <button type="button" class="term-btn" (click)="go('/dashboard')">[ telemetry ]</button>
+                    <button type="button" class="term-btn" (click)="go('/part-lookup')">[ find parts ]</button>
+                    <button type="button" class="term-btn" (click)="go('/nearby')">[ get help ]</button>
                     <button type="button" class="term-btn" (click)="go('/history')">[ history ]</button>
+                    <button type="button" class="term-btn" >[ sign out ]</button>
+
                   </div>
                 </div>
 
@@ -205,7 +210,28 @@
             <p class="obd-section-subtitle">Used to find the right parts for your year, make, and model.</p>
           </div>
         </div>
-        <app-vehicle-selector [initialVehicle]="vehicle()" (vehicleChanged)="onVehicleChanged($event)" />
+
+        @if (!manualVehicle()) {
+          <!-- Auto-filled from the user's saved vehicle: a compact terminal
+               summary in place of the form, with "enter manually" to reveal it. -->
+          <div class="vehicle-summary">
+            <div class="vehicle-summary-main">
+              <span class="vehicle-summary-eyebrow">— using saved vehicle</span>
+              <span class="vehicle-summary-name">{{ vehicleSummary().name }}</span>
+              <div class="vehicle-summary-specs">
+                @if (vehicleSummary().trim) { <span>{{ vehicleSummary().trim }}</span> }
+                @if (vehicleSummary().engine) { <span>{{ vehicleSummary().engine }}</span> }
+                @if (vehicleSummary().vin) { <span class="vehicle-summary-vin">VIN {{ vehicleSummary().vin }}</span> }
+              </div>
+            </div>
+            <button type="button" class="btn btn-action vehicle-summary-edit" (click)="enterManualVehicle()">
+              <mat-icon>edit</mat-icon>
+              Enter manually
+            </button>
+          </div>
+        } @else {
+          <app-vehicle-selector [initialVehicle]="vehicle()" (vehicleChanged)="onVehicleChanged($event)" />
+        }
       </section>
 
       <!-- Lookup button -->
@@ -248,7 +274,7 @@
             />
           </section>
 
-          <!-- Step 4: Parts locator (only when user has selected parts in Step 3) -->
+          <!-- Step 4: Find Parts hand-off (only when user has selected parts in Step 3) -->
           @if (selectedParts().length > 0) {
             <hr class="divider section-divider" />
             <section class="card-section">
@@ -257,14 +283,24 @@
                 <div>
                   <div class="obd-section-title"><mat-icon>store</mat-icon> Find Parts</div>
                   <p class="obd-section-subtitle">
-                    Locate the parts you selected at your preferred online retailer and send your shopping list.
+                    Look up live listings for the parts you selected — scoped to your vehicle — on the Part Lookup page.
                   </p>
                 </div>
               </div>
-              <app-parts-locator
-                [partNames]="selectedParts()"
-                [vehicle]="vehicle()"
-              />
+
+              <div class="find-parts-handoff">
+                <div class="handoff-chips">
+                  <span class="chip-label">Selected:</span>
+                  @for (p of selectedParts(); track p) {
+                    <span class="handoff-chip">{{ p }}</span>
+                  }
+                </div>
+                <button type="button" class="btn btn-action find-parts-btn" (click)="goToPartLookup()">
+                  <mat-icon>store</mat-icon>
+                  Find these parts
+                  <mat-icon>arrow_forward</mat-icon>
+                </button>
+              </div>
             </section>
           }
         </div>

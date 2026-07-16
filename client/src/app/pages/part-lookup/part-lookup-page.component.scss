@@ -2,16 +2,15 @@
 @use '../console-page' as console;
 
 // Part Lookup on the shared instrument-console system: same viewport-locked
-// shell, 44px toolbar seam (search + category filters live there), and the
-// 4-across hairline metric grid as the Dashboard and My Vehicles. Results are
-// flat console cells; blank filler slots keep the frame full, and >12 results
-// scroll within the grid frame.
+// shell, 44px toolbar seam (part search + vehicle scope live there). The body
+// hosts the live parts locator (eBay results), so there's no catalog grid — the
+// page only shows real listings for a real part.
 :host { @include console.host; }
 .page { @include console.page; }
 .page-eyebrow { @include console.eyebrow; }
 .page-head { @include console.head; }
 
-// ── Console toolbar: search · category chips · result count ───────────────────
+// ── Console toolbar: part search · vehicle scope ──────────────────────────────
 .parts-toolbar { @include console.toolbar; }
 
 // Terminal-style search: green "parts$" prompt + mono input (matches the shared
@@ -23,7 +22,7 @@
   flex: 0 1 320px;
   min-width: 170px;
   height: 30px;
-  padding: 0 8px 0 10px;
+  padding: 0 6px 0 10px;
   background: var(--obd-bg, var(--obd-surface));
   border: 1px solid var(--obd-border-strong);
   border-radius: var(--obd-radius-sm);
@@ -55,7 +54,8 @@
   &::placeholder { color: var(--obd-text-muted); }
 }
 
-.toolbar-search-clear {
+.toolbar-search-clear,
+.toolbar-search-go {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -68,10 +68,10 @@
   mat-icon { font-size: 14px; width: 14px; height: 14px; }
   &:hover { background: var(--obd-surface-4); color: var(--obd-text); }
 }
+.toolbar-search-go { color: var(--obd-green); mat-icon { font-size: 16px; width: 16px; height: 16px; } }
 
-// Category chips: compact mono console filters, horizontally scrollable so the
-// toolbar keeps its fixed height at any width.
-.cat-chips {
+// ── Vehicle scope: saved-vehicle chips + manual toggle ────────────────────────
+.vehicle-scope {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -82,8 +82,21 @@
   &::-webkit-scrollbar { display: none; }
 }
 
-.cat-chip {
+.scope-label {
   flex-shrink: 0;
+  font-family: var(--obd-font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--obd-text-muted);
+}
+
+.scope-chip {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   padding: 4px 10px;
   border-radius: var(--obd-radius-sm);
   border: 1px solid transparent;
@@ -91,12 +104,12 @@
   font-family: var(--obd-font-mono);
   font-size: 0.66rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
   white-space: nowrap;
   transition: border-color var(--obd-dur-fast) var(--obd-ease),
               background var(--obd-dur-fast) var(--obd-ease),
               color var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 13px; width: 13px; height: 13px; }
 
   &:hover { color: var(--obd-text); }
 
@@ -107,149 +120,74 @@
   }
 }
 
-.parts-toolbar-hint { @include console.toolbar-hint; }
+.scope-chip--manual { text-transform: uppercase; letter-spacing: 0.04em; }
 
-// ── Parts grid: the shared console metric grid ────────────────────────────────
-.parts-grid {
-  @include console.grid;
-  // Rows never compress below a legible cell height: ≤12 results share the
-  // frame height evenly (gauge-like); more than that, rows floor at 250px and
-  // the grid scrolls within the frame.
-  grid-auto-rows: minmax(250px, 1fr);
-  position: relative;   // anchors the no-results overlay
-  overflow-y: auto;     // >12 results scroll within the frame
-
-  @media (max-width: 720px) { grid-auto-rows: auto; }
-}
-
-// A flat console cell (same language as the garage's vehicle cells).
-.part-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 16px 20px 16px;
-  background: var(--obd-bg, var(--obd-surface));
-  min-width: 0;
-  overflow: hidden;
-}
-
-// Blank filler slot — keeps the hairline frame full when results < 12.
-.part-cell--filler { padding: 0; }
-
-.part-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.part-eyebrow {
+.scope-clear {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  min-width: 0;
-  font-family: var(--obd-font-mono);
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 600;
-  color: var(--obd-text-dim);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--obd-radius-sm);
+  color: var(--obd-text-muted);
 
-  mat-icon { flex-shrink: 0; font-size: 15px; width: 15px; height: 15px; color: var(--obd-blue); }
+  mat-icon { font-size: 14px; width: 14px; height: 14px; }
+  &:hover { background: var(--obd-surface-4); color: var(--obd-text); }
 }
 
-.part-price {
-  flex-shrink: 0;
-  font-family: var(--obd-font-mono);
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--obd-green);
-  font-variant-numeric: tabular-nums;
+// ── Manual year/make/model bar (below the toolbar when "Manual" is active) ────
+.manual-vehicle-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0 2px;
+  flex-wrap: wrap;
 }
 
-.part-name {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 750;
-  letter-spacing: -0.01em;
+.manual-input {
+  height: 30px;
+  padding: 0 10px;
+  background: var(--obd-bg, var(--obd-surface));
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-sm);
   color: var(--obd-text);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-family: var(--obd-font-mono);
+  font-size: 0.78rem;
+  min-width: 0;
+  flex: 1 1 120px;
+
+  &::placeholder { color: var(--obd-text-muted); }
+  &:focus { outline: none; border-color: var(--obd-blue); }
+}
+.manual-year { flex: 0 0 90px; }
+
+.manual-apply {
+  height: 30px;
+  padding: 0 16px;
+  flex-shrink: 0;
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-sm);
+  color: var(--obd-blue);
+  font-family: var(--obd-font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+
+  &:hover { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 10%, transparent); }
 }
 
-.part-desc {
-  margin: 0;
-  font-size: 0.8rem;
-  line-height: 1.45;
-  color: var(--obd-text-dim);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-// Mono key/value readout, same pattern as the garage cells' specs.
-.part-specs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-content: start;
-  gap: 8px 16px;
-  margin: 2px 0 0;
+// ── Body: the live parts locator (or the empty prompt) ────────────────────────
+.parts-body {
   flex: 1 1 auto;
   min-height: 0;
-  overflow: hidden;
-
-  div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .span-2 { grid-column: 1 / -1; }
-
-  dt {
-    font-family: var(--obd-font-mono);
-    font-size: 0.6rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--obd-text-muted);
-  }
-
-  dd {
-    margin: 0;
-    font-size: 0.82rem;
-    color: var(--obd-text);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    &.mono { font-family: var(--obd-font-mono); font-size: 0.76rem; letter-spacing: 0.02em; }
-  }
+  overflow-y: auto;
+  position: relative;
+  padding-top: 18px;
 }
 
-// Related DTC tags pinned to the bottom of the cell.
-.part-codes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: auto;
-  padding-top: 10px;
-  border-top: 1px solid var(--obd-border);
-}
-
-.code-tag {
-  padding: 2px 7px;
-  border-radius: var(--obd-radius-sm);
-  font-family: var(--obd-font-mono);
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: var(--obd-yellow, #e2b23c);
-  background: color-mix(in srgb, var(--obd-yellow, #e2b23c) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--obd-yellow, #e2b23c) 35%, transparent);
-}
-
-// No-results message, overlaid on the blank grid frame.
+// Empty prompt (no active search) overlaid on the body region.
 .empty-overlay {
   position: absolute;
   inset: 0;
@@ -260,7 +198,8 @@
   gap: 12px;
   color: var(--obd-text-muted);
   text-align: center;
+  padding: 24px;
 
   mat-icon { font-size: 40px; width: 40px; height: 40px; color: var(--obd-blue); opacity: 0.7; }
-  p { margin: 0; font-size: 0.9rem; }
+  p { margin: 0; font-size: 0.9rem; max-width: 42ch; }
 }
