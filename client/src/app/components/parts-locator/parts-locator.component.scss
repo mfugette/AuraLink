@@ -1,7 +1,20 @@
+// The locator fills its host cell and manages its own scroll: the results bar +
+// filters stay fixed, and only the grid inside .results-scroll moves. This keeps
+// the page viewport-locked (console layout) with the parts list as the sole
+// scroll region.
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .parts-locator {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  flex: 1;
+  min-height: 0;
+  gap: 14px;
 }
 
 // ── Error state ───────────────────────────────────────────────────────────────
@@ -39,11 +52,16 @@
 .parts-needed-chips {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
+  flex-shrink: 0;
 
   .chip-label {
-    font-size: 0.75rem;
+    font-family: var(--obd-font-mono);
+    font-size: 0.62rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
     color: var(--obd-text-muted);
     white-space: nowrap;
   }
@@ -52,13 +70,14 @@
 .parts-chip {
   display: inline-flex;
   align-items: center;
-  padding: 6px 14px;
-  border-radius: var(--obd-radius-pill);
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: var(--obd-text);
-  background: var(--obd-surface-3);
-  border: 1px solid var(--obd-border);
+  padding: 3px 9px;
+  border-radius: var(--obd-radius-sm);
+  font-family: var(--obd-font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--obd-blue);
+  background: color-mix(in srgb, var(--obd-blue) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--obd-blue) 32%, transparent);
 }
 
 // ── Loading ───────────────────────────────────────────────────────────────────
@@ -76,96 +95,108 @@
 .results-section {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  flex: 1;
+  min-height: 0;
 }
 
-.results-header {
+// Fixed control strip: listing count (left) · selected total · filters (right).
+// Sits on the toolbar seam; the grid below is the only thing that scrolls. The
+// bottom hairline is full-bleed (pulled to both gutters) so it spans the whole
+// width and reads as the grid's top seam, like the other console pages.
+.results-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 14px;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 6px 40px;
+  margin: 0 -40px;
   flex-wrap: wrap;
-  gap: 8px;
+  border-bottom: 1px solid var(--obd-border-strong);
+
+  @media (max-width: 900px) { margin: 0 -24px; padding-left: 24px; padding-right: 24px; }
+  @media (max-width: 600px) { margin: 0 -16px; padding-left: 16px; padding-right: 16px; }
 }
 
 .results-title {
   margin: 0;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-family: var(--obd-font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: var(--obd-text-dim);
+  white-space: nowrap;
+
+  .rt-dim { color: var(--obd-text-muted); font-weight: 400; }
 }
 
 .selected-summary {
-  font-size: 0.85rem;
+  font-family: var(--obd-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
   color: var(--obd-text-dim);
+  white-space: nowrap;
 
   strong { color: var(--obd-green); }
 }
 
-// ── Filters bar ───────────────────────────────────────────────────────────────
+// ── Filters bar (right-aligned on the control strip) ──────────────────────────
 .filters-bar {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 18px;
-  padding: 16px 18px;
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border);
-  border-radius: var(--obd-radius);
-  box-shadow: var(--obd-shadow-sm);
+  align-items: center;
+  gap: 4px 14px;
+  margin-left: auto;
 }
 
 .filter-group {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 7px;
 }
 
 .filter-label {
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-family: var(--obd-font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.08em;
   color: var(--obd-text-muted);
+  white-space: nowrap;
 }
 
 .filter-chips {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px;
 }
 
 .filter-chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  height: 32px;
-  padding: 0 12px;
-  font-size: 0.8rem;
-  font-family: inherit;
-  font-weight: 500;
+  gap: 4px;
+  height: 26px;
+  padding: 0 9px;
+  font-family: var(--obd-font-mono);
+  font-size: 0.66rem;
+  font-weight: 600;
   color: var(--obd-text-dim);
-  background: var(--obd-surface-3);
-  border: 1px solid var(--obd-border);
-  border-radius: var(--obd-radius-pill);
+  background: transparent;
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-sm);
   cursor: pointer;
+  white-space: nowrap;
   transition: border-color var(--obd-dur-fast) var(--obd-ease),
               color var(--obd-dur-fast) var(--obd-ease),
-              background var(--obd-dur-fast) var(--obd-ease),
-              transform var(--obd-dur-fast) var(--obd-ease-spring);
+              background var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+  mat-icon { font-size: 13px; width: 13px; height: 13px; }
 
-  &:hover {
-    border-color: rgba(59, 130, 246, 0.4);
-    background: var(--obd-surface-4);
-    color: var(--obd-text);
-  }
-
-  &:active { transform: scale(0.96); }
+  &:hover { border-color: var(--obd-text-muted); color: var(--obd-text); }
 
   &.active {
-    background: var(--obd-blue-dim);
-    border-color: var(--obd-blue);
+    background: color-mix(in srgb, var(--obd-blue) 12%, transparent);
+    border-color: color-mix(in srgb, var(--obd-blue) 45%, transparent);
     color: var(--obd-blue);
   }
 }
@@ -173,65 +204,91 @@
 .price-range {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .price-input-wrap {
   display: flex;
   align-items: center;
-  gap: 3px;
-  height: 32px;
-  padding: 0 10px;
-  background: var(--obd-surface-3);
-  border: 1px solid var(--obd-border);
+  gap: 2px;
+  height: 26px;
+  padding: 0 8px;
+  background: var(--obd-bg, var(--obd-surface));
+  border: 1px solid var(--obd-border-strong);
   border-radius: var(--obd-radius-sm);
 
   span {
-    font-size: 0.8rem;
+    font-family: var(--obd-font-mono);
+    font-size: 0.66rem;
     color: var(--obd-text-muted);
   }
 
   input {
-    width: 56px;
+    width: 40px;
     background: transparent;
     border: none;
     outline: none;
     color: var(--obd-text);
-    font-size: 0.8rem;
-    font-family: inherit;
+    font-family: var(--obd-font-mono);
+    font-size: 0.66rem;
 
     // Hide native number spinners
     -moz-appearance: textfield;
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   }
+
+  &:focus-within { border-color: var(--obd-blue); }
 }
 
 .price-sep {
   color: var(--obd-text-muted);
-  font-size: 0.8rem;
+  font-size: 0.7rem;
 }
 
 .clear-filters-btn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  height: 32px;
-  padding: 0 10px;
-  margin-left: auto;
-  font-size: 0.8rem;
-  font-family: inherit;
-  font-weight: 500;
+  height: 26px;
+  padding: 0 9px;
+  font-family: var(--obd-font-mono);
+  font-size: 0.64rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: var(--obd-text-muted);
   background: none;
-  border: none;
+  border: 1px solid transparent;
+  border-radius: var(--obd-radius-sm);
   cursor: pointer;
-  transition: color 0.15s;
-  align-self: flex-end;
+  transition: color var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+  mat-icon { font-size: 13px; width: 13px; height: 13px; }
 
-  &:hover { color: var(--obd-red); }
+  &:hover { color: var(--obd-red); border-color: color-mix(in srgb, var(--obd-red) 40%, transparent); }
+}
+
+// ── Scroll region: the ONLY scrolling part of the page ────────────────────────
+// A flex column so the grid inside can grow to fill the available height (rows
+// share the space, so the cards always reach the pager — no dead grey band).
+.results-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  // App background (not the translucent grid seam colour) so any incomplete last
+  // row / short list reads as the page ground, matching the rest of the app.
+  background: var(--obd-bg);
+  // Full-bleed: pull to both gutters so the hairline card grid touches the
+  // sidebar/window edges like the metric grids on other console pages.
+  margin: 0 -40px;
+  scrollbar-width: thin;
+
+  @media (max-width: 900px) { margin: 0 -24px; }
+  @media (max-width: 600px) { margin: 0 -16px; }
 }
 
 // ── No matches (filters too narrow) ─────────────────────────────────────────────
@@ -251,55 +308,63 @@
   .clear-filters-btn { margin: 0; }
 }
 
+// Blocky hairline grid: cards pack edge-to-edge, filling the width AND height —
+// like the metric grids on the other console pages. Rows share the available
+// height (grid-auto-rows: 1fr) so the cards always fill down to the pager; the
+// card image flexes with the row so there's never a dead band. Hairlines are
+// drawn on the CARDS (right + bottom border), NOT via a background-bleed — so
+// any empty cell / short list shows the plain app background, exactly like the
+// "no search yet" state. No rounded corners, no shadow.
 .parts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-auto-rows: minmax(300px, 1fr);   // rows grow to fill; floor keeps legible
+  flex: 1;                              // fill the scroll region's height
+  min-height: 0;
+  align-content: stretch;
+  background: var(--obd-bg);            // empty area = app ground, not grey seams
 
-  @media (max-width: 480px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
+  @media (max-width: 600px)  { grid-template-columns: repeat(2, 1fr); grid-auto-rows: minmax(280px, 1fr); }
 }
 
 .part-card {
   display: flex;
   flex-direction: column;
-  background: var(--obd-surface-2);
-  border: 1px solid var(--obd-border);
-  border-radius: var(--obd-radius-lg);
+  min-height: 0;                         // fill its 1fr row cleanly
+  background: var(--obd-bg, var(--obd-surface));
+  // Hairline seams live on the card, so only real cards are ruled.
+  border-right: 1px solid var(--obd-border);
+  border-bottom: 1px solid var(--obd-border);
   cursor: pointer;
   overflow: hidden;
-  box-shadow: var(--obd-shadow-sm);
-  transition: border-color var(--obd-dur) var(--obd-ease),
-              box-shadow var(--obd-dur) var(--obd-ease),
-              transform var(--obd-dur) var(--obd-ease-spring);
+  position: relative;
+  transition: background var(--obd-dur-fast) var(--obd-ease);
 
-  &:hover {
-    border-color: var(--obd-border-strong);
-    box-shadow: var(--obd-shadow);
-    transform: translateY(-4px);
-  }
+  &:hover { background: var(--obd-surface-2); }
 
   &.selected {
-    border-color: var(--obd-blue);
-    box-shadow: 0 0 0 2px var(--obd-blue), var(--obd-shadow);
+    background: color-mix(in srgb, var(--obd-blue) 10%, var(--obd-bg));
+    // Inner ring instead of a growing outline so the grid geometry never shifts.
+    box-shadow: inset 0 0 0 1px var(--obd-blue);
   }
 }
 
 // ── Image carousel ────────────────────────────────────────────────────────────
+// The image flexes to absorb the row's extra height (the info block below stays
+// its natural size), so a short list grows taller cards instead of a dead band.
 .part-image-wrap {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  flex: 1 1 auto;
+  min-height: 180px;                     // legibility floor
   background: var(--obd-surface-3);
   overflow: hidden;
-  flex-shrink: 0;
 }
 
 .part-image-track {
   display: flex;
-  height: 100%;
+  position: absolute;
+  inset: 0;                              // fill the flexed wrap regardless of height
   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -312,8 +377,8 @@
 }
 
 .part-image-placeholder {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -380,29 +445,34 @@
 
 .selected-badge {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
+  top: 0;
+  right: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 0 0 0 var(--obd-radius-sm);
   background: var(--obd-blue);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 
-  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
 }
 
 // ── Card info ─────────────────────────────────────────────────────────────────
+// Fixed height (does NOT grow) so every card's info block is identical and the
+// image above absorbs the row's extra height. Each row reserves its space
+// (2-line title, one badge line) so no card is taller/shorter than its peers.
 .part-info {
-  flex: 1;
+  flex: 0 0 auto;
+  height: 112px;
+  box-sizing: border-box;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 12px;
+  gap: 5px;
+  padding: 10px 12px 12px;
+  overflow: hidden;
 }
 
 .part-header {
@@ -413,6 +483,7 @@
 }
 
 .part-price {
+  font-family: var(--obd-font-mono);
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--obd-green);
@@ -432,10 +503,13 @@
   mat-icon { font-size: 15px; width: 15px; height: 15px; }
 }
 
+// Always reserve two lines so single- and two-line titles occupy the same space
+// (keeps every info block the same height).
 .listing-title {
   font-size: 0.78rem;
   color: var(--obd-text-dim);
   line-height: 1.4;
+  height: calc(0.78rem * 1.4 * 2);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -443,28 +517,37 @@
 }
 
 .part-number {
-  font-size: 0.73rem;
+  font-size: 0.72rem;
   color: var(--obd-text-muted);
-  font-family: 'Courier New', monospace;
+  font-family: var(--obd-font-mono);
+  height: calc(0.78rem * 1.4 * 2);       // same reserved height as the title
+  display: flex;
+  align-items: flex-start;
 }
 
-// ── Card badges ───────────────────────────────────────────────────────────────
+// ── Card badges (squared, mono, tinted — per the design language) ─────────────
+// Single clipped line so a card with many badges is no taller than one with few.
 .part-badges {
   display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin: 2px 0;
+  flex-wrap: nowrap;
+  gap: 4px;
+  margin: 1px 0;
+  height: 18px;
+  overflow: hidden;
 }
 
 .badge {
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
   gap: 3px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: var(--obd-radius-sm);
+  font-family: var(--obd-font-mono);
+  font-size: 0.62rem;
   font-weight: 600;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
   background: var(--obd-surface-3);
   color: var(--obd-text-muted);
 
@@ -483,10 +566,17 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 0.78rem;
+  font-family: var(--obd-font-mono);
+  font-size: 0.72rem;
   color: var(--obd-text-muted);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  span { overflow: hidden; text-overflow: ellipsis; }
 
   mat-icon {
+    flex-shrink: 0;
     font-size: 13px;
     width: 13px;
     height: 13px;
@@ -513,16 +603,20 @@
   &.out-stock { color: var(--obd-text-muted); }
 }
 
-// ── Notification panel ────────────────────────────────────────────────────────
+// ── Notification panel (fixed action footer below the scroll region) ──────────
 .notify-panel {
+  flex-shrink: 0;
   background: var(--obd-surface-2);
-  border: 1px solid var(--obd-blue-glow);
-  border-radius: var(--obd-radius-lg);
-  padding: 22px;
+  border-top: 1px solid var(--obd-blue-glow);
+  // Full-bleed to the gutters so it reads as a footer bar under the grid.
+  margin: 0 -40px;
+  padding: 14px 40px 4px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  box-shadow: var(--obd-shadow-sm);
+  gap: 12px;
+
+  @media (max-width: 900px) { margin: 0 -24px; padding-left: 24px; padding-right: 24px; }
+  @media (max-width: 600px) { margin: 0 -16px; padding-left: 16px; padding-right: 16px; }
 }
 
 .notify-title {
@@ -661,22 +755,77 @@
   strong { color: var(--obd-text); }
 }
 
-// ── Parts groups ──────────────────────────────────────────────────────────────
-.part-group {
+// ── Pager bar (fixed-height strip above the footer) ───────────────────────────
+.pager-bar {
+  flex-shrink: 0;
+  height: 48px;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  // Full-bleed to the gutters; its top hairline closes off the grid.
+  margin: 0 -40px;
+  padding: 0 40px;
+  border-top: 1px solid var(--obd-border-strong);
+
+  @media (max-width: 900px) { margin: 0 -24px; padding: 0 24px; }
+  @media (max-width: 600px) { margin: 0 -16px; padding: 0 16px; }
 }
 
-.group-heading {
-  margin: 0;
-  font-size: 0.85rem;
-  font-weight: 700;
+.pager-range {
+  font-family: var(--obd-font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: var(--obd-text-muted);
+  white-space: nowrap;
+}
+
+.pager-controls {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.pager-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  font-family: var(--obd-font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
   color: var(--obd-text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid var(--obd-border);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--obd-radius-sm);
+  cursor: pointer;
+  transition: border-color var(--obd-dur-fast) var(--obd-ease),
+              color var(--obd-dur-fast) var(--obd-ease),
+              background var(--obd-dur-fast) var(--obd-ease);
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+
+  &:hover:not(:disabled):not(.active) { border-color: var(--obd-border-strong); color: var(--obd-text); }
+
+  &.active {
+    color: var(--obd-blue);
+    background: color-mix(in srgb, var(--obd-blue) 12%, transparent);
+    border-color: color-mix(in srgb, var(--obd-blue) 45%, transparent);
+  }
+
+  &:disabled { opacity: 0.35; cursor: default; }
+}
+
+.pager-step { color: var(--obd-text-muted); }
+
+.pager-gap {
+  padding: 0 2px;
+  font-family: var(--obd-font-mono);
+  font-size: 0.72rem;
+  color: var(--obd-text-muted);
+  user-select: none;
 }
 
 // ── Empty state ───────────────────────────────────────────────────────────────

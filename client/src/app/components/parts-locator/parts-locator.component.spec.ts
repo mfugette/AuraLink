@@ -76,6 +76,51 @@ describe('PartsLocatorComponent', () => {
     expect(component.filteredResults()[0].part.price).toBe(20);
   });
 
+  it('paginates the filtered list into pages of pageSize', () => {
+    component.results.set(Array.from({ length: 30 }, (_, i) => fakeResult(i + 1)));
+    expect(component.pageSize).toBe(12);
+    expect(component.totalPages()).toBe(3);
+    expect(component.pagedResults().length).toBe(12);
+    expect(component.pageStart()).toBe(1);
+    expect(component.pageEnd()).toBe(12);
+
+    component.nextPage();
+    expect(component.currentPage()).toBe(2);
+    expect(component.pageStart()).toBe(13);
+    expect(component.pagedResults()[0].part.price).toBe(13);
+
+    component.goToPage(3);
+    expect(component.pagedResults().length).toBe(6); // 30 → last page has 6
+    expect(component.pageEnd()).toBe(30);
+  });
+
+  it('goToPage clamps to the valid page range', () => {
+    component.results.set(Array.from({ length: 15 }, (_, i) => fakeResult(i + 1)));
+    component.goToPage(99);
+    expect(component.currentPage()).toBe(2); // clamped to last page
+    component.goToPage(-5);
+    expect(component.currentPage()).toBe(1); // clamped to first page
+  });
+
+  it('applying a filter resets pagination to the first page', () => {
+    component.results.set(Array.from({ length: 30 }, (_, i) =>
+      fakeResult(i + 1, { sellerRating: i % 2 === 0 ? 5 : 3 })));
+    component.goToPage(3);
+    expect(component.currentPage()).toBe(3);
+    component.setMinRating(4);
+    expect(component.currentPage()).toBe(1); // jumped back after re-scoping
+  });
+
+  it('currentPage stays valid when a filter shrinks the list below the current page', () => {
+    component.results.set(Array.from({ length: 30 }, (_, i) =>
+      fakeResult(i + 1, { freeShipping: i < 3 })));
+    component.goToPage(3);
+    component.toggleFreeShippingOnly(); // only 3 remain → 1 page
+    expect(component.totalPages()).toBe(1);
+    expect(component.currentPage()).toBe(1);
+    expect(component.pagedResults().length).toBe(3);
+  });
+
   it('sendList does NOT hit the server when signed out (guest gate)', async () => {
     (TestBed.inject(AuthService) as unknown as { _session: WritableSignal<Session | null> })._session.set(null);
     component.isMobile.set(false);

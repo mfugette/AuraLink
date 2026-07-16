@@ -179,12 +179,16 @@
 }
 
 // ── Body: the live parts locator (or the empty prompt) ────────────────────────
+// The locator owns its own scroll (fixed results bar + filters, scrolling grid),
+// so the body is just a viewport-locked flex host — no scroll here. Its bottom
+// hairline is the toolbar seam; the locator's grid full-bleeds inside it.
 .parts-body {
   flex: 1 1 auto;
   min-height: 0;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   position: relative;
-  padding-top: 18px;
+  padding-top: 12px;
 }
 
 // Empty prompt (no active search) overlaid on the body region.

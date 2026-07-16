@@ -121,12 +121,79 @@ This pass unifies them:
    "browse by category" mode is ever wanted, back it with real listings — do not
    reintroduce a static seed.
 
-## Files touched (for review) — NOT yet committed
+## Files touched (for review) — landed in `e1cede1`
 Modified: `pages/home/home-page.component.{html,ts,scss}`,
 `pages/part-lookup/part-lookup-page.component.{ts,html,scss,spec.ts}`.
 Deleted: `data/parts-catalog.ts`.
 (`app.routes.ts` was touched only by the temporary verify alias, which is reverted
-— it should show no diff.)
+— it shows no diff.)
 
 These sit on `feat/db-backing-pass` alongside the earlier DB-backing + UI passes
 (see `HANDOFF_DB_BACKING.md`); this parts work is a separate, self-contained change.
+
+---
+
+## UI polish pass — Part Lookup on the console layout (2026-07-16, session 2)
+A follow-up **UI-only** pass on the same branch. No server / DB / API-contract
+changes; only the `parts-locator` component (now the single surface using it) and
+the Part Lookup page host were touched. The functional behaviour (eBay search,
+vehicle scope, DTC hand-off, send-list) is unchanged.
+
+### What changed & why
+The locator had been dropped onto Part Lookup as-is (rounded shadowed SaaS cards,
+whole-page scroll, filters stacked above a gappy grid) and didn't match the app's
+instrument-console / terminal design language. This pass conforms it:
+
+- **Only the parts grid scrolls.** The locator is now a flex column filling its
+  host: a **fixed control strip** (`.results-bar` — listing count · selected
+  total · filters) stays put, the grid scrolls inside `.results-scroll`, and the
+  send-list panel is a **fixed footer** below the scroll region. The page host
+  (`.parts-body`) no longer owns scroll — it's a viewport-locked flex host.
+- **Filters moved to the far right of the control strip** (`margin-left:auto`),
+  restyled as compact 26px squared mono chips with tinted-active states. The
+  strip's bottom hairline is **full-bleed** (pulled to both gutters) so it spans
+  the width and reads as the grid's top seam.
+- **Blocky hairline grid packed edge-to-edge.** `grid-template-columns:
+  repeat(auto-fill, minmax(220px, 1fr))`, `grid-auto-rows: minmax(300px, 1fr)`,
+  `flex:1` so rows **share the height and grow to reach the pager** (no dead
+  band) — same idea as the metric grids. Square cards, no shadow, no hover-lift
+  (hover just tints; selected = inset blue ring so geometry never shifts).
+- **Per-part group headings removed** — a single flat grid over the paginated
+  list, so cards sit directly beneath the filter row. (The `groupedResults`
+  getter was deleted; multi-part DTC hand-offs now interleave by page.)
+- **Pagination** — `pageSize = 12`; a **fixed 48px `.pager-bar`** above the footer
+  shows `start–end of N` + `‹ 1 2 … N ›` (mono, tinted active page, disabled
+  ends). Page resets to 1 on any filter change / new search; `currentPage` is
+  clamped so a shrinking filtered set never strands you past the last page.
+- **Uniform card heights.** `.part-info` is a fixed **112px** block: the title
+  always reserves **2 lines** (`height: calc(0.78rem*1.4*2)`), badges are a
+  **single clipped line** (`flex-wrap:nowrap`, 18px). The image
+  (`.part-image-wrap`) flexes to absorb the row's extra height (min 180px), so a
+  short result set grows **bigger images**, not emptier cards. `.part-info` is
+  `flex:0 0 auto`; the image track/placeholder use `position:absolute; inset:0`.
+- **Empty area matches the "no search" ground.** Hairlines are drawn on the
+  **cards** (`border-right`/`border-bottom`), not via a background-bleed, and the
+  grid/scroll background is `--obd-bg` — so an incomplete last row or between-page
+  space reads as the plain app background (`#0b0d11`), not grey seams.
+
+### Files touched (this pass) — committed this session
+Modified: `components/parts-locator/parts-locator.component.{ts,html,scss,spec.ts}`,
+`pages/part-lookup/part-lookup-page.component.scss`.
+Added 4 pagination unit tests (pageSize/window, clamp, filter-resets-page,
+shrink-below-current-page).
+
+### Verification
+- `ng build --configuration development` clean.
+- `parts-locator` spec **11/11**, `part-lookup` spec green (19/19 across both).
+- **Not runtime-driven in a browser this pass** — `/part-lookup` is auth-gated and
+  no Playwright/browser-driver was available in the session; confirmation rests on
+  the compile + test pass and the user's live `ng serve` view (iterated against
+  screenshots). If revisiting, drive it via a temporary unguarded alias (added +
+  reverted) as the original pass did, or while signed in.
+
+### Open items / next steps
+1. **Card proportions are a visual judgment.** With 12 items over ~2 rows in a tall
+   viewport the images get large; if that reads sparse, either raise the row floor
+   cap or bump `pageSize`. Left at `minmax(300px,1fr)` / `pageSize=12`.
+2. The fixed **112px** `.part-info` height is a best-fit estimate — watch for a
+   clipped badge line / title at unusual font scales.

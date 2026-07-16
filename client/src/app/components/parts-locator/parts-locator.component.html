@@ -31,12 +31,14 @@
   <!-- Results -->
   @if (!searching() && results().length > 0) {
     <div class="results-section">
-      <div class="results-header">
+      <!-- Fixed control strip: count (left) · selected total · filters (right).
+           Only the grid below this strip scrolls. -->
+      <div class="results-bar">
         <h4 class="results-title">
           @if (hasActiveFilters()) {
-            Showing {{ filteredResults().length }} of {{ results().length }} listings
+            {{ filteredResults().length }}<span class="rt-dim"> / {{ results().length }}</span> listings
           } @else {
-            {{ results().length }} listing{{ results().length !== 1 ? 's' : '' }} found on eBay
+            {{ results().length }} listing{{ results().length !== 1 ? 's' : '' }} on eBay
           }
         </h4>
         @if (selectedCount > 0) {
@@ -44,98 +46,99 @@
             {{ selectedCount }} selected · <strong>${{ selectedTotal.toFixed(2) }}</strong>
           </span>
         }
-      </div>
 
-      <!-- Filters -->
-      <div class="filters-bar">
-        <div class="filter-group">
-          <span class="filter-label">Condition</span>
-          <div class="filter-chips">
-            @for (c of conditionOptions; track c) {
+        <!-- Filters, pushed to the far right of the control strip. -->
+        <div class="filters-bar">
+          <div class="filter-group">
+            <span class="filter-label">Cond</span>
+            <div class="filter-chips">
+              @for (c of conditionOptions; track c) {
+                <button
+                  type="button"
+                  class="filter-chip"
+                  [class.active]="filterConditions().has(c)"
+                  (click)="toggleCondition(c)"
+                >
+                  {{ c }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">Rating</span>
+            <div class="filter-chips">
+              @for (r of ratingOptions; track r.value) {
+                <button
+                  type="button"
+                  class="filter-chip"
+                  [class.active]="filterMinRating() === r.value"
+                  (click)="setMinRating(r.value)"
+                >
+                  {{ r.label }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">Price</span>
+            <div class="price-range">
+              <div class="price-input-wrap">
+                <span>$</span>
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Min"
+                  [value]="filterMinPrice()"
+                  (input)="onMinPriceInput($any($event.target).value)"
+                />
+              </div>
+              <span class="price-sep">–</span>
+              <div class="price-input-wrap">
+                <span>$</span>
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Max"
+                  [value]="filterMaxPrice()"
+                  (input)="onMaxPriceInput($any($event.target).value)"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-chips">
               <button
                 type="button"
                 class="filter-chip"
-                [class.active]="filterConditions().has(c)"
-                (click)="toggleCondition(c)"
+                [class.active]="filterFreeShippingOnly()"
+                (click)="toggleFreeShippingOnly()"
               >
-                {{ c }}
+                <mat-icon>local_shipping</mat-icon> Free ship
               </button>
-            }
-          </div>
-        </div>
-
-        <div class="filter-group">
-          <span class="filter-label">Seller rating</span>
-          <div class="filter-chips">
-            @for (r of ratingOptions; track r.value) {
               <button
                 type="button"
                 class="filter-chip"
-                [class.active]="filterMinRating() === r.value"
-                (click)="setMinRating(r.value)"
+                [class.active]="filterBestOfferOnly()"
+                (click)="toggleBestOfferOnly()"
               >
-                {{ r.label }}
+                <mat-icon>handshake</mat-icon> Best offer
               </button>
-            }
-          </div>
-        </div>
-
-        <div class="filter-group">
-          <span class="filter-label">Price</span>
-          <div class="price-range">
-            <div class="price-input-wrap">
-              <span>$</span>
-              <input
-                type="number"
-                min="0"
-                placeholder="Min"
-                [value]="filterMinPrice()"
-                (input)="onMinPriceInput($any($event.target).value)"
-              />
-            </div>
-            <span class="price-sep">–</span>
-            <div class="price-input-wrap">
-              <span>$</span>
-              <input
-                type="number"
-                min="0"
-                placeholder="Max"
-                [value]="filterMaxPrice()"
-                (input)="onMaxPriceInput($any($event.target).value)"
-              />
             </div>
           </div>
-        </div>
 
-        <div class="filter-group">
-          <span class="filter-label">More</span>
-          <div class="filter-chips">
-            <button
-              type="button"
-              class="filter-chip"
-              [class.active]="filterFreeShippingOnly()"
-              (click)="toggleFreeShippingOnly()"
-            >
-              <mat-icon>local_shipping</mat-icon> Free shipping
+          @if (hasActiveFilters()) {
+            <button type="button" class="clear-filters-btn" (click)="clearFilters()">
+              <mat-icon>close</mat-icon> Clear
             </button>
-            <button
-              type="button"
-              class="filter-chip"
-              [class.active]="filterBestOfferOnly()"
-              (click)="toggleBestOfferOnly()"
-            >
-              <mat-icon>handshake</mat-icon> Best offer
-            </button>
-          </div>
+          }
         </div>
-
-        @if (hasActiveFilters()) {
-          <button type="button" class="clear-filters-btn" (click)="clearFilters()">
-            <mat-icon>close</mat-icon> Clear filters
-          </button>
-        }
       </div>
 
+      <!-- Scroll region: the only part of the page that scrolls. -->
+      <div class="results-scroll">
       @if (hasActiveFilters() && filteredResults().length === 0) {
         <div class="no-matches-state">
           <mat-icon>filter_alt_off</mat-icon>
@@ -146,11 +149,10 @@
         </div>
       }
 
-      @for (group of groupedResults; track group.partName) {
-        <div class="part-group">
-          <h5 class="group-heading">{{ group.partName }}</h5>
-          <div class="parts-grid">
-            @for (item of group.items; track item.part.id) {
+      <!-- Flat paginated grid: cards sit directly beneath the filter row (no
+           per-part heading); the pager below handles long result sets. -->
+      <div class="parts-grid">
+        @for (item of pagedResults(); track item.part.id) {
               <div class="part-card" [class.selected]="item.selected" (click)="toggleSelection(item)">
 
                 <div class="part-image-wrap">
@@ -253,12 +255,54 @@
                   </div>
                 </div>
               </div>
-            }
-          </div>
-        </div>
-      }
+        }
+      </div><!-- /.parts-grid -->
+      </div><!-- /.results-scroll -->
 
-      <!-- Send your parts list -->
+      <!-- Pager: fixed-height bar above the footer (shows the current window and
+           pages through the filtered list). -->
+      <div class="pager-bar">
+        <span class="pager-range">
+          {{ pageStart() }}–{{ pageEnd() }} of {{ filteredResults().length }}
+        </span>
+
+        <div class="pager-controls">
+          <button
+            type="button"
+            class="pager-btn pager-step"
+            (click)="prevPage()"
+            [disabled]="currentPage() === 1"
+            aria-label="Previous page"
+          >
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+
+          @for (n of pageNumbers(); track $index) {
+            @if (n === -1) {
+              <span class="pager-gap">…</span>
+            } @else {
+              <button
+                type="button"
+                class="pager-btn"
+                [class.active]="n === currentPage()"
+                (click)="goToPage(n)"
+              >{{ n }}</button>
+            }
+          }
+
+          <button
+            type="button"
+            class="pager-btn pager-step"
+            (click)="nextPage()"
+            [disabled]="currentPage() === totalPages()"
+            aria-label="Next page"
+          >
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Send your parts list (fixed action footer, outside the scroll region) -->
       @if (selectedCount > 0) {
         <div class="notify-panel">
           <h4 class="notify-title">

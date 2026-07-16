@@ -77,6 +77,49 @@ export class PartsLocatorComponent implements OnChanges {
     });
   });
 
+  // ── Pagination ───────────────────────────────────────────────────────────────
+  // The grid pages through the filtered list so the scroll region stays short and
+  // the pager sits in the fixed footer bar. `page` is clamped via `currentPage`
+  // so a shrinking filtered set (new filter) never leaves us past the last page.
+  readonly pageSize = 12;
+  private page = signal(1);
+
+  readonly totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.filteredResults().length / this.pageSize))
+  );
+
+  readonly currentPage = computed(() => Math.min(this.page(), this.totalPages()));
+
+  readonly pagedResults = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize;
+    return this.filteredResults().slice(start, start + this.pageSize);
+  });
+
+  readonly pageStart = computed(() =>
+    this.filteredResults().length === 0 ? 0 : (this.currentPage() - 1) * this.pageSize + 1
+  );
+  readonly pageEnd = computed(() =>
+    Math.min(this.currentPage() * this.pageSize, this.filteredResults().length)
+  );
+
+  // Compact page list with gaps: 1 … c-1 c c+1 … N. `-1` marks an ellipsis.
+  readonly pageNumbers = computed<number[]>(() => {
+    const total = this.totalPages();
+    const cur = this.currentPage();
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+
+    const nums = new Set<number>([1, total, cur, cur - 1, cur + 1]);
+    const sorted = [...nums].filter(n => n >= 1 && n <= total).sort((a, b) => a - b);
+    const out: number[] = [];
+    let prev = 0;
+    for (const n of sorted) {
+      if (n - prev > 1) out.push(-1); // ellipsis
+      out.push(n);
+      prev = n;
+    }
+    return out;
+  });
+
   constructor(
     private partsService: PartsService,
     private notificationService: NotificationService,
@@ -122,32 +165,43 @@ export class PartsLocatorComponent implements OnChanges {
     );
   }
 
+  // Any filter change re-scopes the list, so jump back to the first page.
+  private resetPage(): void {
+    this.page.set(1);
+  }
+
   toggleCondition(condition: PartCondition): void {
     this.filterConditions.update(set => {
       const next = new Set(set);
       if (next.has(condition)) next.delete(condition); else next.add(condition);
       return next;
     });
+    this.resetPage();
   }
 
   setMinRating(value: number): void {
     this.filterMinRating.set(value);
+    this.resetPage();
   }
 
   toggleFreeShippingOnly(): void {
     this.filterFreeShippingOnly.update(v => !v);
+    this.resetPage();
   }
 
   toggleBestOfferOnly(): void {
     this.filterBestOfferOnly.update(v => !v);
+    this.resetPage();
   }
 
   onMinPriceInput(value: string): void {
     this.filterMinPrice.set(value === '' ? null : Number(value));
+    this.resetPage();
   }
 
   onMaxPriceInput(value: string): void {
     this.filterMaxPrice.set(value === '' ? null : Number(value));
+    this.resetPage();
   }
 
   clearFilters(): void {
@@ -157,7 +211,15 @@ export class PartsLocatorComponent implements OnChanges {
     this.filterBestOfferOnly.set(false);
     this.filterMinPrice.set(null);
     this.filterMaxPrice.set(null);
+    this.resetPage();
   }
+
+  // ── Pager controls ───────────────────────────────────────────────────────────
+  goToPage(n: number): void {
+    this.page.set(Math.min(Math.max(1, n), this.totalPages()));
+  }
+  nextPage(): void { this.goToPage(this.currentPage() + 1); }
+  prevPage(): void { this.goToPage(this.currentPage() - 1); }
 
   nextImage(item: PartSearchResult, event: Event): void {
     event.stopPropagation();
@@ -229,15 +291,6 @@ export class PartsLocatorComponent implements OnChanges {
     const listText = this.notificationService.buildShoppingList(this.results());
     await this.notificationService.copyToClipboard(listText);
     this.snackBar.open('Parts list copied to clipboard!', 'Done', { duration: 2500 });
-  }
-
-  get groupedResults(): { partName: string; items: PartSearchResult[] }[] {
-    const map = new Map<string, PartSearchResult[]>();
-    for (const item of this.filteredResults()) {
-      if (!map.has(item.part.name)) map.set(item.part.name, []);
-      map.get(item.part.name)!.push(item);
-    }
-    return Array.from(map.entries()).map(([partName, items]) => ({ partName, items }));
   }
 
 }
