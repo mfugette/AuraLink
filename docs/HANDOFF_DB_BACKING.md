@@ -22,6 +22,12 @@ The three blockers below are cleared and the tester caps are runtime-verified:
 
 Remaining: step 5 (optional test-row seeding) and the rest of step 6 (real billing; email sending). The DB-backing pass + Twilio SMS are committed on `feat/db-backing-pass` (`8e4df70`, `a3b5ab8`) — not pushed.
 
+## ℹ️ UI pass landed on this branch (2026-07-15, later) — not DB-related
+Separate from the DB work, a UI restyle was committed on `feat/db-backing-pass` as `534f83c` (icons + notifications). Flagged here only because it moved the client test count and touched `notifications.component`:
+- **Icons reverted to Angular Material `<mat-icon>`** (Material Symbols Outlined font, tuned axes) — the pixel-art `<app-icon>` system + `pixelarticons` dep were **removed entirely** (`components/shared/icon/` deleted, incl. its spec). This reverses the old "Material icons retired" convention; CLAUDE.md updated.
+- **Notifications trigger moved** from the top bar to a fixed right-edge pull-tab; the slide-in pane now mirrors the left sidebar's height + mobile drawer.
+- **Client tests: 271 → 263** — the drop is *only* the removed `icon.component.spec.ts` (~8 tests); all 263 pass. No server or DB code changed. (Older references to "271 passing" below predate this.)
+
 ## Goal of this pass
 Wire the features that were mocked (localStorage / in-memory seed) to real Postgres tables, so everything except hardware-dependent telemetry is testable end-to-end. Schema-first, then routes, then client swaps.
 
