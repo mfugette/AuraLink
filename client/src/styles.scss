@@ -134,6 +134,7 @@ mat-icon.mat-icon {
   --obd-dur-slow:   0.42s;
 
   --obd-header-height: 60px;
+  --obd-footer-height: 53px;   // global footer's fixed height (padding + one mono line); reserved so viewport-locked pages leave room for it
   --obd-sidebar-width: 232px;
   --obd-sidebar-collapsed-width: 47px;
 
