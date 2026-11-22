@@ -133,12 +133,26 @@
   white-space: pre-wrap;
   word-break: break-word;
 
-  .term-strong { color: var(--obd-text); font-weight: 700; }
-  .term-mark { color: color-mix(in srgb, var(--obd-blue) 70%, var(--obd-text-muted)); font-weight: 700; }
-  .term-safety {
+  // These target spans injected via [innerHTML] by AuraTerminalPipe, which do
+  // NOT carry this component's emulated-encapsulation content attribute — so
+  // they must pierce encapsulation with ::ng-deep to take effect.
+  ::ng-deep .term-strong { color: var(--obd-text); font-weight: 700; }
+  ::ng-deep .term-mark { color: color-mix(in srgb, var(--obd-blue) 70%, var(--obd-text-muted)); font-weight: 700; }
+  ::ng-deep .term-safety {
     color: var(--obd-red);
     font-weight: 700;
     letter-spacing: 0.02em;
+  }
+
+  // Severity-colored lines: a whole line reads red (critical) or yellow
+  // (advisory); generic output stays the default blue above. The danger/warn
+  // color must beat the inner .term-mark / .term-safety rules for the arrow
+  // markers and tag on that line, so scope those under the line class too.
+  ::ng-deep .term-line--danger {
+    &, .term-mark, .term-safety { color: var(--obd-red); }
+  }
+  ::ng-deep .term-line--warn {
+    &, .term-mark { color: var(--obd-yellow); }
   }
 }
 

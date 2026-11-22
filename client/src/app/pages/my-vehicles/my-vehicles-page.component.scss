@@ -6,7 +6,6 @@
 // the Dashboard and Part Lookup. Add/edit lives on a dedicated page.
 :host { @include console.host; }
 .page { @include console.page; }
-.page-eyebrow { @include console.eyebrow; }
 .page-head { @include console.head; }
 
 // ── Console toolbar: slot-usage hint (left) + bulk-add action (right) ─────────

@@ -48,21 +48,11 @@
   display: flex;
   flex-direction: column;
 
-  // On phones the collapsed rail is an out-of-flow tab pinned to the right edge
-  // (nothing to push into), matching how the left nav's toggle rail hides.
+  // On phones the collapsed rail is gone entirely — the notifications entry point
+  // moves to the header bell (see .header-bell in app.scss), so there's no
+  // right-edge pull-tab. Only the open pane (a slide-in drawer) shows on mobile.
   @media (max-width: 520px) {
-    position: fixed;
-    top: calc(var(--obd-header-height) + 10px);
-    right: 0;
-    width: auto;
-    height: auto;
-    background: var(--obd-surface-2);
-    border: 1px solid var(--obd-border-strong);
-    border-right: none;
-    border-radius: var(--obd-radius) 0 0 var(--obd-radius);
-    z-index: 200;
-    .notif-rail-head { height: auto; padding: 8px; }
-    .notif-rail-divider, .notif-rail-body { display: none; }
+    display: none;
   }
 }
 

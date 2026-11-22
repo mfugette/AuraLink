@@ -54,8 +54,8 @@
                     @for (line of auraSummary(); track $index) {
                       <div class="aura-box-out"><span class="aura-arrow">→</span> {{ line }}</div>
                     }
-                    <button type="button" class="btn aura-box-cta" (click)="go('/assistant')">
-                      ask aura <mat-icon>arrow_outward</mat-icon>
+                    <button type="button" class="term-btn is-primary aura-box-cta" (click)="getReport()">
+                      [ get report ]
                     </button>
                   </div>
                 </div>
@@ -89,16 +89,30 @@
                 </div>
 
                 <div class="cloud-side cloud-maint">
-                  <span class="cloud-side-eyebrow">— Routine maintenance</span>
-                  @for (item of maintenanceItems(); track item.label) {
-                    <div class="maint-row" [class.soon]="item.status === 'soon'" [class.due]="item.status === 'due'">
-                      <mat-icon class="maint-icon">{{ item.icon }}</mat-icon>
-                      <span class="maint-label">{{ item.label }}</span>
-                      <span class="maint-status">
-                        <span class="maint-dot"></span>{{ item.detail }}
-                      </span>
-                    </div>
-                  }
+                  <div class="maint-head">
+                    <span class="cloud-side-eyebrow">— Routine maintenance</span>
+                    @if (maintDirty()) {
+                      <button type="button" class="maint-save" (click)="saveMaint()">[ save ]</button>
+                    } @else {
+                      <span class="maint-head-sub">tap to mark done</span>
+                    }
+                  </div>
+                  <ul class="maint-checklist">
+                    @for (item of maintenanceItems(); track item.key) {
+                      <li class="maint-row" [class.done]="item.done"
+                          [class.soon]="item.status === 'soon'" [class.due]="item.status === 'due'">
+                        <button type="button" class="maint-check" (click)="toggleMaint(item.key)"
+                                [attr.aria-pressed]="item.done" [attr.aria-label]="'Toggle ' + item.label">
+                          <span class="maint-box">@if (item.done) { <mat-icon>check</mat-icon> }</span>
+                          <mat-icon class="maint-icon">{{ item.icon }}</mat-icon>
+                          <span class="maint-label">{{ item.label }}</span>
+                          <span class="maint-status">
+                            <span class="maint-dot"></span>{{ item.detail }}
+                          </span>
+                        </button>
+                      </li>
+                    }
+                  </ul>
                 </div>
               </div>
 
@@ -242,7 +256,7 @@
           [disabled]="!canLookup()"
           (click)="lookup()"
         >
-          <mat-icon>search</mat-icon>
+          <kbd class="ts-kbd">↵</kbd>
           Look Up {{ codes().length > 0 ? codes().length : '' }} Code{{ codes().length !== 1 ? 's' : '' }}
         </button>
 

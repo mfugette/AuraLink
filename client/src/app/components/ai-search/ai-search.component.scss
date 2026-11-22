@@ -4,7 +4,8 @@
   min-width: 0;
 
   @media (max-width: 720px) { width: 300px; }
-  @media (max-width: 520px) { width: 42px; }
+  // Phones: collapse to a 36px icon button matching the other header links.
+  @media (max-width: 520px) { width: 36px; }
 }
 
 // ── Compact top-bar trigger ─────────────────────────────────────────────────
@@ -34,15 +35,31 @@
     background: var(--obd-surface);
   }
 
-  // Icon-only on phones — the prompt/kbd hint would be cramped, and tapping
+  // Icon-only on phones — collapse to a 36px square that matches the other
+  // header links (.header-link: neutral surface + border, dim icon). Tapping
   // navigates straight to /assistant instead of opening the terminal overlay.
   @media (max-width: 520px) {
-    width: 42px;
-    height: 42px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     justify-content: center;
-    border-radius: var(--obd-radius-sm);
+    background: var(--obd-surface-2);
+    color: var(--obd-text-dim);
+    &:hover { background: var(--obd-surface-3); border-color: var(--obd-text-muted); }
   }
+}
+
+// Icon shown only on phones, where the trigger collapses to a single glyph like
+// the other header links. Hidden on wider screens (the shell prompt reads there).
+// Sized/toned to match .header-link's icon (20px, dim — not accent-colored).
+.ai-trigger-icon {
+  display: none;
+  color: inherit;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+
+  @media (max-width: 520px) { display: inline-flex; align-items: center; justify-content: center; }
 }
 
 // "aura$" prompt prefix — green like the real shell prompt.
@@ -52,13 +69,11 @@
   color: var(--obd-green);
   user-select: none;
   white-space: nowrap;
+
+  // On phones the trigger is icon-only — hide the "aura$" wordmark entirely.
+  @media (max-width: 520px) { display: none; }
 }
 .ai-trigger-caret { color: var(--obd-text-dim); margin-left: 2px; font-weight: 400; }
-
-// On phones the trigger collapses to an icon — show the prompt caret alone.
-@media (max-width: 520px) {
-  .ai-trigger-prompt { color: var(--obd-blue); }
-}
 
 .ai-trigger-text {
   flex: 1;

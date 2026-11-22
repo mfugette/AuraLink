@@ -507,9 +507,10 @@
   width: 100%;
   height: var(--aura-h);                  // fixed band height — matched by .overview-grid
   display: grid;
-  // Lede track widened to fit the pixel-block welcome wordmark (up to ~12 chars);
-  // the Aura box fills the rest of the now-full-bleed row.
-  grid-template-columns: minmax(520px, 0.9fr) minmax(0, 1fr);
+  // Lede + Aura box are always equal-width halves of the full-bleed row. The
+  // 520px floor keeps the pixel-block welcome wordmark (up to ~12 chars) from
+  // clipping; both tracks share it so they stay identical.
+  grid-template-columns: minmax(520px, 1fr) minmax(520px, 1fr);
   gap: 0;
   align-items: stretch;
 
@@ -604,6 +605,7 @@
 }
 
 .aura-box-body {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -618,23 +620,12 @@
   .aura-arrow { color: color-mix(in srgb, var(--obd-blue) 60%, var(--obd-text-muted)); margin-right: 4px; }
 }
 .aura-box-cta {
-  margin-top: 6px;
-  align-self: flex-start;
+  margin-top: auto;          // push to the bottom of the box
+  align-self: flex-start;    // ...and to the left
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 30px;
-  padding: 0 12px;
-  border-radius: var(--obd-radius-sm);
-  background: transparent;
-  border: 1px solid color-mix(in srgb, var(--obd-blue) 55%, transparent);
-  color: var(--obd-blue);
-  font-family: var(--obd-font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.04em;
-  transition: background var(--obd-dur-fast) var(--obd-ease), border-color var(--obd-dur-fast) var(--obd-ease);
   mat-icon { font-size: 15px; width: 15px; height: 15px; }
-  &:hover { border-color: var(--obd-blue); background: color-mix(in srgb, var(--obd-blue) 14%, transparent); }
 }
 
 // ── Vehicle cloud panel: metrics · point cloud · maintenance ──────────────────
@@ -644,7 +635,7 @@
 .console-cloud {
   width: 100%;                            // full width of its row
   display: grid;
-  grid-template-columns: 256px minmax(0, 1fr) 256px;
+  grid-template-columns: 320px minmax(0, 1fr) 320px;
   background: var(--obd-bg, var(--obd-surface));
   // 1.5× the Aura box's height (384px vs 256px).
   // Grows to fill the space between the top row and the metric grid so the
@@ -771,32 +762,124 @@
   }
 }
 
-// Right column — routine-maintenance status rows.
-.maint-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
+// Right column — routine-maintenance checklist (tap a row to mark done).
+// Full-bleed hairline-ruled rows that fill the panel, mirroring the
+// vehicle-editor checklist.
+.cloud-maint {
+  padding: 0;
+  gap: 0;
+  min-height: 0;          // allow the checklist to scroll rather than overflow
+}
+
+.maint-head {
+  display: flex;
+  align-items: baseline;
   gap: 8px;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--obd-border);
+}
+.maint-head-sub {
   font-family: var(--obd-font-mono);
-  font-size: 0.74rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  color: var(--obd-text-muted);
+}
 
-  .maint-icon { font-size: 15px; width: 15px; height: 15px; color: var(--obd-text-muted); }
-  .maint-label { color: var(--obd-text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .maint-status {
-    display: inline-flex; align-items: center; gap: 5px;
-    color: var(--obd-green); letter-spacing: 0.02em; white-space: nowrap;
-  }
-  .maint-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--obd-green); }
+// Replaces the "tap to mark done" hint while there are unsaved ticks — a
+// terminal-style [ save ] action that commits the checklist.
+.maint-save {
+  margin-left: auto;
+  padding: 2px 6px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--obd-font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  color: var(--obd-green);
+  transition: color var(--obd-dur-fast) var(--obd-ease);
 
-  &.soon {
-    .maint-status { color: var(--obd-yellow); }
-    .maint-dot { background: var(--obd-yellow); }
-  }
-  &.due {
-    .maint-icon { color: var(--obd-red); }
-    .maint-status { color: var(--obd-red); }
-    .maint-dot { background: var(--obd-red); }
-  }
+  &:hover { color: var(--obd-text); }
+  &:focus-visible { outline: 2px solid var(--obd-green); outline-offset: 2px; }
+}
+
+.maint-checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;       // 12 rows won't all fit the fixed box — scroll inside it
+  display: flex;
+  flex-direction: column;
+}
+
+.maint-row {
+  flex: 1 0 auto;         // natural height; share slack only when there's room
+  display: flex;
+  border-bottom: 1px solid var(--obd-border);
+  &:last-child { border-bottom: 0; }
+}
+
+.maint-check {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--obd-font-mono);
+  font-size: 0.78rem;
+  transition: background var(--obd-dur-fast) var(--obd-ease);
+
+  &:hover { background: var(--obd-surface-2); }
+  &:focus-visible { outline: 2px solid var(--obd-blue); outline-offset: -2px; }
+}
+
+// Checkbox.
+.maint-box {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--obd-border-strong);
+  border-radius: var(--obd-radius-sm);
+  display: grid;
+  place-items: center;
+  color: var(--obd-bg, #000);
+  mat-icon { font-size: 13px; width: 13px; height: 13px; }
+}
+
+.maint-icon { font-size: 16px; width: 16px; height: 16px; color: var(--obd-text-muted); }
+.maint-label {
+  color: var(--obd-text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.maint-status {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 0.72rem;
+  color: var(--obd-green); letter-spacing: 0.02em; white-space: nowrap;
+}
+.maint-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--obd-green); }
+
+.maint-row.soon {
+  .maint-status { color: var(--obd-yellow); }
+  .maint-dot { background: var(--obd-yellow); }
+}
+.maint-row.due {
+  .maint-icon { color: var(--obd-red); }
+  .maint-status { color: var(--obd-red); }
+  .maint-dot { background: var(--obd-red); }
+}
+
+// Done: fill the box, strike the label, dim the row.
+.maint-row.done {
+  .maint-box { background: var(--obd-blue); border-color: var(--obd-blue); }
+  .maint-label { color: var(--obd-text-muted); text-decoration: line-through; }
+  .maint-icon { opacity: 0.5; }
+  .maint-status { opacity: 0.6; }
 }
 
 // ── Metric grid: 4-across hairline stat cells, flush beneath the vehicle box ───
@@ -1043,6 +1126,23 @@
   }
 
   mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+  // Enter-key hint replaces the old search glyph. Tinted for the solid-blue
+  // fill (translucent white) rather than the default muted surface.
+  .ts-kbd {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--obd-font-mono);
+    font-size: 0.78rem;
+    line-height: 1;
+    padding: 2px 8px;
+    border-radius: var(--obd-radius-sm);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+  }
 }
 
 .reset-btn {

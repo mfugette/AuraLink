@@ -196,6 +196,37 @@
   @media (max-width: 520px) { display: flex; }
 }
 
+// Notifications bell — phones only. On wider screens the right-edge INBOX rail
+// is the entry point, so the bell stays hidden there; on phones (where that rail
+// is gone) it opts back in next to the theme toggle, mirroring .theme-toggle.
+.header-bell {
+  display: none;
+  position: relative;
+
+  @media (max-width: 520px) { display: inline-flex; }
+}
+
+// Unread count badge over the bell (green-tinted chip, matching the rail's count).
+.header-bell-dot {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--obd-green);
+  color: var(--obd-bg, #06080c);
+  font-family: var(--obd-font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
 // ── Body ──────────────────────────────────────────────────────────────────────
 .app-body {
   flex: 1;

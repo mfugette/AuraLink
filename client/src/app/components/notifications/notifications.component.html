@@ -13,7 +13,7 @@
          collapsed left nav's .sidebar-toggle-section. -->
     <div class="notif-rail-head">
       <button type="button" class="notif-rail-toggle" (click)="toggle()"
-              aria-label="Notifications" [attr.aria-expanded]="open()">
+              aria-label="Inbox" [attr.aria-expanded]="open()">
         <mat-icon>chevron_left</mat-icon>
       </button>
     </div>
@@ -32,13 +32,13 @@
 <!-- Open: the inbox pane. In-flow flex child that widens the rail and pushes the
      page content (desktop); a slide-in drawer over a scrim on mobile. -->
 @if (open()) {
-  <aside class="notif-pane" role="dialog" aria-label="Notifications">
+  <aside class="notif-pane" role="dialog" aria-label="Inbox">
       <div class="notif-head">
         <div class="notif-head-title">
           <button type="button" class="notif-collapse" (click)="close()" aria-label="Close panel">
             <mat-icon>chevron_right</mat-icon>
           </button>
-          <h2>Notifications</h2>
+          <h2>Inbox</h2>
         </div>
         <div class="notif-head-actions">
           <button type="button" class="notif-icon-btn" (click)="setTab('settings')"

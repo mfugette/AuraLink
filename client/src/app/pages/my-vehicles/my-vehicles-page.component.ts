@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { AccountService } from '../../services/account.service';
 import { SavedVehicle } from '../../models/account.model';
 import { MatIconModule } from '@angular/material/icon';
+import { PixelTitleComponent } from '../../components/shared/pixel-title/pixel-title.component';
 
 // The garage: a fixed console grid of vehicle slots (like the dashboard's gauge
 // grid). Add/edit happens on a dedicated page (/my-vehicles/add and
@@ -11,7 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-my-vehicles-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatIconModule],
+  imports: [CommonModule, RouterLink, MatIconModule, PixelTitleComponent],
   templateUrl: './my-vehicles-page.component.html',
   styleUrl: './my-vehicles-page.component.scss',
 })

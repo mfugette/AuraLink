@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterOutlet, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -43,6 +43,10 @@ export class App {
   // free /home pipeline. The chrome appears once signed in. (Exposed to the
   // template.)
   protected readonly auth = inject(AuthService);
+
+  // The notifications rail/pane owns its own open state; the header bell toggles
+  // it via this reference (mirroring how the sidebar hamburger drives the drawer).
+  readonly notifications = viewChild(NotificationsComponent);
 
   sidebarCollapsed = signal(true);
   // Separate mobile state: on phones the sidebar isn't part of the layout flow

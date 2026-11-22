@@ -31,6 +31,21 @@
         <mat-icon>help_outline</mat-icon>
       </a>
 
+      <!-- Notifications bell (signed-in only): the phone-sized entry point to the
+           inbox. On wider screens the right-edge INBOX rail is used instead, so
+           this bell is hidden there (see .header-bell). -->
+      @if (auth.isSignedIn()) {
+        <button type="button" class="btn header-link header-bell" (click)="notifications()?.toggle()"
+                matTooltip="Notifications" aria-label="Notifications">
+          <mat-icon>notifications</mat-icon>
+          @if (notifications()?.unreadCount()) {
+            <span class="header-bell-dot" aria-hidden="true">
+              {{ notifications()!.unreadCount() > 9 ? '9+' : notifications()!.unreadCount() }}
+            </span>
+          }
+        </button>
+      }
+
       <app-account-menu />
     </div>
   </header>

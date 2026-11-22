@@ -9,6 +9,7 @@ import { Vehicle } from '../../models/vehicle.model';
 import { AuthService } from '../../services/auth.service';
 import { AccountService } from '../../services/account.service';
 import { SessionService } from '../../services/session.service';
+import { AssistantService } from '../../services/assistant.service';
 import { VehicleCloudComponent } from '../../components/shared/vehicle-cloud/vehicle-cloud.component';
 import { PixelTitleComponent } from '../../components/shared/pixel-title/pixel-title.component';
 import { MatIconModule } from '@angular/material/icon';
@@ -33,10 +34,12 @@ interface CloudMetric {
 // A routine-maintenance line in the vehicle-cloud panel's right column.
 type MaintStatus = 'ok' | 'soon' | 'due';
 interface MaintItem {
+  key: string;
   icon: string;
   label: string;
   detail: string;       // e.g. "in 1,200 mi" / "overdue" / "3 mo ago"
   status: MaintStatus;
+  done: boolean;
 }
 
 // The original single-page hero → DTC entry → vehicle → results → parts flow,
@@ -58,6 +61,7 @@ export class HomePageComponent implements OnInit, OnDestroy {
   protected readonly auth = inject(AuthService);
   private readonly account = inject(AccountService);
   private readonly sessions = inject(SessionService);
+  private readonly assistant = inject(AssistantService);
   private readonly router = inject(Router);
 
   // First name for the "Welcome back" greeting. Falls back to the display name,
@@ -192,22 +196,47 @@ export class HomePageComponent implements OnInit, OnDestroy {
     ];
   });
 
+  // Which maintenance items the user has ticked off, persisted per-vehicle in
+  // localStorage (shared with the vehicle-editor checklist storage convention).
+  private readonly doneKeys = signal<Set<string>>(new Set());
+  // Working copy of the checkboxes — toggling only edits this; it's committed to
+  // `doneKeys` (and persisted) when the user hits [save]. Seeded from `doneKeys`.
+  private readonly pendingKeys = signal<Set<string>>(new Set());
+
+  // True when the working copy diverges from what's saved — drives the [save]
+  // button. Equal sets (nothing ticked, or everything already saved) → false.
+  readonly maintDirty = computed<boolean>(() => {
+    const saved = this.doneKeys();
+    const pending = this.pendingKeys();
+    if (saved.size !== pending.size) return true;
+    for (const k of pending) if (!saved.has(k)) return true;
+    return false;
+  });
+
   readonly maintenanceItems = computed<MaintItem[]>(() => {
     const odo = this.primaryVehicle()?.mileage ?? null;
+    const done = this.pendingKeys();
 
     // Standard mileage-based service intervals. Without a real odometer we still
     // show the schedule with an "unknown" (soon) posture rather than nothing.
-    const schedule: { icon: string; label: string; interval: number }[] = [
-      { icon: 'local_gas_station', label: 'Oil change',     interval: 5000 },
-      { icon: 'sync',              label: 'Tire rotation',   interval: 7500 },
-      { icon: 'warning',          label: 'Brake inspection', interval: 20000 },
-      { icon: 'air',               label: 'Air filter',      interval: 15000 },
-      { icon: 'bolt',              label: 'Battery check',   interval: 30000 },
+    const schedule: { key: string; icon: string; label: string; interval: number }[] = [
+      { key: 'oil',      icon: 'local_gas_station', label: 'Oil change',         interval: 5000 },
+      { key: 'tires',    icon: 'sync',              label: 'Tire rotation',      interval: 7500 },
+      { key: 'brakes',   icon: 'warning',           label: 'Brake inspection',   interval: 20000 },
+      { key: 'air',      icon: 'air',               label: 'Air filter',         interval: 15000 },
+      { key: 'battery',  icon: 'bolt',              label: 'Battery check',      interval: 30000 },
+      { key: 'coolant',  icon: 'device_thermostat', label: 'Coolant flush',      interval: 30000 },
+      { key: 'cabin',    icon: 'ac_unit',           label: 'Cabin air filter',   interval: 15000 },
+      { key: 'wipers',   icon: 'water_drop',        label: 'Wiper blades',       interval: 12000 },
+      { key: 'brakeflu', icon: 'water_drop',        label: 'Brake fluid',        interval: 45000 },
+      { key: 'trans',    icon: 'settings',          label: 'Transmission fluid', interval: 60000 },
+      { key: 'spark',    icon: 'bolt',              label: 'Spark plugs',        interval: 60000 },
+      { key: 'align',    icon: 'build',             label: 'Wheel alignment',    interval: 20000 },
     ];
 
-    return schedule.map(s => {
+    const items = schedule.map<MaintItem>(s => {
       if (odo == null) {
-        return { icon: s.icon, label: s.label, detail: 'sync odometer', status: 'soon' as const };
+        return { key: s.key, icon: s.icon, label: s.label, detail: 'sync odometer', status: 'soon', done: done.has(s.key) };
       }
       // Miles until the next interval boundary.
       const into = odo % s.interval;
@@ -217,9 +246,47 @@ export class HomePageComponent implements OnInit, OnDestroy {
       else if (remaining <= s.interval * 0.2) status = 'soon';
       const detail =
         status === 'due' ? 'due now' : `in ${remaining.toLocaleString()} mi`;
-      return { icon: s.icon, label: s.label, detail, status };
+      return { key: s.key, icon: s.icon, label: s.label, detail, status, done: done.has(s.key) };
+    });
+
+    // Order by importance: due first, then soon, then not-yet-needed; completed
+    // items sink to the bottom regardless of status.
+    const rank: Record<MaintStatus, number> = { due: 0, soon: 1, ok: 2 };
+    return items.sort((a, b) => {
+      if (a.done !== b.done) return a.done ? 1 : -1;
+      return rank[a.status] - rank[b.status];
     });
   });
+
+  toggleMaint(key: string): void {
+    const next = new Set(this.pendingKeys());
+    next.has(key) ? next.delete(key) : next.add(key);
+    this.pendingKeys.set(next);
+  }
+
+  // Commit the working copy: it becomes the saved state and is persisted. The
+  // sets are now equal, so `maintDirty` flips false and the [save] button hides.
+  saveMaint(): void {
+    this.doneKeys.set(new Set(this.pendingKeys()));
+    this.persistDone();
+  }
+
+  private maintStorageKey(): string {
+    return `auralink.maint.${this.primaryVehicle()?.id ?? 'primary'}`;
+  }
+  private loadDoneMaint(): void {
+    try {
+      const raw = localStorage.getItem(this.maintStorageKey());
+      const saved = raw ? new Set(JSON.parse(raw) as string[]) : new Set<string>();
+      this.doneKeys.set(saved);
+      this.pendingKeys.set(new Set(saved));
+    } catch { /* ignore malformed storage */ }
+  }
+  private persistDone(): void {
+    try {
+      localStorage.setItem(this.maintStorageKey(), JSON.stringify([...this.doneKeys()]));
+    } catch { /* storage full / unavailable — non-fatal */ }
+  }
 
   codes = signal<string[]>([]);
   vehicle = signal<Vehicle>({ year: null, make: null, model: null, subModel: null, engine: null, driveType: null, transmission: null, fuelType: null, bodyStyle: null, mileage: null, vin: null });
@@ -265,8 +332,12 @@ export class HomePageComponent implements OnInit, OnDestroy {
     // then auto-fill the vehicle form from the primary (or first) saved vehicle
     // and collapse the form to a summary (user can still "enter manually").
     if (this.auth.isSignedIn()) {
-      this.account.fetchVehicles().subscribe(() => this.autofillPrimaryVehicle());
+      this.account.fetchVehicles().subscribe(() => {
+        this.autofillPrimaryVehicle();
+        this.loadDoneMaint();
+      });
     }
+    this.loadDoneMaint();
   }
 
   // Pre-fill the vehicle form from the user's primary (or first) saved vehicle and
@@ -355,6 +426,34 @@ export class HomePageComponent implements OnInit, OnDestroy {
   // Authenticated-hero quick actions.
   go(route: string): void {
     this.router.navigate([route]);
+  }
+
+  // "[ get report ]" on the Aura status box: hand Aura the raw status facts
+  // (drive/mileage totals + any flagged warnings) and ask it to elaborate, then
+  // open the assistant terminal (which auto-sends the queued query on load —
+  // same path as the top-bar entry). We build the details from the drive data
+  // directly rather than reusing the box's display strings, so UI-only phrasing
+  // like "ask aura for next steps" never leaks into the prompt.
+  getReport(): void {
+    const vehicle = this.heroVehicle();
+    const drives = this.recentDrives();
+    const totalMi = drives.reduce((s, d) => s + d.distanceMi, 0);
+    const warnLabels = [...new Set(drives.map(d => d.warnLabel).filter(Boolean))] as string[];
+
+    const details = [`${drives.length} recent drives, ${totalMi.toFixed(0)} mi logged.`];
+    if (warnLabels.length > 0) {
+      details.push(`Flagged warnings: ${warnLabels.join(', ').toLowerCase()}.`);
+    } else if (drives.length > 0) {
+      details.push('No warnings on recent drives.');
+    }
+
+    const prompt =
+      `Here's my current vehicle status${vehicle ? ` for my ${vehicle}` : ''}:\n` +
+      details.map(d => `- ${d}`).join('\n') +
+      `\n\nElaborate on this: what's likely going on, how urgent is each item, and what should I do next?`;
+
+    this.assistant.queue(prompt);
+    this.router.navigate(['/assistant']);
   }
 
   // ── Live DTC flow (Bluetooth dongle demo) ──────────────────────────────────

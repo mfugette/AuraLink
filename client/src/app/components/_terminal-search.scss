@@ -39,6 +39,25 @@
   .ts-caret { color: var(--obd-text-dim); margin-left: 1px; font-weight: 400; }
 }
 
+// The `↵` enter-key hint — the terminal "go" affordance shared by every
+// search/submit trigger, echoing the top-bar Aura prompt's `.ai-trigger-kbd`.
+// Replaces the old magnifying-glass icon on search buttons so the whole app
+// signals "press enter" the same way.
+@mixin kbd {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--obd-font-mono);
+  font-size: 0.72rem;
+  line-height: 1;
+  color: var(--obd-text-muted);
+  padding: 2px 8px;
+  border-radius: var(--obd-radius-sm);
+  background: var(--obd-surface-3);
+  border: 1px solid var(--obd-border);
+}
+
 // Mono caption above a field (the "name$"/"year"-style label). Lowercase mono,
 // muted — the terminal counterpart to the old .field-label.
 @mixin label {

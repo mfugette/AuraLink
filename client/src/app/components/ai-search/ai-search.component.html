@@ -1,5 +1,8 @@
 <!-- Compact top-bar trigger — styled as a shell prompt to echo the Aura terminal. -->
-<button type="button" class="ai-trigger" (click)="activate()" aria-label="Ask Aura">
+<button type="button" class="ai-trigger" (click)="activate()" aria-label="Ask Aura" matTooltip="Ask Aura">
+  <!-- Phones collapse the trigger to a single icon (mirrors the other header
+       links); the shell-prompt label + kbd hint show only on wider screens. -->
+  <mat-icon class="ai-trigger-icon">auto_awesome</mat-icon>
   <span class="ai-trigger-prompt">aura<span class="ai-trigger-caret">$</span></span>
   <span class="ai-trigger-text">chat with aura…</span>
   <kbd class="ai-trigger-kbd">↵</kbd>

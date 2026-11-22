@@ -1,5 +1,6 @@
 @use '../page-shell' as *;
 @use '../console-page' as console;
+@use '../../components/terminal-search' as ts;
 
 // Find Help Nearby on the shared instrument-console system: viewport-locked
 // shell, 44px toolbar seam (category tabs + location status), and a full-bleed
@@ -109,14 +110,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: var(--obd-radius-sm);
-  color: var(--obd-blue);
-  transition: background var(--obd-dur-fast) var(--obd-ease);
 
-  mat-icon { font-size: 17px; width: 17px; height: 17px; }
-  &:hover:not(:disabled) { background: color-mix(in srgb, var(--obd-blue) 18%, transparent); }
+  .ts-kbd { @include ts.kbd; }
+  &:hover:not(:disabled) .ts-kbd { color: var(--obd-text); border-color: var(--obd-border-strong); }
   &:disabled { opacity: 0.5; }
 }
 

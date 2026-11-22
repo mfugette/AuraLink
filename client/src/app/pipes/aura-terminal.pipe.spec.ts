@@ -39,6 +39,19 @@ describe('AuraTerminalPipe', () => {
     expect(html('[ safety ] disconnect the battery')).toContain('<span class="term-safety">[ safety ]</span>');
   });
 
+  it('renders a [ safety ] line as a whole-line danger color', () => {
+    const out = html('[ safety ] Stop the vehicle immediately.');
+    expect(out).toContain('class="term-line term-line--danger"');
+    // The inner tag span is preserved inside the line wrapper.
+    expect(out).toContain('<span class="term-safety">[ safety ]</span>');
+  });
+
+  it('colors danger-word lines red and advisory lines yellow', () => {
+    expect(html('Do not restart the engine.')).toContain('term-line--danger');
+    expect(html('Caution: check coolant level soon.')).toContain('term-line--warn');
+    expect(html('Likely causes: parasitic drain.')).not.toContain('term-line--');
+  });
+
   it('accents ▸ and → structure markers', () => {
     const out = html('▸ step one\n  → detail');
     expect(out).toContain('<span class="term-mark">▸</span>');
