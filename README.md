@@ -2,7 +2,7 @@
 
 AuraLink is a vehicle diagnostics and management app I've been building. It started as a way to look up OBD-II trouble codes without wading through forum threads, and it's grown into something closer to a full garage manager: your vehicles, their repair history, maintenance, parts, nearby shops, and an AI assistant (Aura) that you can actually ask questions about your car.
 
-The project lives at [auralink.vin](https://auralink.vin). The repo was originally called OpenOBD, so you might still see that name in a few places.
+The project will live at [auralink.vin](https://auralink.vin). The repo was originally called OpenOBD, so you might still see that name in a few places.
 
 ## Why I'm building it
 
